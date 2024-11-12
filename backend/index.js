@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { clerkMiddleware } from "@clerk/express";
 
 import userRoutes from "./routes/user.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
 import connectDb from "./db/connectDb.js";
 
 dotenv.config();
@@ -15,6 +16,7 @@ app.use(clerkMiddleware()); // it attach the user in req-> req.auth
 const PORT = process.env.PORT || 3000;
 
 app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/admin", adminRoutes);
 
 // Error handling
 app.use((err, req, res, next) => {
