@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import path from "express";
+import path from "path";
 
 import { clerkMiddleware } from "@clerk/express";
 import fileUpload from "express-fileupload";
