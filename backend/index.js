@@ -6,6 +6,7 @@ import { clerkMiddleware } from "@clerk/express";
 import fileUpload from "express-fileupload";
 
 import userRoutes from "./routes/user.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import albumRoutes from "./routes/album.routes.js";
 import songRoutes from "./routes/song.routes.js";
@@ -33,6 +34,7 @@ app.use(
 );
 
 app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/albums",albumRoutes);
 app.use("/api/songs",songRoutes);

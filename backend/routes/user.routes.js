@@ -1,8 +1,10 @@
 import express from "express";
-import { authCheck } from "../controllers/user.controller.js";
+import { getAllUsers } from "../controllers/user.controller.js";
+import { protectRoute } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.post("/authCheck", authCheck);
+
+router.get("/getUsers",protectRoute,getAllUsers);
 
 export default router;
