@@ -29,6 +29,7 @@ app.use(
 
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/admin", adminRoutes);
+app.use("/api/albums",albumRoutes);
 
 // Error handling
 app.use((err, req, res, next) => {
