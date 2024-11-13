@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const roomSchema = mongoose.Schema(
   {
+    roomId:{
+      type:String,
+      unique:true,
+      required:true,
+    },
     roomName: {
       type: String,
       required: true,
@@ -15,7 +20,7 @@ const roomSchema = mongoose.Schema(
       required: true,
     },
     modarators: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-
+    requests:[{type:mongoose.Schema.Types.ObjectId,ref:"User"}],
     participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     messages: [
       { type: mongoose.Schema.Types.ObjectId, ref: "Message", default: [] },
