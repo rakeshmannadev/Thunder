@@ -1,4 +1,6 @@
-import Header from "./components/Header"
+import { Route, Routes } from "react-router-dom"
+import AuthCallbackPage from "./Pages/Auth/AuthCallbackPage"
+import HomePage from "./Pages/Home/HomePage"
 
 
 function App() {
@@ -6,7 +8,10 @@ function App() {
 
   return (
     <>
-    <Header/>
+    <Routes>
+      <Route path="/" element={<HomePage/>} />
+      <Route path="/authCallback" element={<AuthCallbackPage/>}/>
+    </Routes>
     </>
   )
 }
