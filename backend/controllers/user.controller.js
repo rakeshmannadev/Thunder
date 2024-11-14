@@ -1,10 +1,22 @@
-import User from "../models/User.js";
+import Room from "../models/Room.js";
 
 export const getAllUsers = async (req, res, next) => {
   try {
-    const currentUserId = req.auth.userId;
-    const users = await User.find({ clerkId: { $ne: currentUserId } });
-    res.status(200).json({ status: true, users });
+    const { roomId } = req.params;
+
+    const currentUserId = req.user._id;
+    const room = await Room.findOne({ roomId });
+
+    if (!room)
+      return res
+        .status(404)
+        .json({ status: false, message: "No room found with this roomId" });
+
+    const participants = room.participants.filter(
+      (userId) => userId !== currentUserId
+    );
+
+    res.status(200).json({ status: true, participants });
   } catch (error) {
     console.log("Error in getall users controller");
     next(error);
