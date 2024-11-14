@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { create } from "domain";
 import { Clock, Pause, Play } from "lucide-react";
 import { useParams } from "react-router-dom";
 
@@ -128,7 +127,9 @@ const AlbumPage = () => {
                         <div className="flex items-center">
                           {song.createdAt.split("T")[0]}
                         </div>
-                        <div className="flex items-center"></div>
+                        <div className="flex items-center">
+                          {formatDuration(song.duration)}
+                        </div>
                       </div>
                     );
                   })}
@@ -143,3 +144,9 @@ const AlbumPage = () => {
 };
 
 export default AlbumPage;
+
+export const formatDuration = (seconds: number) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+};
