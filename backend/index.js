@@ -44,10 +44,10 @@ app.use(
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/admin", adminRoutes);
-app.use("/api/albums", albumRoutes);
-app.use("/api/songs", songRoutes);
-app.use("/api/rooms", roomRoutes);
-app.use("/api/messages", messageRoutes);
+app.use("/api/v1/albums", albumRoutes);
+app.use("/api/v1/songs", songRoutes);
+app.use("/api/v1/rooms", roomRoutes);
+app.use("/api/v1/messages", messageRoutes);
 
 app.get("/:roomId", protectRoute, sendJoinRequest);
 

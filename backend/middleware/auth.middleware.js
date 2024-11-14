@@ -1,4 +1,3 @@
-import { clerkClient } from "@clerk/express";
 import User from "../models/User.js";
 
 export async function protectRoute(req, res, next) {
@@ -21,12 +20,8 @@ export async function protectRoute(req, res, next) {
 
 export async function IsAdmin(req, res, next) {
   try {
-    const currentUser = await clerkClient.users.getUser(req.auth.userId);
-    const user = await User.findOne({
-      email: currentUser.primaryEmailAddress?.emailAddress,
-    });
-
-    if (user.role !== "admin") {
+    
+    if (req.user.role !== "admin") {
       return res
         .status(401)
         .json({ status: false, message: "Unauthorized! User is not admin" });

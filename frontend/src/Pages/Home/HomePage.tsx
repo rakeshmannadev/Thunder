@@ -1,11 +1,13 @@
-import Header from "@/components/Header"
+import Header from "@/components/Header";
+
 
 const HomePage = () => {
-  return (
-    <div>
-        <Header />
-    </div>
-  )
-}
 
-export default HomePage
+  return (
+    <div className="rounded-md overflow-hidden" >
+      <Header />
+    </div>
+  );
+};
+
+export default HomePage;
