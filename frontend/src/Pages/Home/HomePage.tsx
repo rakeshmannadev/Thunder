@@ -1,12 +1,14 @@
 import Header from "@/components/Header";
 
 
+
 const HomePage = () => {
 
   return (
-    <div className="rounded-md overflow-hidden" >
+    <main className="rounded-md overflow-hidden" >
       <Header />
-    </div>
+     
+    </main>
   );
 };
 
