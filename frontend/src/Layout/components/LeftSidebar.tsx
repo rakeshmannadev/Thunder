@@ -2,12 +2,58 @@ import PlaylistSkeleton from "@/components/Skeleton/PlaylistSkeleton";
 import { buttonVariants } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import useMusicStore from "@/store/useMusicStore";
 import { SignedIn } from "@clerk/clerk-react";
 import { Group, Home, Library, PlusCircle } from "lucide-react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const LeftSidebar = () => {
-    const isLoading =false;
+//   const{albums,songs,fetchAlbums,fetchSongs,isLoading} = useMusicStore()
+  // useEffect(()=>{
+  //     fetchAlbums();
+  // },[])
+
+  const isLoading= false;
+  const albums = [
+    {
+      _id: 2342342,
+      imageUrl: "/google.png",
+      title: "Top charts",
+      artist: "Sonu nigam",
+    },
+    {
+      _id: 2342342,
+      imageUrl: "/google.png",
+      title: "Top charts",
+      artist: "Sonu nigam",
+    },
+    {
+      _id: 2342342,
+      imageUrl: "/google.png",
+      title: "Top charts",
+      artist: "Sonu nigam",
+    },
+    {
+      _id: 2342342,
+      imageUrl: "/google.png",
+      title: "Top charts",
+      artist: "Sonu nigam",
+    },
+    {
+      _id: 2342342,
+      imageUrl: "/google.png",
+      title: "Top charts",
+      artist: "Sonu nigam",
+    },
+    {
+      _id: 2342342,
+      imageUrl: "/google.png",
+      title: "Top charts",
+      artist: "Sonu nigam",
+    },
+  ];
+
   return (
     <aside className="h-full flex flex-col gap-2">
       {/* Navigation menu */}
@@ -66,12 +112,28 @@ const LeftSidebar = () => {
           </div>
         </div>
         <ScrollArea className="h-[calc(100vh-300px)]">
-            <div className="space-y-2">
-                {isLoading ?(
-                    <PlaylistSkeleton/>
-                ):("Playlist")}
+          <div className="space-y-2">
+            {isLoading ? <PlaylistSkeleton /> : 
+                (
+                    albums.map((album)=>(
+                        <Link 
+                        to={`/album/${album._id}`}
+                        key={album._id}
+                        className="p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer"
+                        
+                        >
+                        <img src={album.imageUrl} alt="album_img" 
+                        className="size-12 rounded-md flex-shrink-0 object-cover " />
+                        <div className="flex-1 min-w-0 hidden md:block">
+                            <p className="font-medium truncate">{album.title}</p>
+                            <p className="text-sm text-zinc-400 truncate">Album ● {album.artist}</p>
+                        </div>
+                        </Link>
 
-            </div>
+                    ))
+                )
+            }
+          </div>
         </ScrollArea>
       </section>
     </aside>
