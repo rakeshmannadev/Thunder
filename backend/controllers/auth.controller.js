@@ -17,7 +17,7 @@ export const authCheck = async (req, res, next) => {
       }
       res.status(200).json({ status: true });
     } catch (error) {
-      console.log("Error in Signup controller");
+      console.log("Error in Signup controller",error.message);
       next(error);
     }
   };
