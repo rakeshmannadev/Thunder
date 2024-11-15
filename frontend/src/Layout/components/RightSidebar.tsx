@@ -15,7 +15,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu";
 import {
   Bell,
   Check,
@@ -26,10 +25,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
-
 const RightSidebar = () => {
-
-
   const isLoading = false;
   const rooms = [
     {
@@ -82,29 +78,25 @@ const RightSidebar = () => {
               <DropdownMenuSeparator />
               <ScrollArea>
                 <div className="space-y-2">
-                  {rooms.map((room) =>
-                    rooms.map((room) => (
-                      <Link
-                        to={`/room/${room._id}`}
-                        key={room._id}
-                        className="p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer"
-                      >
-                        <Avatar>
-                          <AvatarImage src="https://github.com/shadcn.png" />
-                          <AvatarFallback>CN</AvatarFallback>
-                        </Avatar>
+                  {rooms.map((room) => (
+                    <Link
+                      to={`/room/${room._id}`}
+                      key={room._id}
+                      className="p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer"
+                    >
+                      <Avatar>
+                        <AvatarImage src="https://github.com/shadcn.png" />
+                        <AvatarFallback>CN</AvatarFallback>
+                      </Avatar>
 
-                        <div className="flex-1 min-w-0 hidden md:block">
-                          <p className="font-medium truncate">
-                            {room.roomName}
-                          </p>
-                          <p className="text-sm text-zinc-400 truncate">
-                            Text message
-                          </p>
-                        </div>
-                      </Link>
-                    ))
-                  )}
+                      <div className="flex-1 min-w-0 hidden md:block">
+                        <p className="font-medium truncate">{room.roomName}</p>
+                        <p className="text-sm text-zinc-400 truncate">
+                          Text message
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               </ScrollArea>
             </DropdownMenuContent>
@@ -125,59 +117,57 @@ const RightSidebar = () => {
               <DropdownMenuSeparator />
               <ScrollArea>
                 <div className="space-y-2">
-                  {rooms.map((room) =>
-                    rooms.map((room) => (
-                      <Link
-                        to={`/room/${room._id}`}
-                        key={room._id}
-                        className="p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer"
-                      >
-                        <Avatar>
-                          <AvatarImage src="https://github.com/shadcn.png" />
-                          <AvatarFallback>CN</AvatarFallback>
-                        </Avatar>
+                  {rooms.map((room) => (
+                    <Link
+                      to={`/room/${room._id}`}
+                      key={room._id}
+                      className="p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer"
+                    >
+                      <Avatar>
+                        <AvatarImage src="https://github.com/shadcn.png" />
+                        <AvatarFallback>CN</AvatarFallback>
+                      </Avatar>
 
-                        <div className="flex-1  min-w-0 hidden md:flex gap-2 items-center">
-                          <div>
-                            <p className="font-medium truncate">
-                              {room.roomName}
-                            </p>
-                            <p className="text-sm text-zinc-400 truncate">
-                              Text message
-                            </p>
-                          </div>
-
-                          <div className="flex gap-2">
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <Button variant={"outline"} size={"icon"}>
-                                    <Check color="green" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Accept</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <Button variant={"outline"} size={"icon"}>
-                                    <X color="red" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Decline</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </div>
+                      <div className="flex-1  min-w-0 hidden md:flex gap-2 items-center">
+                        <div>
+                          <p className="font-medium truncate">
+                            {room.roomName}
+                          </p>
+                          <p className="text-sm text-zinc-400 truncate">
+                            Text message
+                          </p>
                         </div>
-                      </Link>
-                    ))
-                  )}
+
+                        <div className="flex gap-2">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Button variant={"outline"} size={"icon"}>
+                                  <Check color="green" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Accept</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Button variant={"outline"} size={"icon"}>
+                                  <X color="red" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Decline</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               </ScrollArea>
             </DropdownMenuContent>
