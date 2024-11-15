@@ -25,6 +25,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/room" element={<RoomPage />} />
           <Route path="/album/:id" element={<AlbumPage />} />
+          
 
         </Route>
       </Routes>
