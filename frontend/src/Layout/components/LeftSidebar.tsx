@@ -18,37 +18,37 @@ const LeftSidebar = () => {
   const albums = [
     {
       _id: 2342342,
-      imageUrl: "/google.png",
+      imageUrl: "/Kesariya.jpg",
       title: "Top charts",
       artist: "Sonu nigam",
     },
     {
       _id: 2342342,
-      imageUrl: "/google.png",
+      imageUrl: "/Kesariya.jpg",
       title: "Top charts",
       artist: "Sonu nigam",
     },
     {
       _id: 2342342,
-      imageUrl: "/google.png",
+      imageUrl: "/Kesariya.jpg",
       title: "Top charts",
       artist: "Sonu nigam",
     },
     {
       _id: 2342342,
-      imageUrl: "/google.png",
+      imageUrl: "/Kesariya.jpg",
       title: "Top charts",
       artist: "Sonu nigam",
     },
     {
       _id: 2342342,
-      imageUrl: "/google.png",
+      imageUrl: "/Kesariya.jpg",
       title: "Top charts",
       artist: "Sonu nigam",
     },
     {
       _id: 2342342,
-      imageUrl: "/google.png",
+      imageUrl: "/Kesariya.jpg",
       title: "Top charts",
       artist: "Sonu nigam",
     },

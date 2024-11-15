@@ -20,7 +20,7 @@ const MainLayout = () => {
         <ResizablePanel
           defaultSize={20}
           minSize={isMobile ? 0 : 10}
-          maxSize={30}
+          maxSize={20}
         >
           <LeftSidebar />
         </ResizablePanel>
@@ -32,9 +32,9 @@ const MainLayout = () => {
         {/* Right side */}
         <ResizableHandle className="w-2 bg-black rounded-lg transition-colors" />
         <ResizablePanel
-          defaultSize={20}
+          defaultSize={18}
           minSize={0}
-          maxSize={25}
+          maxSize={18}
           collapsedSize={0}
         >
           <RightSidebar />

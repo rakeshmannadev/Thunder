@@ -11,7 +11,7 @@ const Chatheader = () => {
 	if (!selectedUser) return null;
 
 	return (
-		<div className='p-4 border-b border-zinc-800'>
+		<div className='p-4 border-b border-zinc-900'>
 			<div className='flex items-center gap-3'>
 				<Avatar>
 					<AvatarImage src={selectedUser.imageUrl} />

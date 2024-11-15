@@ -8,19 +8,19 @@ const AlbumPage = () => {
   const isPlaying = false;
   const currentAlbum = {
     _id: 2342342,
-    imageUrl: "/google.png",
+    imageUrl: "/Agneepath.jpg",
     title: "Top charts",
     artist: "Sonu nigam",
     releaseYear: 2024,
     songs: [
       {
         _id: 23424,
-        title: "Abhi mujhme kabhi",
+        title: "Abhi mujhme kahi",
         artist: "Sonu nigam",
         duration: 234,
         createdAt: "2024-12-12",
         album: 2342342,
-        imageUrl: "/google.png",
+        imageUrl: "/Agneepath.jpg",
         audioUrl: null,
       },
     ],
