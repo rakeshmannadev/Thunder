@@ -19,7 +19,7 @@ const formatTime = (date: string) => {
 const RoomPage = () => {
   const selectedUser = {
     fullName: "Arijit Singh",
-    imageUrl: "Kesariya.jpg",
+    imageUrl: "/Kesariya.jpg",
   };
 
   const messages = [
@@ -63,7 +63,7 @@ const RoomPage = () => {
 
   const user = {
     id: 34234,
-    imageUrl: "/google.png",
+    imageUrl: "/Agneepath.jpg",
   };
 
 
