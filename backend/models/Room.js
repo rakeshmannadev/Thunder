@@ -7,6 +7,10 @@ const roomSchema = mongoose.Schema(
       unique:true,
       required:true,
     },
+    visability:{
+      type:String,
+      default:"public"
+    },
     roomName: {
       type: String,
       required: true,
