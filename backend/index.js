@@ -14,8 +14,6 @@ import songRoutes from "./routes/song.routes.js";
 import roomRoutes from "./routes/room.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import connectDb from "./db/connectDb.js";
-import { protectRoute } from "./middleware/auth.middleware.js";
-import { sendJoinRequest } from "./controllers/room.controller.js";
 
 dotenv.config();
 const __dirname = path.resolve();
@@ -48,8 +46,6 @@ app.use("/api/v1/albums", albumRoutes);
 app.use("/api/v1/songs", songRoutes);
 app.use("/api/v1/rooms", roomRoutes);
 app.use("/api/v1/messages", messageRoutes);
-
-app.get("/:roomId", protectRoute, sendJoinRequest);
 
 // Error handling
 app.use((err, req, res, next) => {

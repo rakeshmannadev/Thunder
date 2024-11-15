@@ -1,6 +1,7 @@
 import generateRandomCode from "../helper/generateRoomId.js";
 import { uploadeFiles } from "../helper/uploadeFIleToCloudinary.js";
 import Room from "../models/Room.js";
+import User from "../models/User.js";
 
 export const createRoom = async (req, res, next) => {
   try {
@@ -21,6 +22,11 @@ export const createRoom = async (req, res, next) => {
       image: imageUrl,
       admin: req.user._id,
     });
+    if (room) {
+      await User.findByIdAndUpdate(req.user._id, {
+        $push: { rooms: room._id },
+      });
+    }
     res.status(201).json({ status: true, message: "Room is created", room });
   } catch (error) {
     console.log("Error in create room controller");
@@ -37,12 +43,14 @@ export const deleteRoom = async (req, res, next) => {
     if (!room)
       return res.status(404).json({ status: false, message: "Room not found" });
 
-    if (room.admin != req.user._id) {
+    if (req.user.role !== "admin") {
       return res
         .status(401)
         .json({ status: false, message: "You are not an admin." });
     }
-
+    await User.findByIdAndUpdate(req.user._id, {
+      $pull: { rooms: roomId },
+    });
     await Room.findOneAndDelete({ roomId });
     res.status(200).json({ status: true, message: "Room is deleted" });
   } catch (error) {
@@ -51,28 +59,6 @@ export const deleteRoom = async (req, res, next) => {
   }
 };
 
-export const sendJoinRequest = async (req, res, next) => {
-  try {
-    const { roomId } = req.params;
-
-    const room = await Room.findOne({ roomId });
-
-    if (!room)
-      return res.status(404).json({ status: false, message: "Room not found" });
-
-    await Room.findOneAndUpdate(
-      { roomId },
-      {
-        $push: { requests: req.user._id },
-      }
-    );
-
-    res.status(200).json({ status: true, message: "Join request is send" });
-  } catch (error) {
-    console.log("Error in join Request controller");
-    next(error);
-  }
-};
 export const acceptJoinRequests = async (req, res, next) => {
   try {
     const { roomId, userId } = req.body;
@@ -88,7 +74,7 @@ export const acceptJoinRequests = async (req, res, next) => {
         message: "No room is available with this roomid",
       });
 
-    if (room.admin !== req.user._id)
+    if (req.user.role !== "admin")
       return res
         .status(401)
         .json({ status: false, message: "Only room admin can do that" });
@@ -96,11 +82,16 @@ export const acceptJoinRequests = async (req, res, next) => {
     if (room.participants.includes(userId)) {
       return res.status(401).json({
         status: false,
-        message: "You are already a member of this group",
+        message: "User is already a member of this group",
       });
     }
 
     room.participants.push(userId);
+    const otherUser = await User.findById(userId);
+    if (otherUser) {
+      otherUser.rooms.push(roomId);
+    }
+    await otherUser.save();
     await room.save();
   } catch (error) {
     console.log("Error in accept request controller");
@@ -124,13 +115,18 @@ export const removeMember = async (req, res, next) => {
         message: "No room is available with this roomid",
       });
 
-    if (room.admin !== req.user._id)
+    if (req.user.role !== "admin")
       return res
         .status(401)
         .json({ status: false, message: "Only room admin can do that" });
 
+    const otherUser = await User.findById(userId);
+    if (otherUser) {
+      otherUser.rooms.pull(roomId);
+    }
     room.participants.pull(userId);
 
+    await otherUser.save();
     await room.save();
     res.status(200).json({ status: true, message: "Member removed from room" });
   } catch (error) {
@@ -154,7 +150,7 @@ export const addModarator = async (req, res, next) => {
         message: "No room is available with this roomid",
       });
 
-    if (room.admin !== req.user._id)
+    if (req.user.role !== "admin")
       return res
         .status(401)
         .json({ status: false, message: "Only room admin can do that" });
@@ -186,7 +182,7 @@ export const removeModarator = async (req, res, next) => {
         message: "No room is available with this roomid",
       });
 
-    if (room.admin !== req.user._id)
+    if (req.user.role !== "admin")
       return res
         .status(401)
         .json({ status: false, message: "Only room admin can do that" });

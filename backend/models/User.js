@@ -17,6 +17,7 @@ const userSchema = mongoose.Schema(
       type: String,
       default: "user",
     },
+    rooms:[{type:mongoose.Schema.Types.ObjectId,ref:"Room"}],
     favorites: {
       type: Array,
       default: [],
