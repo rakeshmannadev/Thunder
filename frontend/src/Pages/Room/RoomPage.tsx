@@ -58,6 +58,16 @@ const RoomPage = () => {
       senderId: 3423,
       content: "This is test message",
       createdAt: "20-05-2024",
+    },,{
+      _id: "r234",
+      senderId: 34234,
+      content: "This is test message",
+      createdAt: "20-05-2024",
+    },,{
+      _id: "r234",
+      senderId: 3423,
+      content: "This is test message",
+      createdAt: "20-05-2024",
     },
   ];
 
@@ -71,7 +81,7 @@ const RoomPage = () => {
     <main className="h-full rounded-lg bg-gradient-to-b from-zinc-800 to-zinc-900 overflow-hidden">
       <Header />
 
-      <div className="grid lg:grid-cols-[250px_1fr] grid-cols-[80px_1fr] h-[calc(100vh-90px)]">
+      <div className="grid lg:grid-cols-[250px_1fr] grid-cols-[80px_1fr] h-[calc(100vh-130px)]">
         {/* <UsersList /> */}
         <UsersList/>
         {/* chat message */}
@@ -90,8 +100,8 @@ const RoomPage = () => {
               <ResizablePanel  >
 
               
-              <ScrollArea className="h-[calc(100vh-240px)]   ">
-                <div className="p-4  space-y-4 ">
+              <ScrollArea className="h-[calc(100vh-360px)] pb-16    ">
+                <div className="p-4  space-y-4  py-5   ">
                   {messages &&
                     messages.map((message: any) => (
                       <div
@@ -127,8 +137,8 @@ const RoomPage = () => {
                 </div>
               </ScrollArea>
               </ResizablePanel>
-              </ResizablePanelGroup>
               <MessageInput />
+              </ResizablePanelGroup>
             </>
           ) : (
             <NoConversationPlaceholder />
