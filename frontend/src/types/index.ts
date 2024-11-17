@@ -19,3 +19,16 @@ export interface Album{
     songs:Song[]
 }
 
+export interface Room{
+    _id:string,
+    roomId:string,
+    visability:string,
+    roomName:string,
+    image:string,
+    admin:string,
+    modarators:any[],
+    requests:any[],
+    participants:any[],
+    messages:any[]
+}
+

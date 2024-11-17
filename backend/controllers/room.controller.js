@@ -6,24 +6,24 @@ import User from "../models/User.js";
 export const createRoom = async (req, res, next) => {
   try {
     const { roomName } = req.body;
-    if (!roomName || !req.files) {
+    if (!roomName) {
       return res.status(401).json({
         status: false,
-        message: "Please provide all files and details",
+        message: "Please provide room name",
       });
     }
-    const { imageFile } = req.files;
+    // const { imageFile } = req.files;
 
-    const imageUrl = await uploadeFiles(imageFile);
+    // const imageUrl = await uploadeFiles(imageFile);
     const roomId = generateRandomCode(8);
     const room = await Room.create({
       roomId,
       roomName,
-      image: imageUrl,
-      admin: req.user._id,
+     
+      admin: '67358fc7bc540ea5b27aa7de',
     });
     if (room) {
-      await User.findByIdAndUpdate(req.user._id, {
+      await User.findByIdAndUpdate('67358fc7bc540ea5b27aa7de', {
         $push: { rooms: room._id },
       });
     }

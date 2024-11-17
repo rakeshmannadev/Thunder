@@ -3,7 +3,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import useMusicStore from "@/store/useMusicStore";
-import { SignedIn } from "@clerk/clerk-react";
+import useUserStore from "@/store/useUserStore";
+import { SignedIn, useUser } from "@clerk/clerk-react";
 import { Group, Home, Library, PlusCircle } from "lucide-react";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -14,7 +15,16 @@ const LeftSidebar = () => {
   //     fetchAlbums();
   // },[])
 
-  const isLoading= false;
+  const {user} = useUser();
+
+  const {isLoading,rooms,fetchJoinedRooms} = useUserStore();
+
+  useEffect(()=>{
+    if(user){
+      fetchJoinedRooms();
+    }
+  },[user])
+  
   const albums = [
     {
       _id: 2342342,
@@ -88,8 +98,11 @@ const LeftSidebar = () => {
             </Link>
           </SignedIn>
 
-          <Link
-            to={"/room"}
+
+          {rooms && rooms.length>0 && rooms.map((room)=>(
+            <Link
+            key={room._id}
+            to={`/room/${room.roomId}`}
             className={cn(
               buttonVariants({
                 variant: "ghost",
@@ -98,8 +111,11 @@ const LeftSidebar = () => {
             )}
           >
             <Group className="mr-2 size-5" />
-            <span className="hidden md:inline"> Room</span>
+            <span className="hidden md:inline"> {room.roomName}</span>
           </Link>
+          ))
+
+          }
         </div>
       </section>
 

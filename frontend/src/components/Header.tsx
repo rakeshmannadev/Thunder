@@ -1,4 +1,4 @@
-import { SignedOut, UserButton } from "@clerk/clerk-react";
+import { SignedOut, UserButton, useUser } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
 import { LayoutDashboard } from "lucide-react";
 import SignInWithGoogleBtn from "./SignInWithGoogleBtn";
@@ -8,11 +8,15 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "./ui/button";
 
 const Header = () => {
-  const { checkAdminStatus, isAdmin, isLoading } = useAuthStore();
+  const { user } = useUser();
+
+  const { checkAdminStatus, isAdmin } = useAuthStore();
 
   useEffect(() => {
-    checkAdminStatus();
-  }, [checkAdminStatus]);
+    if (user) {
+      checkAdminStatus();
+    }
+  }, [user]);
 
   return (
     <header className="flex  justify-between items-center sticky top-0 w-full p-4 bg-zinc-900/75 backdrop-blur-md z-10 ">

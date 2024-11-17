@@ -3,8 +3,10 @@ import User from "../models/User.js";
 
 export const getJoinedRooms = async (req, res, next) => {
   try {
-    const rooms = await Room.find({ roomId: { $in: req.user.rooms } });
-    res.status(200).json(rooms);
+    console.log(req.user);
+    const rooms = await Room.find({ _id: { $in: req.user.rooms } });
+    console.log(rooms)
+    res.status(200).json({rooms});
   } catch (error) {
     console.log("Error in getJoinedRooms user controller", error.message);
     next(error);
