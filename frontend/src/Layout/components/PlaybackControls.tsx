@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import usePlayerStore from "@/store/usePlayerStore";
 import { Laptop2, ListMusic, Mic2, Pause, Play, Repeat, Shuffle, SkipBack, SkipForward, Volume1 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -10,54 +11,44 @@ const formatTime = (seconds: number) => {
 };
 
 export const PlaybackControls = () => {
-	// const { currentSong, isPlaying, togglePlay, playNext, playPrevious } = usePlayerStore();
+	const { currentSong, isPlaying, togglePlay, playNext, playPrevious } = usePlayerStore();
 
 	const [volume, setVolume] = useState(75);
 	const [currentTime, setCurrentTime] = useState(0);
 	const [duration, setDuration] = useState(0);
 	const audioRef = useRef<HTMLAudioElement | null>(null);
 
-	// useEffect(() => {
-	// 	audioRef.current = document.querySelector("audio");
+	useEffect(() => {
+		audioRef.current = document.querySelector("audio");
 
-	// 	const audio = audioRef.current;
-	// 	if (!audio) return;
+		const audio = audioRef.current;
+		if (!audio) return;
 
-	// 	const updateTime = () => setCurrentTime(audio.currentTime);
-	// 	const updateDuration = () => setDuration(audio.duration);
+		const updateTime = () => setCurrentTime(audio.currentTime);
+		const updateDuration = () => setDuration(audio.duration);
 
-	// 	audio.addEventListener("timeupdate", updateTime);
-	// 	audio.addEventListener("loadedmetadata", updateDuration);
+		audio.addEventListener("timeupdate", updateTime);
+		audio.addEventListener("loadedmetadata", updateDuration);
 
-	// 	const handleEnded = () => {
-	// 		usePlayerStore.setState({ isPlaying: false });
-	// 	};
+		const handleEnded = () => {
+			usePlayerStore.setState({ isPlaying: false });
+		};
 
-	// 	audio.addEventListener("ended", handleEnded);
+		audio.addEventListener("ended", handleEnded);
 
-	// 	return () => {
-	// 		audio.removeEventListener("timeupdate", updateTime);
-	// 		audio.removeEventListener("loadedmetadata", updateDuration);
-	// 		audio.removeEventListener("ended", handleEnded);
-	// 	};
-	// }, [currentSong]);
+		return () => {
+			audio.removeEventListener("timeupdate", updateTime);
+			audio.removeEventListener("loadedmetadata", updateDuration);
+			audio.removeEventListener("ended", handleEnded);
+		};
+	}, [currentSong]);
 
 	const handleSeek = (value: number[]) => {
 		if (audioRef.current) {
 			audioRef.current.currentTime = value[0];
 		}
 	};
-const currentSong =    {
-	_id: "34234",
-	title: "Kesariya",
-	imageUrl: "/Kesariya.jpg",
-	artist: "Arijit Singh",
-	album: "Bramhastra",
-	audioUrl: "string",
-	duration: 123,
-	
-  }
-  const isPlaying = false;
+
 	return (
 		<footer className='h-20 sm:h-24 bg-zinc-900 border-t border-zinc-800 px-4'>
 			<div className='flex justify-between items-center h-full max-w-[1800px] mx-auto'>
@@ -97,7 +88,7 @@ const currentSong =    {
 							size='icon'
 							variant='ghost'
 							className='hover:text-white text-zinc-400'
-							
+							onClick={playPrevious}
 							disabled={!currentSong}
 						>
 							<SkipBack className='h-4 w-4' />
@@ -106,7 +97,7 @@ const currentSong =    {
 						<Button
 							size='icon'
 							className='bg-white hover:bg-white/80 text-black rounded-full h-8 w-8'
-							
+							onClick={togglePlay}
 							disabled={!currentSong}
 						>
 							{isPlaying ? <Pause className='h-5 w-5' /> : <Play className='h-5 w-5' />}
@@ -115,7 +106,7 @@ const currentSong =    {
 							size='icon'
 							variant='ghost'
 							className='hover:text-white text-zinc-400'
-							
+							onClick={playNext}
 							disabled={!currentSong}
 						>
 							<SkipForward className='h-4 w-4' />

@@ -12,12 +12,11 @@ const HomePage = () => {
   const {isLoading,madeForYou,trending,fetchMadeForYouSongs,fetchTrendingSongs} = useMusicStore()
 
   useEffect(()=>{
+	if(madeForYou.length <=0 || trending.length <=0)
     fetchMadeForYouSongs();
     fetchTrendingSongs();
-  },[])
+  },[fetchMadeForYouSongs,fetchTrendingSongs])
 
-
-// const madeForYouSongs = [
 //   {
 //     _id: "34234",
 //     title: "Kesariya",
