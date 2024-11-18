@@ -1,11 +1,13 @@
 import { axiosInstance } from "@/lib/axios";
-import { Playlist, Room } from "@/types";
+import { Playlist, Room, User } from "@/types";
 import { create } from "zustand";
 
 interface UserStore {
   fetchJoinedRooms: () => Promise<void>;
   fetchPlaylists: () => Promise<void>;
+  getCurrentUser:()=>Promise<void>;
   rooms: Room[];
+  currentUser:User | null;
   playlists: Playlist[];
   isLoading: boolean;
 }
@@ -14,6 +16,7 @@ const useUserStore = create<UserStore>((set, get) => ({
   isLoading: true,
   rooms: [],
   playlists: [],
+  currentUser:null,
   fetchJoinedRooms: async () => {
     set({ isLoading: true });
     try {
@@ -37,6 +40,17 @@ const useUserStore = create<UserStore>((set, get) => ({
       set({ isLoading: false });
     }
   },
+  getCurrentUser:async ()=>{
+    set({isLoading:true});
+    try {
+      const response = await axiosInstance.get("/user/getCurrentUser");
+      set({currentUser:response.data.user});
+    } catch (error:any) {
+      console.log(error.response.data.message)
+    }finally{
+      set({isLoading:false})
+    }
+  }
 }));
 
 export default useUserStore;

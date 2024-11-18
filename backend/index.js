@@ -14,6 +14,7 @@ import songRoutes from "./routes/song.routes.js";
 import roomRoutes from "./routes/room.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import connectDb from "./db/connectDb.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 const __dirname = path.resolve();
@@ -27,6 +28,7 @@ app.use(
     credentials: true,
   })
 );
+app.use(cookieParser());
 app.use(clerkMiddleware()); // it attach the user in req-> req.auth
 app.use(
   fileUpload({
@@ -38,6 +40,7 @@ app.use(
     },
   })
 );
+
 
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/auth", authRoutes);

@@ -1,28 +1,23 @@
 import FeaturedGridSkeleton from "@/components/Skeleton/FeaturedGridSkleton";
 import PlayButton from "./PlayButton";
+import useMusicStore from "@/store/useMusicStore";
+import { useEffect } from "react";
 
 const FeaturedSection = () => {
+  const { isLoading, featured, fetchFeaturedSongs } = useMusicStore();
   const error = null;
-  const isLoading = false;
-  const featuredSongs = [
-    {
-      _id: "34234",
-      title: "Kesariya",
-      imageUrl: "/Kesariya.jpg",
-      artist: "Arijit Singh",
-      album: "Bramhastra",
-      audioUrl: "string",
-      duration: 123,
-      
-    },
-  ];
+
+  useEffect(() => {
+    fetchFeaturedSongs();
+  }, []);
+
   if (isLoading) return <FeaturedGridSkeleton />;
 
   if (error) return <p className="text-red-500 mb-4 text-lg">{error}</p>;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-      {featuredSongs.map((song) => (
+      {featured.map((song) => (
         <div
           key={song._id}
           className="flex items-center bg-zinc-800/50 rounded-md overflow-hidden

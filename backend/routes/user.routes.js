@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  getCurrentUser,
   getJoinedRooms,
   getJoinRequests,
   getPlaylists,
@@ -13,6 +14,7 @@ import { protectRoute } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
+router.get("/getCurrentUser",protectRoute,getCurrentUser);
 router.get("/getJoinedRooms", protectRoute, getJoinedRooms);
 router.get("/getPlaylists", protectRoute, getPlaylists);
 

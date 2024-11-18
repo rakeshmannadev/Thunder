@@ -3,7 +3,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import useUserStore from "@/store/useUserStore";
-import { SignedIn, useUser } from "@clerk/clerk-react";
+import { SignedIn, useAuth } from "@clerk/clerk-react";
 import { Group, Home, Library, PlusCircle } from "lucide-react";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -11,16 +11,16 @@ import { Link } from "react-router-dom";
 const LeftSidebar = () => {
 
 
-  const {user} = useUser();
+  const {userId}=  useAuth()
 
   const {isLoading,rooms,playlists,fetchJoinedRooms,fetchPlaylists} = useUserStore();
 
   useEffect(()=>{
-    if(user){
+    if(userId){
       fetchJoinedRooms();
       fetchPlaylists();
     }
-  },[user])
+  },[userId])
 
 
   

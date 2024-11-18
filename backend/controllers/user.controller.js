@@ -147,3 +147,11 @@ export const getJoinRequests = async (req, res, next) => {
     next(error);
   }
 };
+export const getCurrentUser = async(req,res)=>{
+  try {
+    res.status(200).json({user:req.user});
+  } catch (error) {
+    console.log("Error in get current user controller",error.message)
+    
+  }
+}

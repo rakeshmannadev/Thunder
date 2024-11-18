@@ -1,25 +1,28 @@
 import { axiosInstance } from "@/lib/axios";
-import { Album, Song } from "@/types";
+import { Song } from "@/types";
 import { create } from "zustand";
 
 interface MusicStore {
-  albums: Album[];
-  songs: Song[];
+  featured: Song[];
+  madeForYou: Song[];
+  trending:Song[];
   isLoading: boolean;
-  fetchAlbums: () => Promise<void>;
-  fetchSongs: () => Promise<void>;
+  fetchFeaturedSongs: () => Promise<void>;
+  fetchMadeForYouSongs: () => Promise<void>;
+  fetchTrendingSongs: () => Promise<void>;
 }
 
 const useMusicStore = create<MusicStore>((set) => ({
-  albums: [],
-  songs: [],
+  featured:[],
+  madeForYou:[],
+  trending:[],
   isLoading: false,
 
-  fetchAlbums: async () => {
+  fetchFeaturedSongs: async () => {
     set({ isLoading: true });
     try {
-      const response = await axiosInstance.get("/albums");
-      set({ albums: response.data.albums });
+      const response = await axiosInstance.get("/songs/featured");
+      set({ featured: response.data.songs });
     } catch (error: any) {
       console.log("Error in fetching albums", error.response.data.message);
     } finally {
@@ -27,16 +30,26 @@ const useMusicStore = create<MusicStore>((set) => ({
     }
   },
 
-  fetchSongs: async () => {
+  fetchMadeForYouSongs: async () => {
     set({ isLoading: true });
     try {
-      const response = await axiosInstance.get("/songs");
-      set({ songs: response.data.songs });
+      const response = await axiosInstance.get("/songs/made-for-you");
+      set({ madeForYou: response.data.songs });
     } catch (error: any) {
       console.log("Error in fetching songs", error.response.data.message);
     } finally {
       set({ isLoading: false });
     }
   },
+  fetchTrendingSongs:async ()=>{
+    try {
+      const response = await axiosInstance.get("/songs/trending");
+      set({ trending: response.data.songs });
+    } catch (error: any) {
+      console.log("Error in fetching songs", error.response.data.message);
+    } finally {
+      set({ isLoading: false });
+    }
+  }
 }));
 export default useMusicStore;

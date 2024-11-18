@@ -2,35 +2,46 @@ import Header from "@/components/Header";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import FeaturedSection from "./components/FeaturedSection";
 import SectionGrid from "./components/SectionGrid";
+import useMusicStore from "@/store/useMusicStore";
+import { useEffect } from "react";
 
 
 
 const HomePage = () => {
-const madeForYouSongs = [
-  {
-    _id: "34234",
-    title: "Kesariya",
-    imageUrl: "/Kesariya.jpg",
-    artist: "Arijit Singh",
-    album: "Bramhastra",
-    audioUrl: "string",
-    duration: 123,
+
+  const {isLoading,madeForYou,trending,fetchMadeForYouSongs,fetchTrendingSongs} = useMusicStore()
+
+  useEffect(()=>{
+    fetchMadeForYouSongs();
+    fetchTrendingSongs();
+  },[])
+
+
+// const madeForYouSongs = [
+//   {
+//     _id: "34234",
+//     title: "Kesariya",
+//     imageUrl: "/Kesariya.jpg",
+//     artist: "Arijit Singh",
+//     album: "Bramhastra",
+//     audioUrl: "string",
+//     duration: 123,
     
-  },
-]
-const trendingSongs = [
-  {
-    _id: "34234",
-    title: "Kesariya",
-    imageUrl: "/Kesariya.jpg",
-    artist: "Arijit Singh",
-    album: "Bramhastra",
-    audioUrl: "string",
-    duration: 123,
+//   },
+// ]
+// const trendingSongs = [
+//   {
+//     _id: "34234",
+//     title: "Kesariya",
+//     imageUrl: "/Kesariya.jpg",
+//     artist: "Arijit Singh",
+//     album: "Bramhastra",
+//     audioUrl: "string",
+//     duration: 123,
     
-  },
-]
-const isLoading=false;
+//   },
+// ]
+// const isLoading=false;
   return (
     <main className='rounded-md overflow-hidden h-full bg-gradient-to-b from-zinc-800 to-zinc-900'>
 			<Header />
@@ -40,8 +51,8 @@ const isLoading=false;
 					<FeaturedSection />
 
 					<div className='space-y-8'>
-						<SectionGrid title='Made For You' songs={madeForYouSongs} isLoading={isLoading} />
-						<SectionGrid title='Trending' songs={trendingSongs} isLoading={isLoading} />
+						<SectionGrid title='Made For You' songs={madeForYou} isLoading={isLoading} />
+						<SectionGrid title='Trending' songs={trending} isLoading={isLoading} />
 					</div>
 				</div>
 			</ScrollArea>

@@ -4,6 +4,7 @@ import { Loader } from "lucide-react";
 import React, {  useEffect, useState } from "react";
 
     const updateAxiosHeader = async (token:String | null)=>{
+        console.log(axiosInstance.defaults.headers)
         if(token){
             axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         }else{

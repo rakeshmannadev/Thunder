@@ -40,3 +40,15 @@ export interface Playlist{
     songs:Song[],
 
 }
+export interface User{
+    _id:string,
+    clerkId:string,
+    name:string,
+    image:string,
+    role:string,
+    favorites:Array<any>,
+    playlists:Array<Playlist>,
+    followers:Array<any>,
+    following:Array<any>,
+
+}
