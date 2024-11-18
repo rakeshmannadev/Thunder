@@ -3,15 +3,23 @@ import User from "../models/User.js";
 
 export const getJoinedRooms = async (req, res, next) => {
   try {
-    console.log(req.user);
+  
     const rooms = await Room.find({ _id: { $in: req.user.rooms } });
-    console.log(rooms)
     res.status(200).json({rooms});
   } catch (error) {
     console.log("Error in getJoinedRooms user controller", error.message);
     next(error);
   }
 };
+
+export const getPlaylists = async(req,res,next)=>{
+  try {
+    res.status(200).json({playlists:req.user.playlist});
+  } catch (error) {
+    console.log("Error in getPlaylists user controller",error.message)
+    next(error);
+  }
+}
 
 export const getRoomMembers = async (req, res, next) => {
   try {

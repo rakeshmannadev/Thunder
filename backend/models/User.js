@@ -22,10 +22,21 @@ const userSchema = mongoose.Schema(
       type: Array,
       default: [],
     },
-    playlists: {
-      type: Array,
-      default: [],
-    },
+    playlists: [
+     {
+      playListName:{
+        type:String,
+        required:true,
+      },
+      artist:{
+        type:String,
+      },
+      imageUrl:{
+        type:String,
+      },
+      songs:[{type:mongoose.Schema.Types.ObjectId,ref:"Song"}]
+     }
+    ],
     followers: {
       type: Array,
       default: [],

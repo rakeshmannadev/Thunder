@@ -2,6 +2,7 @@ import express from "express";
 import {
   getJoinedRooms,
   getJoinRequests,
+  getPlaylists,
   getPublicRooms,
   getRoomMembers,
   joinPublicRoom,
@@ -13,6 +14,8 @@ import { protectRoute } from "../middleware/auth.middleware.js";
 const router = express.Router();
 
 router.get("/getJoinedRooms", protectRoute, getJoinedRooms);
+router.get("/getPlaylists", protectRoute, getPlaylists);
+
 router.get("/getRoomMembers/:roomId", protectRoute, getRoomMembers);
 router.get("/getPublicRooms", getPublicRooms);
 router.put("/join-public-room/:roomId", protectRoute, joinPublicRoom);

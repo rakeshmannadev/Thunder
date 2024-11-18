@@ -32,3 +32,11 @@ export interface Room{
     messages:any[]
 }
 
+export interface Playlist{
+    _id:string,
+    playListName:string,
+    imageUrl:string,
+    artist:string,
+    songs:Song[],
+
+}
