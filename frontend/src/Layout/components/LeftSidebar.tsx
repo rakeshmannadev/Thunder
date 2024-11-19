@@ -14,7 +14,7 @@ const LeftSidebar = () => {
   const {userId}=  useAuth()
 
   const {isLoading,rooms,playlists,fetchJoinedRooms,fetchPlaylists} = useUserStore();
-
+  
   useEffect(()=>{
     if(userId){
       fetchJoinedRooms();

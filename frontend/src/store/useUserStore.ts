@@ -1,11 +1,13 @@
 import { axiosInstance } from "@/lib/axios";
 import { Playlist, Room, User } from "@/types";
+import toast from "react-hot-toast";
 import { create } from "zustand";
 
 interface UserStore {
   fetchJoinedRooms: () => Promise<void>;
   fetchPlaylists: () => Promise<void>;
   getCurrentUser:()=>Promise<void>;
+  addToFavorite:(artist:string,imageUrl:string,songId:string,playlistName:string)=>Promise<void>;
   rooms: Room[];
   currentUser:User | null;
   playlists: Playlist[];
@@ -49,6 +51,31 @@ const useUserStore = create<UserStore>((set, get) => ({
       console.log(error.response.data.message)
     }finally{
       set({isLoading:false})
+    }
+  },
+  addToFavorite:async(artist:string,imageUrl:string,songId:string,playListName:string)=>{
+    if(!get().currentUser) return;
+    try {
+      const response = await axiosInstance.post("/user/addToFavorite",{
+        artist,imageUrl,songId,playListName
+      });
+
+      if(response.data.status){
+        set((state)=>({
+          playlists:state.playlists.map((playlist)=>
+          playlist.playListName ===playListName ? 
+          {...playlist,
+            songs:[...playlist.songs,songId]
+          }:playlist
+          ),
+        }))
+        toast.success(response.data.message);
+      }
+    
+
+    } catch (error:any) {
+      console.log(error.response.data.message)
+      toast.error(error.response.data.message);
     }
   }
 }));

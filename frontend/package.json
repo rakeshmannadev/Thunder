@@ -23,6 +23,7 @@
     "lucide-react": "^0.456.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-hot-toast": "^2.4.1",
     "react-resizable-panels": "^2.1.6",
     "react-router-dom": "^6.28.0",
     "tailwind-merge": "^2.5.4",

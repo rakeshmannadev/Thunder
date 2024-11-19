@@ -33,9 +33,9 @@ const AudioPlayer = () => {
 
     const audio = audioRef.current;
     const isSongChange = prevSongRef.current !== currentSong.audioUrl;
-   console.log(isSongChange)
+   
     if (isSongChange) {
-      console.log("Current audiourl",currentSong.audioUrl)
+      
       audio.src = currentSong?.audioUrl;
       audio.currentTime = 0;
       prevSongRef.current = currentSong.audioUrl;

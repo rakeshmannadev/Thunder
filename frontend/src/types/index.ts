@@ -37,7 +37,7 @@ export interface Playlist{
     playListName:string,
     imageUrl:string,
     artist:string,
-    songs:Song[],
+    songs:string[],
 
 }
 export interface User{
@@ -46,9 +46,9 @@ export interface User{
     name:string,
     image:string,
     role:string,
-    favorites:Array<any>,
     playlists:Array<Playlist>,
     followers:Array<any>,
     following:Array<any>,
 
 }
+

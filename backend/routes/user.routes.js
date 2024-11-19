@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  addToFavorite,
   getCurrentUser,
   getJoinedRooms,
   getJoinRequests,
@@ -17,6 +18,7 @@ const router = express.Router();
 router.get("/getCurrentUser",protectRoute,getCurrentUser);
 router.get("/getJoinedRooms", protectRoute, getJoinedRooms);
 router.get("/getPlaylists", protectRoute, getPlaylists);
+router.post("/addToFavorite", protectRoute, addToFavorite);
 
 router.get("/getRoomMembers/:roomId", protectRoute, getRoomMembers);
 router.get("/getPublicRooms", getPublicRooms);

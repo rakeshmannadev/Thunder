@@ -3,23 +3,22 @@ import User from "../models/User.js";
 
 export const getJoinedRooms = async (req, res, next) => {
   try {
-  
     const rooms = await Room.find({ _id: { $in: req.user.rooms } });
-    res.status(200).json({rooms});
+    res.status(200).json({ rooms });
   } catch (error) {
     console.log("Error in getJoinedRooms user controller", error.message);
     next(error);
   }
 };
 
-export const getPlaylists = async(req,res,next)=>{
+export const getPlaylists = async (req, res, next) => {
   try {
-    res.status(200).json({playlists:req.user.playlist});
+    res.status(200).json({ playlists: req.user.playlists });
   } catch (error) {
-    console.log("Error in getPlaylists user controller",error.message)
+    console.log("Error in getPlaylists user controller", error.message);
     next(error);
   }
-}
+};
 
 export const getRoomMembers = async (req, res, next) => {
   try {
@@ -147,11 +146,44 @@ export const getJoinRequests = async (req, res, next) => {
     next(error);
   }
 };
-export const getCurrentUser = async(req,res)=>{
+export const getCurrentUser = async (req, res) => {
   try {
-    res.status(200).json({user:req.user});
+    res.status(200).json({ user: req.user });
   } catch (error) {
-    console.log("Error in get current user controller",error.message)
-    
+    console.log("Error in get current user controller", error.message);
   }
-}
+};
+
+export const addToFavorite = async (req, res, next) => {
+  try {
+    const { songId, playListName, imageUrl, artist } = req.body;
+    const user = req.user;
+
+    let favoritesPlayList = user.playlists.find(
+      (playlist) => playlist.playListName === "Favorites"
+    );
+
+    if (!favoritesPlayList) {
+      favoritesPlayList = {
+        playListName,
+        artist,
+        imageUrl,
+        songs: [],
+      };
+      user.playlists.push(favoritesPlayList);
+    }
+
+    if (favoritesPlayList.songs.includes(songId)) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Song is already in favorites!" });
+    }
+    favoritesPlayList.songs.push(songId);
+
+    await user.save();
+    res.status(200).json({ status: true, message: "Song added to favorites" });
+  } catch (error) {
+    console.log("Error in addtoFavorite controller", error.message);
+    next(error);
+  }
+};
