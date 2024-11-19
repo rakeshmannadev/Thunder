@@ -23,7 +23,7 @@ export const getFeaturedSongs = async (req, res, next) => {
           artist: 1,
           imageUrl: 1,
           audioUrl: 1,
-          album: 1,
+          albumId:1
         },
       },
     ]);

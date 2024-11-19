@@ -4,18 +4,19 @@ import FeaturedSection from "./components/FeaturedSection";
 import SectionGrid from "./components/SectionGrid";
 import useMusicStore from "@/store/useMusicStore";
 import { useEffect } from "react";
+import AlbumGrid from "./components/AlbumGrid";
 
 
 
 const HomePage = () => {
 
-  const {isLoading,madeForYou,trending,fetchMadeForYouSongs,fetchTrendingSongs} = useMusicStore()
+  const {isLoading,madeForYouAlbums,trending,fetchMadeForYouAlbums,fetchTrendingSongs} = useMusicStore()
 
   useEffect(()=>{
-	if(madeForYou.length <=0 || trending.length <=0)
-    fetchMadeForYouSongs();
+	if(madeForYouAlbums.length <=0 || trending.length <=0)
+    fetchMadeForYouAlbums();
     fetchTrendingSongs();
-  },[fetchMadeForYouSongs,fetchTrendingSongs])
+  },[fetchMadeForYouAlbums,fetchTrendingSongs])
 
 //   {
 //     _id: "34234",
@@ -50,7 +51,7 @@ const HomePage = () => {
 					<FeaturedSection />
 
 					<div className='space-y-8'>
-						<SectionGrid title='Made For You' songs={madeForYou} isLoading={isLoading} />
+						<AlbumGrid title='Made For You' songs={madeForYouAlbums}  isLoading={isLoading} />
 						<SectionGrid title='Trending' songs={trending} isLoading={isLoading} />
 					</div>
 				</div>

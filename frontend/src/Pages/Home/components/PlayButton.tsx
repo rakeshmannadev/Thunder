@@ -9,7 +9,7 @@ const PlayButton = ({ song }: { song: Song }) => {
 
 	const isCurrentSong = currentSong?._id === song._id;
 
-
+	
 
 	const handlePlay = () => {
 		if (isCurrentSong) togglePlay();

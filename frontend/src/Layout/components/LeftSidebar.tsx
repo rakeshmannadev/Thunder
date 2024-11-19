@@ -22,10 +22,6 @@ const LeftSidebar = () => {
     }
   },[userId])
 
-
-  
-
-  //   {
   //     _id: 2342342,
   //     imageUrl: "/Kesariya.jpg",
   //     title: "Top charts",

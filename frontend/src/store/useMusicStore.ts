@@ -1,20 +1,20 @@
 import { axiosInstance } from "@/lib/axios";
-import { Song } from "@/types";
+import { Album, Song } from "@/types";
 import { create } from "zustand";
 
 interface MusicStore {
   featured: Song[];
-  madeForYou: Song[];
+  madeForYouAlbums: Album[];
   trending:Song[];
   isLoading: boolean;
   fetchFeaturedSongs: () => Promise<void>;
-  fetchMadeForYouSongs: () => Promise<void>;
+  fetchMadeForYouAlbums: () => Promise<void>;
   fetchTrendingSongs: () => Promise<void>;
 }
 
 const useMusicStore = create<MusicStore>((set) => ({
   featured:[],
-  madeForYou:[],
+  madeForYouAlbums:[],
   trending:[],
   isLoading: false,
 
@@ -30,11 +30,11 @@ const useMusicStore = create<MusicStore>((set) => ({
     }
   },
 
-  fetchMadeForYouSongs: async () => {
+  fetchMadeForYouAlbums: async () => {
     set({ isLoading: true });
     try {
-      const response = await axiosInstance.get("/songs/made-for-you");
-      set({ madeForYou: response.data.songs });
+      const response = await axiosInstance.get("/albums");
+      set({ madeForYouAlbums: response.data.albums });
     } catch (error: any) {
       console.log("Error in fetching songs", error.response.data.message);
     } finally {

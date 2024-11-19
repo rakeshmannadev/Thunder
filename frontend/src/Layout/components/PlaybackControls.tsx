@@ -17,6 +17,7 @@ import {
   Volume1,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
 const formatTime = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
@@ -102,9 +103,9 @@ export const PlaybackControls = () => {
                 className="w-14 h-14 object-cover rounded-md"
               />
               <div className="flex-1 min-w-0">
-                <div className="font-medium truncate hover:underline cursor-pointer">
+                <Link to={`/album/${currentSong.albumId}`} className="font-medium truncate hover:underline cursor-pointer">
                   {currentSong.title}
-                </div>
+                </Link>
                 <div className="text-sm text-zinc-400 truncate hover:underline cursor-pointer">
                   {currentSong.artist}
                 </div>

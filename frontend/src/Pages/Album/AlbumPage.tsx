@@ -9,7 +9,7 @@ import { useParams } from "react-router-dom";
 const AlbumPage = () => {
   const { id } = useParams();
   const { isPlaying, currentSong, togglePlay, playAlbum } = usePlayerStore();
-  const { getPlaylistSongs, currentPlaylist } = useUserStore();
+  const { getPlaylistSongs, currentPlaylist,playlists } = useUserStore();
 
   const handlePlayAlbum = () => {
     if (!currentPlaylist) return;
@@ -34,7 +34,7 @@ const AlbumPage = () => {
     if (id) {
       getPlaylistSongs(id);
     }
-  }, [id, getPlaylistSongs]);
+  }, [id, getPlaylistSongs,playlists]);
 
   return (
     <div className="h-full">

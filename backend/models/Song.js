@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 const songSchema = mongoose.Schema(
   {
+    songId:{
+      type:String,
+      
+    },
     title: {
       type: String,
       required: true,
@@ -24,9 +28,8 @@ const songSchema = mongoose.Schema(
       type: Number,
       required: true,
     },
-    album: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Album",
+    albumId: {
+      type:String,
       required: false,
     },
   },

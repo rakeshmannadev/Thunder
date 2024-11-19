@@ -3,6 +3,7 @@ export interface Song{
     title:string,
     artist:string,
     album:string,
+    albumId:string,
     imageUrl:string,
     audioUrl:string,
     duration:number,
@@ -12,6 +13,7 @@ export interface Song{
 
 export interface Album{
     _id:string,
+    albumId:string,
     title:string,
     imageUrl:string,
     artist:string,

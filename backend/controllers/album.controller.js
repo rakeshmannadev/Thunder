@@ -2,7 +2,7 @@ import Album from "../models/Album.js";
 
 export const getAllAlbums = async (req, res, next) => {
   try {
-    const albums = await Album.find();
+    const albums = await Album.find().limit(4);
     res.status(200).json({ status: true, albums });
   } catch (error) {
     console.log("Error in get all albums controller");

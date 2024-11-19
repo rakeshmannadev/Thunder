@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 const albumSchema = mongoose.Schema(
   {
+    albumId: {
+      type: String,
+      required: true,
+    },
     title: {
       type: String,
       required: true,
