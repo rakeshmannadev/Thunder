@@ -1,40 +1,40 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import useMusicStore from "@/store/useMusicStore";
 import usePlayerStore from "@/store/usePlayerStore";
+import useUserStore from "@/store/useUserStore";
 import { Clock, Pause, Play } from "lucide-react";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-const AlbumPage = () => {
+const PlaylistPage = () => {
   const { id } = useParams();
   const { isPlaying, currentSong, togglePlay, playAlbum } = usePlayerStore();
-  const { currentAlbum,fetchAlbumById } = useMusicStore();
+  const { currentPlaylist,getPlaylistSongs,playlists } = useUserStore();
 
   const handlePlayAlbum = () => {
-    if (!currentAlbum) return;
+    if (!currentPlaylist) return;
 
-    const isCurrentAlbumPlaying = currentAlbum?.songs.some(
+    const iscurrentPlaylistPlaying = currentPlaylist?.songs.some(
       (song) => song._id === currentSong?._id
     );
-    if (isCurrentAlbumPlaying) togglePlay();
+    if (iscurrentPlaylistPlaying) togglePlay();
     else {
       // start playing the album from the beginning
-      playAlbum(currentAlbum?.songs, 0);
+      playAlbum(currentPlaylist?.songs, 0);
     }
   };
 
   const handlePlaySong = (index: number) => {
-    if (!currentAlbum) return;
+    if (!currentPlaylist) return;
 
-    playAlbum(currentAlbum?.songs, index);
+    playAlbum(currentPlaylist?.songs, index);
   };
 
   useEffect(() => {
     if (id ) {
-      fetchAlbumById(id);
+      getPlaylistSongs(id);
     }
-  }, [id, fetchAlbumById]);
+  }, [id, getPlaylistSongs,playlists]);
 
   return (
     <div className="h-full">
@@ -49,19 +49,19 @@ const AlbumPage = () => {
           <div className="relative z-10">
             <div className="flex p-6 gap-6 pb-8">
               <img
-                src={currentAlbum?.imageUrl}
+                src={currentPlaylist?.imageUrl}
                 alt=""
                 className="w-[240px] h-[240px] shadow-xl rounded"
               />
               <div className="flex flex-col justify-end">
-                <p className="text-sm font-medium">Album</p>
+                <p className="text-sm font-medium">Playlist</p>
                 <h1 className="text-7xl font-bold my-4">
-                  {currentAlbum?.title}
+                  {currentPlaylist?.playListName}
                 </h1>
                 <div className="flex items-center gap-2 text-sm text-zinc-100">
-                  <span>{currentAlbum?.artist}</span>
-                  <span>● {currentAlbum?.songs.length} Songs</span>
-                  <span>● {currentAlbum?.releaseYear}</span>
+                  <span>{currentPlaylist?.artist}</span>
+                  <span>● {currentPlaylist?.songs.length} Songs</span>
+                  
                 </div>
               </div>
             </div>
@@ -74,7 +74,7 @@ const AlbumPage = () => {
                 hover:scale-105 transition-all"
               >
                 {isPlaying &&
-                currentAlbum?.songs.some(
+                currentPlaylist?.songs.some(
                   (song) => song._id === currentSong?._id
                 ) ? (
                   <Pause className="h-7 w-7 text-black" />
@@ -102,7 +102,7 @@ const AlbumPage = () => {
               {/* Song lists */}
               <div className="px-6">
                 <div className="space-y-2 py-4">
-                  {currentAlbum?.songs.map((song, index) => {
+                  {currentPlaylist?.songs.map((song, index) => {
                     const isCurrentSong = currentSong?._id === song._id;
                     return (
                       <div
@@ -156,7 +156,7 @@ const AlbumPage = () => {
   );
 };
 
-export default AlbumPage;
+export default PlaylistPage;
 
 export const formatDuration = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);

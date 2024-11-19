@@ -128,7 +128,7 @@ const LeftSidebar = () => {
                 (
                  playlists && playlists.length>0 &&  playlists.map((playlist)=>(
                         <Link 
-                        to={`/album/${playlist._id}`}
+                        to={`/playlist/${playlist._id}`}
                         key={playlist._id}
                         className="p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer"
                         

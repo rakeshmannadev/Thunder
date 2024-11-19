@@ -2,7 +2,17 @@ import Album from "../models/Album.js";
 
 export const getAllAlbums = async (req, res, next) => {
   try {
-    const albums = await Album.find().limit(4);
+    const albums = await Album.aggregate([
+      {$sample:{size:4}},
+      {$project:{
+        _id:1,
+        albumId:1,
+        title:1,
+        artist:1,
+        imageUrl:1,
+    
+      }}
+    ])
     res.status(200).json({ status: true, albums });
   } catch (error) {
     console.log("Error in get all albums controller");
@@ -13,7 +23,7 @@ export const getAllAlbums = async (req, res, next) => {
 export const getAlbumById = async (req, res, next) => {
   try {
     const { albumId } = req.params;
-    const album = await Album.findById(albumId).populate("songs");
+    const album = await Album.findOne({albumId}).populate("songs");
     if (!album)
       return res
         .status(400)

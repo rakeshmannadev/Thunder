@@ -17,7 +17,7 @@ export interface Album{
     title:string,
     imageUrl:string,
     artist:string,
-    releaseYear:number,
+    releaseYear:string,
     songs:Song[]
 }
 
