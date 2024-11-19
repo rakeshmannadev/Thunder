@@ -5,6 +5,7 @@ import {
   getJoinedRooms,
   getJoinRequests,
   getPlaylists,
+  getPlaylistSongs,
   getPublicRooms,
   getRoomMembers,
   joinPublicRoom,
@@ -19,6 +20,7 @@ router.get("/getCurrentUser",protectRoute,getCurrentUser);
 router.get("/getJoinedRooms", protectRoute, getJoinedRooms);
 router.get("/getPlaylists", protectRoute, getPlaylists);
 router.post("/addToFavorite", protectRoute, addToFavorite);
+router.get("/getPlaylistSongs/:id", protectRoute, getPlaylistSongs);
 
 router.get("/getRoomMembers/:roomId", protectRoute, getRoomMembers);
 router.get("/getPublicRooms", getPublicRooms);

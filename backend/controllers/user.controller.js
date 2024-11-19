@@ -1,4 +1,5 @@
 import Room from "../models/Room.js";
+import Song from "../models/Song.js";
 import User from "../models/User.js";
 
 export const getJoinedRooms = async (req, res, next) => {
@@ -184,6 +185,21 @@ export const addToFavorite = async (req, res, next) => {
     res.status(200).json({ status: true, message: "Song added to favorites" });
   } catch (error) {
     console.log("Error in addtoFavorite controller", error.message);
+    next(error);
+  }
+};
+
+export const getPlaylistSongs = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const songs = await User.findOne({"playlists._id":id}).populate('playlists.songs');
+
+    console.log(songs)
+    
+    res.status(200).json({ status: true, songs });
+  } catch (error) {
+    console.log("Error in getPlaylistSongs", error.message);
     next(error);
   }
 };

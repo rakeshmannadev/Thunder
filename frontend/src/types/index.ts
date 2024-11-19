@@ -6,7 +6,7 @@ export interface Song{
     imageUrl:string,
     audioUrl:string,
     duration:number,
-    createdAt:Date,
+    createdAt:string,
     updatedAt:Date,
 }
 
@@ -37,7 +37,7 @@ export interface Playlist{
     playListName:string,
     imageUrl:string,
     artist:string,
-    songs:string[],
+    songs:Song[] |any[],
 
 }
 export interface User{

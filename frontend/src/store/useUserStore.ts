@@ -1,5 +1,6 @@
 import { axiosInstance } from "@/lib/axios";
 import { Playlist, Room, User } from "@/types";
+
 import toast from "react-hot-toast";
 import { create } from "zustand";
 
@@ -8,9 +9,11 @@ interface UserStore {
   fetchPlaylists: () => Promise<void>;
   getCurrentUser:()=>Promise<void>;
   addToFavorite:(artist:string,imageUrl:string,songId:string,playlistName:string)=>Promise<void>;
+  getPlaylistSongs:(id:string) =>Promise<void>;
   rooms: Room[];
   currentUser:User | null;
   playlists: Playlist[];
+  currentPlaylist:Playlist |null;
   isLoading: boolean;
 }
 
@@ -18,6 +21,7 @@ const useUserStore = create<UserStore>((set, get) => ({
   isLoading: true,
   rooms: [],
   playlists: [],
+  currentPlaylist:null,
   currentUser:null,
   fetchJoinedRooms: async () => {
     set({ isLoading: true });
@@ -76,6 +80,16 @@ const useUserStore = create<UserStore>((set, get) => ({
     } catch (error:any) {
       console.log(error.response.data.message)
       toast.error(error.response.data.message);
+    }
+  },
+  getPlaylistSongs:async(id) =>{
+    try {
+      const response = await axiosInstance.get(`/user/getPlaylistSongs/${id}`);
+      if(response.data.status){
+        set({currentPlaylist:response.data.songs.playlists[0]});
+      }
+    } catch (error:any) {
+      console.log(error.response.data.message);
     }
   }
 }));

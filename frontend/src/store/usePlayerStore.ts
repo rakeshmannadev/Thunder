@@ -2,7 +2,7 @@ import { Song } from "@/types";
 import { create } from "zustand";
 
 interface PlayerStore {
-  currentSong: Song | null;
+  currentSong: Song | any;
   isPlaying: boolean;
   queue: Song[];
   currentIndex: number;
