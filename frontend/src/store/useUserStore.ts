@@ -11,6 +11,7 @@ interface UserStore {
   addToFavorite:(artist:string,imageUrl:string,songId:string,playlistName:string)=>Promise<void>;
   getPlaylistSongs:(id:string) =>Promise<void>;
   addSongToPlaylist:(playlistId:string|any,songId:string,playListName:string,artist:string,imageUrl:string) =>Promise<void>;
+  addAlbumToPlaylist:(playListName:string,artist:string,albumId:string |any,imageUrl:string,songs:Array<string>) =>Promise<void>;
   rooms: Room[];
   currentUser:User | null;
   playlists: Playlist[];
@@ -110,7 +111,7 @@ const useUserStore = create<UserStore>((set, get) => ({
           }))
           }else{
             set((state)=>({
-              playlists:[...state.playlists,{_id:playlistId,playListName,artist,imageUrl,songs:[songId]}]
+              playlists:[...state.playlists,{_id:playlistId,playListName,artist,albumId:null,imageUrl,songs:[songId]}]
             }))
           }
           toast.success(response.data.message);
@@ -120,6 +121,23 @@ const useUserStore = create<UserStore>((set, get) => ({
         toast.error(error.response.data.message);
       }
   },
+  addAlbumToPlaylist:async( playListName, artist,albumId, imageUrl, songs)=> {
+      try {
+        const response = await axiosInstance.post("/user/addAlbumToPlaylist",{
+          playListName,artist,albumId,imageUrl,songs
+        });
+        
+        if(response.data.status){
+          set((state)=>({
+            playlists:[...state.playlists,{_id:response.data.playlist.playlists[response.data.playlist.playlists.length-1]._id,playListName,artist,albumId,imageUrl,songs}]
+          }))
+          toast.success(response.data.message);
+        }
+      } catch (error:any) {
+        console.log(error.response.data.message)
+      }
+  },
+
 }));
 
 export default useUserStore;

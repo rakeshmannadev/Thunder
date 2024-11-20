@@ -3,8 +3,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import useMusicStore from "@/store/useMusicStore";
 import usePlayerStore from "@/store/usePlayerStore";
+import useUserStore from "@/store/useUserStore";
 
-import { Clock, Pause, Play, PlusCircle } from "lucide-react";
+import { CircleCheckBig, Clock, Pause, Play, PlusCircle } from "lucide-react";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
@@ -12,7 +13,7 @@ const AlbumPage = () => {
   const { id } = useParams();
   const { isPlaying, currentSong, togglePlay, playAlbum } = usePlayerStore();
   const { currentAlbum, fetchAlbumById, isLoading } = useMusicStore();
-
+  const { addAlbumToPlaylist, playlists } = useUserStore();
   const handlePlayAlbum = () => {
     if (!currentAlbum) return;
 
@@ -38,6 +39,26 @@ const AlbumPage = () => {
       fetchAlbumById(id);
     }
   }, [id, fetchAlbumById]);
+
+  const isAddedToPlaylist = playlists.find(
+    (playlist) => playlist.albumId === currentAlbum?.albumId
+  );
+
+  const handleAddAlbumToPlaylist = () => {
+    if (currentAlbum) {
+      const songs: string[] = [];
+      currentAlbum.songs.map((song) => {
+        songs.push(song._id);
+      });
+      addAlbumToPlaylist(
+        currentAlbum.title,
+        currentAlbum.artist,
+        currentAlbum.albumId,
+        currentAlbum.imageUrl,
+        songs
+      );
+    }
+  };
 
   return (
     <div className="h-full">
@@ -96,8 +117,17 @@ const AlbumPage = () => {
                   <Play className="h-7 w-7 text-black" />
                 )}
               </Button>
-
-              <PlusCircle className="size-9 cursor-pointer" />
+              {isAddedToPlaylist ? (
+                <CircleCheckBig
+                  className="size-9 cursor-pointer"
+                  color="green"
+                />
+              ) : (
+                <PlusCircle
+                  onClick={handleAddAlbumToPlaylist}
+                  className="size-9 cursor-pointer"
+                />
+              )}
             </div>
 
             {/* Table section */}
@@ -165,9 +195,12 @@ const AlbumPage = () => {
                       );
                     })}
                   {isLoading &&
-                    Array.from({ length: 10 }).map(() => {
+                    Array.from({ length: 10 }).map((_, index) => {
                       return (
-                        <div className="flex items-center justify-between gap-2 px-10 mt-5">
+                        <div
+                          key={index}
+                          className="flex items-center justify-between gap-2 px-10 mt-5"
+                        >
                           <div className="flex gap-2">
                             <Skeleton className="h-[55px] size-10 " />
                             <div className="space-y-2">
@@ -179,7 +212,7 @@ const AlbumPage = () => {
                             <Skeleton className="h-[15px] w-20  " />
                           </div>
                           <div>
-                          <Skeleton className="h-[15px] w-12  " />
+                            <Skeleton className="h-[15px] w-12  " />
                           </div>
                         </div>
                       );

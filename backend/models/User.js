@@ -25,6 +25,10 @@ const userSchema = mongoose.Schema(
         type:String,
         required:true,
       },
+      albumId:{
+        type:String,
+        default:null
+      },
       artist:{
         type:String,
       },

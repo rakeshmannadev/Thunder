@@ -36,7 +36,10 @@ import {
   Shuffle,
   SkipBack,
   SkipForward,
+  Volume,
   Volume1,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
@@ -57,7 +60,8 @@ export const PlaybackControls = () => {
   const { addToFavorite, playlists, addSongToPlaylist } = useUserStore();
   const { user } = useUser();
 
-  const [volume, setVolume] = useState(75);
+  const [volume, setVolume] = useState(20);
+  const [isMute,setMute] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [playlistName, setPlaylistName] = useState("");
@@ -231,6 +235,7 @@ export const PlaybackControls = () => {
               step={1}
               className="w-full hover:cursor-grab active:cursor-grabbing"
               onValueChange={handleSeek}
+              
             />
             <div className="text-xs text-zinc-400">{formatTime(duration)}</div>
           </div>
@@ -336,15 +341,42 @@ export const PlaybackControls = () => {
 
           <div className="flex items-center gap-2">
             <Button
+            onClick={()=>{
+              if(audioRef.current){
+                
+                audioRef.current.volume = isMute ? volume/100 :0
+                setMute(!isMute)
+
+              }
+
+            }}
               size="icon"
               variant="ghost"
               className="hover:text-white text-zinc-400"
             >
-              <Volume1 className="h-4 w-4" />
+              {isMute ?<VolumeX className="size-4" /> :volume <= 20 ? (
+                
+                <Volume className="h-4 w-4"  />
+                
+                ):
+                (volume >20 && volume <=50) ?(<Volume1 className="size-4" />): volume >50 && (<Volume2 className="size-4" />)
+                }
             </Button>
 
             <Slider
               value={[volume]}
+              
+              onWheel={(event) => {
+                const delta = event.deltaY; // Detect scroll direction
+                setVolume((prevVolume) => {
+                  // Adjust the volume and clamp between 0 and 100
+                  const newVolume = Math.min(100, Math.max(0, prevVolume - delta / 20)); 
+                  if (audioRef.current) {
+                    audioRef.current.volume = newVolume / 100; // Update audio volume
+                  }
+                  return newVolume;
+                });
+              }}
               max={100}
               step={1}
               className="w-24 hover:cursor-grab active:cursor-grabbing"

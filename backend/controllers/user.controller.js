@@ -254,18 +254,15 @@ export const addToPlaylist = async(req,res,next)=>{
 
 export const addAlbumToPlaylist = async (req,res,next)=>{
 try {
-  const {playListName,imageUrl,artist,songs} = req.body;
-  const user = req.user;
-
-  user.playlists.push({
-    playListName,
-    imageUrl,
-    artist,
-    songs,
-  })
-
-  await user.save();
-  res.status(200).json({status:true,message:"Album added to playlist"});
+  const {playListName,imageUrl,artist,albumId,songs} = req.body;
+  
+  
+ const playlist = await User.findOneAndUpdate({
+  _id:req.user._id
+ },{
+  $push:{playlists:{playListName,imageUrl,artist,albumId,songs}}
+ },{new:true})
+  res.status(200).json({status:true,message:"Album added to playlist",playlist});
 
 } catch (error) {
   console.log("Error in addAlbumToPlaylist controller",error.message);

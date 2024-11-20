@@ -39,6 +39,7 @@ export interface Playlist{
     playListName:string,
     imageUrl:string,
     artist:string,
+    albumId:string |any,
     songs:Song[] |any[],
 
 }
