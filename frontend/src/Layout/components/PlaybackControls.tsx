@@ -132,19 +132,19 @@ export const PlaybackControls = () => {
     }
   };
 
-  const handleAddToPlaylist = () => {
+  const handleAddToPlaylist = (playlistId=null) => {
     if (!currentSong) return toast.error("Play a song first");
 
-    if (!playlistName || !artist)
-      return toast.error("Please provide all details");
+  
 
     addSongToPlaylist(
-      null,
+      playlistId,
       currentSong._id,
       playlistName,
       artist,
       currentSong.imageUrl
     );
+    closeModal()
   };
 
   return (
@@ -292,7 +292,14 @@ export const PlaybackControls = () => {
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent>
-                      <DropdownMenuItem>Playlist</DropdownMenuItem>
+                      {playlists && playlists.map((playlist)=>(
+                        <DropdownMenuItem
+                        className="cursor-pointer"
+                        key={playlist._id}
+                        onClick={()=>handleAddToPlaylist(playlist._id)}
+                        >{playlist.playListName}</DropdownMenuItem>
+
+                      ))}
                     </DropdownMenuSubContent>
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
@@ -334,7 +341,7 @@ export const PlaybackControls = () => {
                 </div>
               </div>
               <DialogFooter>
-                <Button onClick={handleAddToPlaylist}>Save changes</Button>
+                <Button onClick={()=>handleAddToPlaylist(null)}>Create playlist</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>

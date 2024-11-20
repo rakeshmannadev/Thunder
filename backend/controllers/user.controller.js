@@ -207,65 +207,81 @@ export const getPlaylistSongs = async (req, res, next) => {
       },
       { $project: { playlists: 1 } }, // Keep only the matched playlist
     ]);
-   
+
     res.status(200).json({ status: true, songs });
   } catch (error) {
     console.log("Error in getPlaylistSongs", error.message);
     next(error);
   }
 };
-export const addToPlaylist = async(req,res,next)=>{
+export const addToPlaylist = async (req, res, next) => {
   try {
-    const {playlistId,artist,songId,playListName,imageUrl} = req.body;
+    const { playlistId, artist, songId, playListName, imageUrl } = req.body;
+
     const user = req.user;
 
-    if(!playlistId){
-      user.playlists.push({
-        playListName,
-        artist,
-        imageUrl,
-        songs:songId
-      })
-
-      await user.save();
-     return res.status(201).json({status:true,message:"Playlist created"})
+    if (!playlistId) {
+      if(!playListName || !artist || !songId) return res.status(400).json({status:false,message:"Please provide all details"})
+      const playlist = await User.findOneAndUpdate(
+        {
+          _id: req.user._id,
+        },
+        {
+          $push: {
+            playlists: { playListName, imageUrl, artist, songs: [songId] },
+          },
+        },
+        { new: true }
+      );
+      return res
+        .status(200)
+        .json({ status: true, message: "Album added to playlist", playlist });
     }
 
-    const playlist = user.playlists.filter((p)=>p._id === playlistId);
-
-    const isSongPresent = playlist.songs.includes(songId);
-
-    if(isSongPresent) return res.status(400).json({status:false,message:"Song is already in this playlist"});
-
-    user.playlists.map((playlist)=>{
-      if(playlist._id ===playlistId){
+    user.playlists.map((playlist) => {
+      if (playlist._id.toString() === playlistId.toString()) {
+        if (playlist.songs.includes(songId)) {
+          return res
+            .status(400)
+            .json({
+              status: false,
+              message: "Song is already in this playlist",
+            });
+        }
         playlist.songs.push(songId);
       }
-    })
+    });
 
     await user.save();
-    res.status(200).json({status:true,message:"Song added to playlist"})
-
+    return res
+      .status(200)
+      .json({ status: true, message: "Song added to playlist" });
   } catch (error) {
-    console.log("Error in addToPlaylist controller",error.message);
+    console.log("Error in addToPlaylist controller", error.message);
     next(error);
   }
-}
+};
 
-export const addAlbumToPlaylist = async (req,res,next)=>{
-try {
-  const {playListName,imageUrl,artist,albumId,songs} = req.body;
-  
-  
- const playlist = await User.findOneAndUpdate({
-  _id:req.user._id
- },{
-  $push:{playlists:{playListName,imageUrl,artist,albumId,songs}}
- },{new:true})
-  res.status(200).json({status:true,message:"Album added to playlist",playlist});
+export const addAlbumToPlaylist = async (req, res, next) => {
+  try {
+    const { playListName, imageUrl, artist, albumId, songs } = req.body;
 
-} catch (error) {
-  console.log("Error in addAlbumToPlaylist controller",error.message);
-  next(error);
-}
-}
+    const playlist = await User.findOneAndUpdate(
+      {
+        _id: req.user._id,
+      },
+      {
+        $push: {
+          playlists: { playListName, imageUrl, artist, albumId, songs },
+        },
+      },
+      { new: true }
+    );
+    res
+      .status(200)
+      .json({ status: true, message: "Album added to playlist", playlist });
+  } catch (error) {
+    console.log("Error in addAlbumToPlaylist controller", error.message);
+    next(error);
+  }
+};

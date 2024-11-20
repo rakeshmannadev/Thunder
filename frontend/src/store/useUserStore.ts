@@ -99,7 +99,9 @@ const useUserStore = create<UserStore>((set, get) => ({
   },
   addSongToPlaylist:async(playlistId, songId, playListName, artist, imageUrl) => {
       try {
+        
         const response = await axiosInstance.post("/user/addToPlaylist",{playlistId,songId,playListName,artist,imageUrl})
+        
         if(response.data.status){
           if(playlistId){
             set((state)=>({
@@ -111,14 +113,14 @@ const useUserStore = create<UserStore>((set, get) => ({
           }))
           }else{
             set((state)=>({
-              playlists:[...state.playlists,{_id:playlistId,playListName,artist,albumId:null,imageUrl,songs:[songId]}]
+              playlists:[...state.playlists,{_id:response.data.playlist.playlists[response.data.playlist.playlists.length-1]._id,playListName,artist,albumId:null,imageUrl,songs:[songId]}]
             }))
           }
           toast.success(response.data.message);
         }
       } catch (error:any) {
         console.log(error.response.data.message)
-        toast.error(error.response.data.message);
+        toast.error(error.response.data.message)
       }
   },
   addAlbumToPlaylist:async( playListName, artist,albumId, imageUrl, songs)=> {

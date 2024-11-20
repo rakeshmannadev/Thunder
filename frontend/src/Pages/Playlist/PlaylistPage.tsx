@@ -9,7 +9,7 @@ import { useParams } from "react-router-dom";
 const PlaylistPage = () => {
   const { id } = useParams();
   const { isPlaying, currentSong, togglePlay, playAlbum } = usePlayerStore();
-  const { currentPlaylist,getPlaylistSongs,playlists } = useUserStore();
+  const { currentPlaylist, getPlaylistSongs, playlists } = useUserStore();
 
   const handlePlayAlbum = () => {
     if (!currentPlaylist) return;
@@ -31,10 +31,11 @@ const PlaylistPage = () => {
   };
 
   useEffect(() => {
-    if (id ) {
+    if (id) {
+      useUserStore.setState({ currentPlaylist: null });
       getPlaylistSongs(id);
     }
-  }, [id, getPlaylistSongs,playlists]);
+  }, [id, getPlaylistSongs, playlists]);
 
   return (
     <div className="h-full">
@@ -61,7 +62,6 @@ const PlaylistPage = () => {
                 <div className="flex items-center gap-2 text-sm text-zinc-100">
                   <span>{currentPlaylist?.artist}</span>
                   <span>● {currentPlaylist?.songs.length} Songs</span>
-                  
                 </div>
               </div>
             </div>

@@ -35,7 +35,7 @@ export interface Room{
 }
 
 export interface Playlist{
-    _id:string,
+    _id:string|any,
     playListName:string,
     imageUrl:string,
     artist:string,
