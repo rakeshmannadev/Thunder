@@ -11,7 +11,9 @@ const Header = () => {
   const { getCurrentUser, currentUser } = useUserStore();
 
   useEffect(() => {
-    getCurrentUser();
+    if (!currentUser) {
+      getCurrentUser();
+    }
   }, [getCurrentUser]);
 
   return (
@@ -25,7 +27,7 @@ const Header = () => {
             className={cn(buttonVariants({ variant: "outline" }))}
           >
             <LayoutDashboard className="size-4 mr-2" />
-            Admin Dashboard
+            <span className="hidden md:block">Admin Dashboard</span>
           </Link>
         )}
 

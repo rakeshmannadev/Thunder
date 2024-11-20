@@ -33,31 +33,8 @@ const RightSidebar = () => {
       roomId: 23452,
       roomName: "Sangeet",
       image: "/google.png",
-    },
-    {
-      _id: 423452,
-      roomId: 23452,
-      roomName: "Sangeet",
-      image: "/google.png",
-    },
-    {
-      _id: 423452,
-      roomId: 23452,
-      roomName: "Sangeet",
-      image: "/google.png",
-    },
-    {
-      _id: 423452,
-      roomId: 23452,
-      roomName: "Sangeet",
-      image: "/google.png",
-    },
-    {
-      _id: 423452,
-      roomId: 23452,
-      roomName: "Sangeet",
-      image: "/google.png",
-    },
+    }
+    
   ];
   return (
     <aside className="h-full flex flex-col gap-2">

@@ -1,6 +1,8 @@
 import express from "express";
 import {
+  addAlbumToPlaylist,
   addToFavorite,
+  addToPlaylist,
   getCurrentUser,
   getJoinedRooms,
   getJoinRequests,
@@ -20,6 +22,8 @@ router.get("/getCurrentUser",protectRoute,getCurrentUser);
 router.get("/getJoinedRooms", protectRoute, getJoinedRooms);
 router.get("/getPlaylists", protectRoute, getPlaylists);
 router.post("/addToFavorite", protectRoute, addToFavorite);
+router.post("/addToPlaylist", protectRoute, addToPlaylist);
+router.post("/addAlbumToPlaylist", protectRoute, addAlbumToPlaylist);
 router.get("/getPlaylistSongs/:id", protectRoute, getPlaylistSongs);
 
 router.get("/getRoomMembers/:roomId", protectRoute, getRoomMembers);

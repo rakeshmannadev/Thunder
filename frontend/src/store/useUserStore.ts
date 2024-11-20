@@ -10,6 +10,7 @@ interface UserStore {
   getCurrentUser:()=>Promise<void>;
   addToFavorite:(artist:string,imageUrl:string,songId:string,playlistName:string)=>Promise<void>;
   getPlaylistSongs:(id:string) =>Promise<void>;
+  addSongToPlaylist:(playlistId:string|any,songId:string,playListName:string,artist:string,imageUrl:string) =>Promise<void>;
   rooms: Room[];
   currentUser:User | null;
   playlists: Playlist[];
@@ -37,6 +38,7 @@ const useUserStore = create<UserStore>((set, get) => ({
   },
   fetchPlaylists: async () => {
     set({ isLoading: true });
+
     try {
       const response = await axiosInstance.get("/user/getPlaylists");
       set({ playlists: response.data.playlists });
@@ -83,15 +85,41 @@ const useUserStore = create<UserStore>((set, get) => ({
     }
   },
   getPlaylistSongs:async(id) =>{
+    
     try {
       const response = await axiosInstance.get(`/user/getPlaylistSongs/${id}`);
+     
       if(response.data.status){
-        set({currentPlaylist:response.data.songs.playlists[0]});
+        set({currentPlaylist:response.data.songs[0].playlists});
       }
     } catch (error:any) {
       console.log(error.response.data.message);
     }
-  }
+  },
+  addSongToPlaylist:async(playlistId, songId, playListName, artist, imageUrl) => {
+      try {
+        const response = await axiosInstance.post("/user/addToPlaylist",{playlistId,songId,playListName,artist,imageUrl})
+        if(response.data.status){
+          if(playlistId){
+            set((state)=>({
+            playlists:state.playlists.map((playlist)=>
+              playlist._id === playlistId ?
+              {...playlist,songs:[...playlist.songs,songId]}:
+              playlist
+            ),
+          }))
+          }else{
+            set((state)=>({
+              playlists:[...state.playlists,{_id:playlistId,playListName,artist,imageUrl,songs:[songId]}]
+            }))
+          }
+          toast.success(response.data.message);
+        }
+      } catch (error:any) {
+        console.log(error.response.data.message)
+        toast.error(error.response.data.message);
+      }
+  },
 }));
 
 export default useUserStore;

@@ -1,15 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 import useMusicStore from "@/store/useMusicStore";
 import usePlayerStore from "@/store/usePlayerStore";
-import { Clock, Pause, Play } from "lucide-react";
+
+import { Clock, Pause, Play, PlusCircle } from "lucide-react";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 const AlbumPage = () => {
   const { id } = useParams();
   const { isPlaying, currentSong, togglePlay, playAlbum } = usePlayerStore();
-  const { currentAlbum,fetchAlbumById } = useMusicStore();
+  const { currentAlbum, fetchAlbumById, isLoading } = useMusicStore();
 
   const handlePlayAlbum = () => {
     if (!currentAlbum) return;
@@ -31,7 +33,8 @@ const AlbumPage = () => {
   };
 
   useEffect(() => {
-    if (id ) {
+    if (id) {
+      useMusicStore.setState({ currentAlbum: null });
       fetchAlbumById(id);
     }
   }, [id, fetchAlbumById]);
@@ -48,21 +51,32 @@ const AlbumPage = () => {
           {/* content */}
           <div className="relative z-10">
             <div className="flex p-6 gap-6 pb-8">
-              <img
-                src={currentAlbum?.imageUrl}
-                alt=""
-                className="w-[240px] h-[240px] shadow-xl rounded"
-              />
+              {!isLoading && (
+                <img
+                  src={currentAlbum?.imageUrl}
+                  alt=""
+                  className="w-[240px] h-[240px] shadow-xl rounded"
+                />
+              )}
+              {isLoading && (
+                <Skeleton className="h-[240px] w-[240px] rounded" />
+              )}
               <div className="flex flex-col justify-end">
                 <p className="text-sm font-medium">Album</p>
-                <h1 className="text-7xl font-bold my-4">
-                  {currentAlbum?.title}
-                </h1>
-                <div className="flex items-center gap-2 text-sm text-zinc-100">
-                  <span>{currentAlbum?.artist}</span>
-                  <span>● {currentAlbum?.songs.length} Songs</span>
-                  <span>● {currentAlbum?.releaseYear}</span>
-                </div>
+                {!isLoading && (
+                  <h1 className="text-7xl font-bold my-4">
+                    {currentAlbum?.title}
+                  </h1>
+                )}
+                {isLoading && <Skeleton className="h-10 w-[250px]" />}
+                {!isLoading && (
+                  <div className="flex items-center gap-2 text-sm text-zinc-100">
+                    <span>{currentAlbum?.artist}</span>
+                    <span>● {currentAlbum?.songs.length} Songs</span>
+                    <span>● {currentAlbum?.releaseYear}</span>
+                  </div>
+                )}
+                {isLoading && <Skeleton className="h-4 w-[250px] mt-5" />}
               </div>
             </div>
             {/* Play button */}
@@ -82,13 +96,15 @@ const AlbumPage = () => {
                   <Play className="h-7 w-7 text-black" />
                 )}
               </Button>
+
+              <PlusCircle className="size-9 cursor-pointer" />
             </div>
 
             {/* Table section */}
             <div className="bg-black/20 backdrop-blur-sm">
               {/* table header */}
               <div
-                className="grid grid-cols-[16px_4fr_2fr_1fr] gap-4 px-10 py-2 text-sm 
+                className="grid grid-cols-[16px_4fr_2fr_1fr_1fr] gap-4 px-10 py-2 text-sm 
             text-zinc-400 border-b border-white/5"
               >
                 <div>#</div>
@@ -102,50 +118,72 @@ const AlbumPage = () => {
               {/* Song lists */}
               <div className="px-6">
                 <div className="space-y-2 py-4">
-                  {currentAlbum?.songs.map((song, index) => {
-                    const isCurrentSong = currentSong?._id === song._id;
-                    return (
-                      <div
-                        key={song._id}
-                        onClick={() => handlePlaySong(index)}
-                        className={`grid grid-cols-[16px_4fr_2fr_1fr] gap-4 px-4 py-2 text-sm text-zinc-400 hover:bg-white/5 rounded-md group cursor-pointer`}
-                      >
-                        <div className="flex items-center justify-center">
-                          {isCurrentSong && isPlaying ? (
-                            <div className="size-4 text-green-500">♫</div>
-                          ) : (
-                            <span className="group-hover:hidden">
-                              {index + 1}
-                            </span>
-                          )}
-                          {!isCurrentSong && (
-                            <Play className="h-4 w-4 hidden group-hover:block" />
-                          )}
-                        </div>
+                  {!isLoading &&
+                    currentAlbum?.songs.map((song, index) => {
+                      const isCurrentSong = currentSong?._id === song._id;
+                      return (
+                        <div
+                          key={song._id}
+                          onClick={() => handlePlaySong(index)}
+                          className={`grid grid-cols-[16px_4fr_2fr_1fr_1fr] gap-4 px-4 py-2 text-sm text-zinc-400 hover:bg-white/5 rounded-md group cursor-pointer`}
+                        >
+                          <div className="flex items-center justify-center">
+                            {isCurrentSong && isPlaying ? (
+                              <div className="size-4 text-green-500">♫</div>
+                            ) : (
+                              <span className="group-hover:hidden">
+                                {index + 1}
+                              </span>
+                            )}
+                            {!isCurrentSong && (
+                              <Play className="h-4 w-4 hidden group-hover:block" />
+                            )}
+                          </div>
 
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={song.imageUrl}
-                            alt={song.title}
-                            className="size-10"
-                          />
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={song.imageUrl}
+                              alt={song.title}
+                              className="size-10"
+                            />
 
-                          <div>
-                            <div className={`font-medium text-white`}>
-                              {song.title}
+                            <div>
+                              <div className={`font-medium text-white`}>
+                                {song.title}
+                              </div>
+                              <div>{song.artist}</div>
                             </div>
-                            <div>{song.artist}</div>
+                          </div>
+                          <div className="flex items-center">
+                            {song.createdAt.split("T")[0]}
+                          </div>
+                          <div className="flex items-center">
+                            {formatDuration(song.duration)}
+                          </div>
+                          <div className="flex items-center"></div>
+                        </div>
+                      );
+                    })}
+                  {isLoading &&
+                    Array.from({ length: 10 }).map(() => {
+                      return (
+                        <div className="flex items-center justify-between gap-2 px-10 mt-5">
+                          <div className="flex gap-2">
+                            <Skeleton className="h-[55px] size-10 " />
+                            <div className="space-y-2">
+                              <Skeleton className="h-[15px] w-20  " />
+                              <Skeleton className="h-[15px] w-12  " />
+                            </div>
+                          </div>
+                          <div>
+                            <Skeleton className="h-[15px] w-20  " />
+                          </div>
+                          <div>
+                          <Skeleton className="h-[15px] w-12  " />
                           </div>
                         </div>
-                        <div className="flex items-center">
-                          {song.createdAt.split("T")[0]}
-                        </div>
-                        <div className="flex items-center">
-                          {formatDuration(song.duration)}
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
                 </div>
               </div>
             </div>

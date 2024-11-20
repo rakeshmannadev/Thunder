@@ -1,3 +1,23 @@
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import usePlayerStore from "@/store/usePlayerStore";
@@ -5,11 +25,13 @@ import useUserStore from "@/store/useUserStore";
 import { useUser } from "@clerk/clerk-react";
 import {
   Heart,
-  Laptop2,
   ListMusic,
+  ListPlus,
   Mic2,
   Pause,
   Play,
+  Plus,
+  PlusCircle,
   Repeat,
   Shuffle,
   SkipBack,
@@ -18,6 +40,9 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { Label } from "@radix-ui/react-dropdown-menu";
+import { Input } from "@/components/ui/input";
+import toast from "react-hot-toast";
 
 const formatTime = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
@@ -28,14 +53,27 @@ const formatTime = (seconds: number) => {
 export const PlaybackControls = () => {
   const { currentSong, isPlaying, togglePlay, playNext, playPrevious } =
     usePlayerStore();
-	
-  const { addToFavorite,playlists } = useUserStore();
+
+  const { addToFavorite, playlists, addSongToPlaylist } = useUserStore();
   const { user } = useUser();
-  
+
   const [volume, setVolume] = useState(75);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [playlistName, setPlaylistName] = useState("");
+  const [artist, setArtist] = useState("");
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  const closeModal = () => {
+    setIsOpen(false);
+  };
+
+  const openModal = () => {
+    setIsOpen(true);
+  };
 
   useEffect(() => {
     audioRef.current = document.querySelector("audio");
@@ -69,13 +107,13 @@ export const PlaybackControls = () => {
   };
 
   let isAlreadyFavorite;
-  const favoriteSongs = playlists.find((playlist)=>playlist.playListName==='Favorites');
+  const favoriteSongs = playlists.find(
+    (playlist) => playlist.playListName === "Favorites"
+  );
 
-  if(favoriteSongs && currentSong){
-
+  if (favoriteSongs && currentSong) {
     isAlreadyFavorite = favoriteSongs.songs.includes(currentSong._id);
   }
-
 
   const handleAddToFavorite = () => {
     if (currentSong) {
@@ -88,6 +126,21 @@ export const PlaybackControls = () => {
         "Favorites"
       );
     }
+  };
+
+  const handleAddToPlaylist = () => {
+    if (!currentSong) return toast.error("Play a song first");
+
+    if (!playlistName || !artist)
+      return toast.error("Please provide all details");
+
+    addSongToPlaylist(
+      null,
+      currentSong._id,
+      playlistName,
+      artist,
+      currentSong.imageUrl
+    );
   };
 
   return (
@@ -103,7 +156,10 @@ export const PlaybackControls = () => {
                 className="w-14 h-14 object-cover rounded-md"
               />
               <div className="flex-1 min-w-0">
-                <Link to={`/album/${currentSong.albumId}`} className="font-medium truncate hover:underline cursor-pointer">
+                <Link
+                  to={`/album/${currentSong.albumId}`}
+                  className="font-medium truncate hover:underline cursor-pointer"
+                >
                   {currentSong.title}
                 </Link>
                 <div className="text-sm text-zinc-400 truncate hover:underline cursor-pointer">
@@ -181,14 +237,20 @@ export const PlaybackControls = () => {
         </div>
         {/* volume controls */}
         <div className="hidden sm:flex items-center gap-4 min-w-[180px] w-[30%] justify-end">
-          {user && <Button
-            onClick={handleAddToFavorite}
-            size="icon"
-            variant="ghost"
-            className="hover:text-white text-zinc-400"
-          >
-            <Heart className="h-4 w-4" fill={isAlreadyFavorite ? 'green':''} color={isAlreadyFavorite?'green':'gray'}  />
-          </Button>}
+          {user && (
+            <Button
+              onClick={handleAddToFavorite}
+              size="icon"
+              variant="ghost"
+              className="hover:text-white text-zinc-400"
+            >
+              <Heart
+                className="h-4 w-4"
+                fill={isAlreadyFavorite ? "green" : ""}
+                color={isAlreadyFavorite ? "green" : "gray"}
+              />
+            </Button>
+          )}
           <Button
             size="icon"
             variant="ghost"
@@ -203,13 +265,74 @@ export const PlaybackControls = () => {
           >
             <ListMusic className="h-4 w-4" />
           </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="hover:text-white text-zinc-400"
-          >
-            <Laptop2 className="h-4 w-4" />
-          </Button>
+
+          <Dialog open={isOpen} onOpenChange={closeModal}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button aria-haspopup="true" size="icon" variant="ghost">
+                  <ListPlus className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem onClick={openModal}>
+                  <PlusCircle /> Create playlist
+                </DropdownMenuItem>
+
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <Plus />
+                    <span>Add to playlist</span>
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem>Playlist</DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DialogContent
+              className="sm:max-w-[425px]"
+              onEscapeKeyDown={closeModal}
+            >
+              <DialogHeader>
+                <DialogTitle>Create Playlist</DialogTitle>
+                <DialogDescription>
+                  Playlist will appeare on leftside
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">
+                    Name
+                  </Label>
+                  <Input
+                    onChange={(e) => setPlaylistName(e.target.value)}
+                    id="name"
+                    placeholder="Party songs"
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="username" className="text-right">
+                    Artist name
+                  </Label>
+                  <Input
+                    onChange={(e) => setArtist(e.target.value)}
+                    id="username"
+                    placeholder="Arijit"
+                    className="col-span-3"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button onClick={handleAddToPlaylist}>Save changes</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           <div className="flex items-center gap-2">
             <Button

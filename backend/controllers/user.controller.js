@@ -1,7 +1,6 @@
 import Room from "../models/Room.js";
-import Song from "../models/Song.js";
 import User from "../models/User.js";
-
+import mongoose from "mongoose";
 export const getJoinedRooms = async (req, res, next) => {
   try {
     const rooms = await Room.find({ _id: { $in: req.user.rooms } });
@@ -192,14 +191,84 @@ export const addToFavorite = async (req, res, next) => {
 export const getPlaylistSongs = async (req, res, next) => {
   try {
     const { id } = req.params;
+    const user = req.user;
 
-    const songs = await User.findOne({"playlists._id":id}).populate('playlists.songs');
-
-    console.log(songs)
-    
+    const songs = await User.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(user._id) } }, // Match user by userId
+      { $unwind: "$playlists" }, // Decompose playlists array
+      { $match: { "playlists._id": new mongoose.Types.ObjectId(id) } }, // Match specific playlist by _id
+      {
+        $lookup: {
+          from: "songs", // Collection name for songs
+          localField: "playlists.songs",
+          foreignField: "_id",
+          as: "playlists.songs",
+        },
+      },
+      { $project: { playlists: 1 } }, // Keep only the matched playlist
+    ]);
+   
     res.status(200).json({ status: true, songs });
   } catch (error) {
     console.log("Error in getPlaylistSongs", error.message);
     next(error);
   }
 };
+export const addToPlaylist = async(req,res,next)=>{
+  try {
+    const {playlistId,artist,songId,playListName,imageUrl} = req.body;
+    const user = req.user;
+
+    if(!playlistId){
+      user.playlists.push({
+        playListName,
+        artist,
+        imageUrl,
+        songs:songId
+      })
+
+      await user.save();
+     return res.status(201).json({status:true,message:"Playlist created"})
+    }
+
+    const playlist = user.playlists.filter((p)=>p._id === playlistId);
+
+    const isSongPresent = playlist.songs.includes(songId);
+
+    if(isSongPresent) return res.status(400).json({status:false,message:"Song is already in this playlist"});
+
+    user.playlists.map((playlist)=>{
+      if(playlist._id ===playlistId){
+        playlist.songs.push(songId);
+      }
+    })
+
+    await user.save();
+    res.status(200).json({status:true,message:"Song added to playlist"})
+
+  } catch (error) {
+    console.log("Error in addToPlaylist controller",error.message);
+    next(error);
+  }
+}
+
+export const addAlbumToPlaylist = async (req,res,next)=>{
+try {
+  const {playListName,imageUrl,artist,songs} = req.body;
+  const user = req.user;
+
+  user.playlists.push({
+    playListName,
+    imageUrl,
+    artist,
+    songs,
+  })
+
+  await user.save();
+  res.status(200).json({status:true,message:"Album added to playlist"});
+
+} catch (error) {
+  console.log("Error in addAlbumToPlaylist controller",error.message);
+  next(error);
+}
+}

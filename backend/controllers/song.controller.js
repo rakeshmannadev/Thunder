@@ -46,7 +46,7 @@ export const getMadeForYou = async (req, res, next) => {
           artist: 1,
           imageUrl: 1,
           audioUrl: 1,
-          album: 1,
+          albumId: 1,
         },
       },
     ]);
@@ -69,7 +69,7 @@ export const getTrending = async (req, res, next) => {
           artist: 1,
           imageUrl: 1,
           audioUrl: 1,
-          album: 1,
+          albumId: 1,
         },
       },
     ]);

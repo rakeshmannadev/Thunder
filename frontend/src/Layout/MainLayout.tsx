@@ -8,9 +8,20 @@ import LeftSidebar from "./components/LeftSidebar";
 import RightSidebar from "./components/RightSidebar";
 import { PlaybackControls } from "./components/PlaybackControls";
 import AudioPlayer from "./components/AudioPlayer";
+import { useEffect, useState } from "react";
 
 const MainLayout = () => {
-  const isMobile = false;
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   return (
     <div className="h-screen bg-black text-white flex flex-col">
@@ -21,7 +32,7 @@ const MainLayout = () => {
         <AudioPlayer />
         {/* Leftsidebar */}
         <ResizablePanel
-          defaultSize={20}
+          defaultSize={15}
           minSize={isMobile ? 0 : 10}
           maxSize={20}
         >
@@ -33,18 +44,21 @@ const MainLayout = () => {
           <Outlet />
         </ResizablePanel>
         {/* Right side */}
-        <ResizableHandle className="w-2 bg-black rounded-lg transition-colors" />
-        <ResizablePanel
-          defaultSize={18}
-          minSize={0}
-          maxSize={18}
-          collapsedSize={0}
-        >
-          <RightSidebar />
-        </ResizablePanel>
-        
+        {!isMobile && (
+          <>
+            <ResizableHandle className="w-2 bg-black rounded-lg transition-colors" />
+            <ResizablePanel
+              defaultSize={isMobile ? 0 : 18}
+              minSize={0}
+              maxSize={18}
+              collapsedSize={0}
+            >
+              <RightSidebar />
+            </ResizablePanel>
+          </>
+        )}
       </ResizablePanelGroup>
-      <PlaybackControls/>
+      <PlaybackControls />
     </div>
   );
 };

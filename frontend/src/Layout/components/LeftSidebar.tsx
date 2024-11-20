@@ -16,54 +16,17 @@ const LeftSidebar = () => {
   const {isLoading,rooms,playlists,fetchJoinedRooms,fetchPlaylists} = useUserStore();
   
   useEffect(()=>{
-    if(userId){
+    if(userId && rooms.length<=0 && playlists.length<=0){
       fetchJoinedRooms();
       fetchPlaylists();
     }
-  },[userId])
-
-  //     _id: 2342342,
-  //     imageUrl: "/Kesariya.jpg",
-  //     title: "Top charts",
-  //     artist: "Sonu nigam",
-  //   },
-  //   {
-  //     _id: 2342342,
-  //     imageUrl: "/Kesariya.jpg",
-  //     title: "Top charts",
-  //     artist: "Sonu nigam",
-  //   },
-  //   {
-  //     _id: 2342342,
-  //     imageUrl: "/Kesariya.jpg",
-  //     title: "Top charts",
-  //     artist: "Sonu nigam",
-  //   },
-  //   {
-  //     _id: 2342342,
-  //     imageUrl: "/Kesariya.jpg",
-  //     title: "Top charts",
-  //     artist: "Sonu nigam",
-  //   },
-  //   {
-  //     _id: 2342342,
-  //     imageUrl: "/Kesariya.jpg",
-  //     title: "Top charts",
-  //     artist: "Sonu nigam",
-  //   },
-  //   {
-  //     _id: 2342342,
-  //     imageUrl: "/Kesariya.jpg",
-  //     title: "Top charts",
-  //     artist: "Sonu nigam",
-  //   },
-  // ];
+  },[userId,rooms.length,playlists.length])
 
   return (
     <aside className="h-full flex flex-col gap-2">
       {/* Navigation menu */}
-      <section className=" rounded-lg bg-zinc-900 p-4 ">
-        <div className="space-y-2 ">
+      <section className=" rounded-lg bg-zinc-900 p-4 flex flex-col items-center ">
+        <div className="space-y-2  w-fit ">
           <Link
             to={"/"}
             className={cn(
@@ -73,7 +36,7 @@ const LeftSidebar = () => {
               })
             )}
           >
-            <Home className="mr-2 size-5" />
+            <Home className="md:mr-2 size-5" />
             <span className="hidden md:inline">Home</span>
           </Link>
 
@@ -88,7 +51,7 @@ const LeftSidebar = () => {
                 })
               )}
             >
-              <PlusCircle className="mr-2 size-5" />
+              <PlusCircle className="md:mr-2 size-5" />
               <span className="hidden md:inline">Create Room</span>
             </Link>
           </SignedIn>
@@ -105,7 +68,7 @@ const LeftSidebar = () => {
               })
             )}
           >
-            <Group className="mr-2 size-5" />
+            <Group className="md:mr-2 size-5" />
             <span className="hidden md:inline"> {room.roomName}</span>
           </Link>
           ))
@@ -115,26 +78,26 @@ const LeftSidebar = () => {
       </section>
 
       {/* Library section */}
-      <section className="flex-1 rounded-lg bg-zinc-900 p-4">
-        <div className="flex items-center justify-between mb-4">
+      <section className="flex-1 flex flex-col  items-center rounded-lg bg-zinc-900 p-4">
+        <div className="flex items-center justify-between md:float-start md:mr-auto mb-4">
           <div className=" flex items-center text-white px-2">
-            <Library className="size-5 mr-2" />
+            <Library className="size-5 md:mr-2" />
             <span className="hidden md:inline">Playlists</span>
           </div>
         </div>
-        <ScrollArea className="h-[calc(100vh-300px)]">
-          <div className="space-y-2">
+        <ScrollArea className="h-[calc(100vh-300px)] w-fit">
+          <div className="space-y-2  ">
             {isLoading ? <PlaylistSkeleton /> : 
                 (
                  playlists && playlists.length>0 &&  playlists.map((playlist)=>(
                         <Link 
                         to={`/playlist/${playlist._id}`}
                         key={playlist._id}
-                        className="p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer"
+                        className="p-2 max-sm:w-16 hover:bg-zinc-800 rounded-full md:rounded-md flex items-center gap-3 group cursor-pointer"
                         
                         >
                         <img src={playlist.imageUrl} alt="playlist_img" 
-                        className="size-12 rounded-md flex-shrink-0 object-cover " />
+                        className="  md:size-12 rounded-full md:rounded-md flex-shrink-0 object-cover " />
                         <div className="flex-1 min-w-0 hidden md:block">
                             <p className="font-medium truncate">{playlist.playListName}</p>
                             <p className="text-sm text-zinc-400 truncate">playlist ● {playlist.artist}</p>
