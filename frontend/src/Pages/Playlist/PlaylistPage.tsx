@@ -3,13 +3,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import usePlayerStore from "@/store/usePlayerStore";
 import useUserStore from "@/store/useUserStore";
-import { Clock, Pause, Play } from "lucide-react";
+import { Clock, Pause, Play, Shuffle } from "lucide-react";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 const PlaylistPage = () => {
   const { id } = useParams();
-  const { isPlaying, currentSong, togglePlay, playAlbum } = usePlayerStore();
+  const { isPlaying, currentSong, togglePlay, playAlbum,isShuffle } = usePlayerStore();
   const { currentPlaylist, getPlaylistSongs,isLoading, playlists } = useUserStore();
 
   const handlePlayAlbum = () => {
@@ -29,6 +29,15 @@ const PlaylistPage = () => {
     if (!currentPlaylist) return;
 
     playAlbum(currentPlaylist?.songs, index);
+  };
+
+  const handleShufflePlaylist = () => {
+    if (!currentPlaylist) return;
+    if(isShuffle) return usePlayerStore.setState({isShuffle:false});
+    
+    usePlayerStore.setState({ isShuffle: true });
+    const randomIndex = Math.floor(Math.random() * currentPlaylist.songs.length);
+    playAlbum(currentPlaylist?.songs, randomIndex);
   };
 
   useEffect(() => {
@@ -94,6 +103,13 @@ const PlaylistPage = () => {
                   <Play className="h-7 w-7 text-black" />
                 )}
               </Button>
+
+              <Shuffle
+                onClick={handleShufflePlaylist}
+                className={`size-5 cursor-pointer ${
+                  isShuffle && "text-green-500"
+                } `}
+              />
             </div>
 
             {/* Table section */}

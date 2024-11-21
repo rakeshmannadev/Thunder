@@ -33,6 +33,8 @@ import {
   Plus,
   PlusCircle,
   Repeat,
+  Repeat1,
+  Repeat1Icon,
   Shuffle,
   SkipBack,
   SkipForward,
@@ -47,6 +49,7 @@ import { Label } from "@radix-ui/react-dropdown-menu";
 import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
 import TooltipComponent from "@/components/Tooltip/TooltipComponent";
+import useMusicStore from "@/store/useMusicStore";
 
 const formatTime = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
@@ -55,8 +58,17 @@ const formatTime = (seconds: number) => {
 };
 
 export const PlaybackControls = () => {
-  const { currentSong, isPlaying, togglePlay, playNext, playPrevious } =
-    usePlayerStore();
+  const {
+    currentSong,
+    isPlaying,
+    togglePlay,
+    playNext,
+    playPrevious,
+    playAlbum,
+    isShuffle,
+    isRepeat,
+  } = usePlayerStore();
+  const { featured, trending } = useMusicStore();
 
   const { addToFavorite, playlists, addSongToPlaylist } = useUserStore();
   const { user } = useUser();
@@ -93,7 +105,21 @@ export const PlaybackControls = () => {
     audio.addEventListener("loadedmetadata", updateDuration);
 
     const handleEnded = () => {
-      usePlayerStore.setState({ isPlaying: false });
+      if(isRepeat && currentSong){
+        setCurrentTime(0);
+        usePlayerStore.setState({ isPlaying: true });
+        if(audioRef.current){
+          audioRef.current.currentTime = 0;
+          audioRef.current.play();
+        }
+
+      }else{
+        usePlayerStore.setState({ isPlaying: false });
+        if(audioRef.current){
+          audioRef.current.pause();
+        }
+      }
+      
     };
 
     audio.addEventListener("ended", handleEnded);
@@ -103,12 +129,41 @@ export const PlaybackControls = () => {
       audio.removeEventListener("loadedmetadata", updateDuration);
       audio.removeEventListener("ended", handleEnded);
     };
-  }, [currentSong]);
+  }, [currentSong, isRepeat]);
 
   const handleSeek = (value: number[]) => {
     if (audioRef.current) {
       audioRef.current.currentTime = value[0];
     }
+  };
+
+  const handleShuffle = () => {
+    if (isShuffle) return usePlayerStore.setState({ isShuffle: false });
+
+    const songs = [...featured, ...trending];
+    const album = {
+      _id: "34234",
+      albumId: "42342",
+      title: "Shuffle album",
+      imageUrl: "shuffle",
+      artist: "various",
+      releaseYear: "null",
+      songs: songs,
+    };
+    const randomIndex = Math.floor(Math.random() * songs.length);
+    useMusicStore.setState({ currentAlbum: album });
+    const updatedAlbum = useMusicStore.getState().currentAlbum;
+
+    if (!updatedAlbum) return;
+
+    playAlbum(updatedAlbum?.songs, randomIndex);
+    usePlayerStore.setState({ isShuffle: true });
+  };
+
+  const handleRepeat = () => {
+    if (isRepeat) return usePlayerStore.setState({ isRepeat: false });
+
+    usePlayerStore.setState({ isRepeat: true });
   };
 
   let isAlreadyFavorite;
@@ -177,64 +232,65 @@ export const PlaybackControls = () => {
         <div className="flex flex-col items-center gap-2 flex-1 max-w-full sm:max-w-[45%]">
           <div className="flex items-center gap-4 sm:gap-6">
             <TooltipComponent text="Suffle">
-
-            <Button
-              size="icon"
-              variant="ghost"
-              className="hidden sm:inline-flex hover:text-white text-zinc-400"
+              <Button
+                onClick={handleShuffle}
+                size="icon"
+                variant="ghost"
+                className="hidden sm:inline-flex hover:text-white text-zinc-400"
               >
-              <Shuffle className="h-4 w-4" />
-            </Button>
-              </TooltipComponent>
+                <Shuffle className={`size-4 ${isShuffle && "text-white"}`} />
+              </Button>
+            </TooltipComponent>
             <TooltipComponent text="Previous song">
-
-            <Button
-              size="icon"
-              variant="ghost"
-              className="hover:text-white text-zinc-400"
-              onClick={playPrevious}
-              disabled={!currentSong}
+              <Button
+                size="icon"
+                variant="ghost"
+                className="hover:text-white text-zinc-400"
+                onClick={playPrevious}
+                disabled={!currentSong}
               >
-              <SkipBack className="h-4 w-4" />
-            </Button>
-              </TooltipComponent>
-            <TooltipComponent text={isPlaying ?'Pause song':'Play song'}>
-
-            <Button
-              size="icon"
-              className="bg-white hover:bg-white/80 text-black rounded-full h-8 w-8"
-              onClick={togglePlay}
-              disabled={!currentSong}
+                <SkipBack className="h-4 w-4" />
+              </Button>
+            </TooltipComponent>
+            <TooltipComponent text={isPlaying ? "Pause song" : "Play song"}>
+              <Button
+                size="icon"
+                className="bg-white hover:bg-white/80 text-black rounded-full h-8 w-8"
+                onClick={togglePlay}
+                disabled={!currentSong}
               >
-              {isPlaying ? (
-                <Pause className="h-5 w-5" />
-              ) : (
-                <Play className="h-5 w-5" />
-              )}
-            </Button>
-              </TooltipComponent>
+                {isPlaying ? (
+                  <Pause className="h-5 w-5" />
+                ) : (
+                  <Play className="h-5 w-5" />
+                )}
+              </Button>
+            </TooltipComponent>
             <TooltipComponent text="Next song">
-
-            <Button
-              size="icon"
-              variant="ghost"
-              className="hover:text-white text-zinc-400"
-              onClick={playNext}
-              disabled={!currentSong}
+              <Button
+                size="icon"
+                variant="ghost"
+                className="hover:text-white text-zinc-400"
+                onClick={playNext}
+                disabled={!currentSong}
               >
-              <SkipForward className="h-4 w-4" />
-            </Button>
-              </TooltipComponent>
+                <SkipForward className="h-4 w-4" />
+              </Button>
+            </TooltipComponent>
             <TooltipComponent text="Repeat song">
-
-            <Button
-              size="icon"
-              variant="ghost"
-              className="hidden sm:inline-flex hover:text-white text-zinc-400"
+              <Button
+                onClick={handleRepeat}
+                size="icon"
+                variant="ghost"
+                className="hidden sm:inline-flex hover:text-white text-zinc-400"
               >
-              <Repeat className="h-4 w-4" />
-            </Button>
-              </TooltipComponent>
+                {isRepeat ? (
+                  <Repeat1 className="h-4 w-4 text-white" />
+                ) : (
+                  <Repeat className="size-4" />
+                )}
+              </Button>
+            </TooltipComponent>
           </div>
 
           <div className="hidden sm:flex items-center gap-2 w-full">
@@ -281,30 +337,28 @@ export const PlaybackControls = () => {
             <Mic2 className="h-4 w-4" />
           </Button>
           <TooltipComponent text="Current queue">
-
-          <Button
-            size="icon"
-            variant="ghost"
-            className="hover:text-white text-zinc-400"
+            <Button
+              size="icon"
+              variant="ghost"
+              className="hover:text-white text-zinc-400"
             >
-            <ListMusic className="h-4 w-4" />
-          </Button>
-            </TooltipComponent>
+              <ListMusic className="h-4 w-4" />
+            </Button>
+          </TooltipComponent>
 
           <Dialog open={isOpen} onOpenChange={closeModal}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 {user && (
-                  <TooltipComponent text="Add to playlist">
-                    <Button
-                      aria-haspopup="true"
-                      size="icon"
-                      variant="ghost"
-                      className="hover:text-white text-zinc-400"
-                    >
-                      <ListPlus className="h-4 w-4" />
-                    </Button>
-                  </TooltipComponent>
+                  <Button
+                    title="Add to playlist"
+                    aria-haspopup="true"
+                    size="icon"
+                    variant="ghost"
+                    className="hover:text-white text-zinc-400"
+                  >
+                    <ListPlus className="h-4 w-4" />
+                  </Button>
                 )}
               </DropdownMenuTrigger>
 

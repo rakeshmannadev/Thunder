@@ -20,6 +20,7 @@ const useMusicStore = create<MusicStore>((set) => ({
   trending:[],
   currentAlbum: null,
   isLoading: false,
+  
 
   fetchFeaturedSongs: async () => {
     set({ isLoading: true });

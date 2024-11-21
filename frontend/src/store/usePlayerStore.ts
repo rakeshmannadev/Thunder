@@ -4,6 +4,8 @@ import { create } from "zustand";
 interface PlayerStore {
   currentSong: Song | any;
   isPlaying: boolean;
+  isShuffle: boolean;
+  isRepeat:boolean;
   queue: Song[];
   currentIndex: number;
 
@@ -18,6 +20,8 @@ interface PlayerStore {
 const usePlayerStore = create<PlayerStore>((set, get) => ({
   currentSong: null,
   isPlaying: false,
+  isShuffle: false,
+  isRepeat:false,
   queue: [],
   currentIndex: -1,
 
@@ -42,7 +46,7 @@ const usePlayerStore = create<PlayerStore>((set, get) => ({
   },
   setCurrentSong: (song: Song | null) => {
     if (!song) return;
-    
+
     const songIndex = get().queue.findIndex((s) => s._id === song._id);
 
     set({
@@ -53,51 +57,73 @@ const usePlayerStore = create<PlayerStore>((set, get) => ({
   },
   togglePlay: () => {
     const willStartPlaying = !get().isPlaying;
-    
-    set({
-        isPlaying:willStartPlaying,
-    })
 
+    set({
+      isPlaying: willStartPlaying,
+    });
   },
   playNext: () => {
-    const {currentIndex,queue} = get();
-    const nextIndex = currentIndex+1;
+    const { currentIndex, queue, isShuffle,isRepeat } = get();
+    let nextIndex;
 
-    if(nextIndex < queue.length){
-        const nextSong = queue[nextIndex];
-
-
-        set({
-            currentSong:nextSong,
-            currentIndex:nextIndex,
-            isPlaying:true
-        })
-
-    }else{
-        // if no next song
-
-        set({isPlaying:false})
+    if (isRepeat) {
+      // If repeat is active, stay on the current song
+      nextIndex = currentIndex % queue.length;
+    } else if (isShuffle) {
+      // Shuffle mode: Pick a random song that isn't the current one
+      do {
+        nextIndex = Math.floor(Math.random() * queue.length);
+      } while (nextIndex === currentIndex && queue.length > 1);
+    } else {
+      // Sequential mode
+      nextIndex = currentIndex + 1;
     }
+    
+    if (nextIndex < queue.length) {
+      const nextSong = queue[nextIndex];
 
+      set({
+        currentSong: nextSong,
+        currentIndex: nextIndex,
+        isPlaying: true,
+      });
+    } else {
+      // if no next song
+
+      set({ isPlaying: false });
+    }
   },
   playPrevious: () => {
-    const {currentIndex,queue} = get();
-    const prevIndex = currentIndex-1;
+    const { currentIndex, queue,isRepeat,isShuffle } = get();
+    if (!queue || queue.length === 0) {
+      set({ isPlaying: false });
+      return;
+    }
+  
+    let previousIndex;
+  
+    if (isRepeat) {
+      previousIndex = currentIndex; // Stay on the current song
+    } else if (isShuffle) {
+      do {
+        previousIndex = Math.floor(Math.random() * queue.length);
+      } while (previousIndex === currentIndex && queue.length > 1);
+    } else {
+      previousIndex = currentIndex - 1;
+    }
 
-    if(prevIndex >=0){
-        const prevSong = queue[prevIndex];
+    if (previousIndex >= 0) {
+      const prevSong = queue[previousIndex];
 
-        set({
-            currentSong:prevSong,
-            currentIndex:prevIndex,
-            isPlaying:true,
-        })
-    }else{
-        // if no prev song
+      set({
+        currentSong: prevSong,
+        currentIndex: previousIndex,
+        isPlaying: true,
+      });
+    } else {
+      // if no prev song
 
-        set({isPlaying:false});
-
-
+      set({ isPlaying: false });
     }
   },
 }));

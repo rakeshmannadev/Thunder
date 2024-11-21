@@ -5,13 +5,21 @@ import useMusicStore from "@/store/useMusicStore";
 import usePlayerStore from "@/store/usePlayerStore";
 import useUserStore from "@/store/useUserStore";
 
-import { CircleCheckBig, Clock, Pause, Play, PlusCircle } from "lucide-react";
+import {
+  CircleCheckBig,
+  Clock,
+  Pause,
+  Play,
+  PlusCircle,
+  Shuffle,
+} from "lucide-react";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 const AlbumPage = () => {
   const { id } = useParams();
-  const { isPlaying, currentSong, togglePlay, playAlbum } = usePlayerStore();
+  const { isPlaying, currentSong, togglePlay, playAlbum, isShuffle } =
+    usePlayerStore();
   const { currentAlbum, fetchAlbumById, isLoading } = useMusicStore();
   const { addAlbumToPlaylist, playlists } = useUserStore();
   const handlePlayAlbum = () => {
@@ -31,6 +39,15 @@ const AlbumPage = () => {
     if (!currentAlbum) return;
 
     playAlbum(currentAlbum?.songs, index);
+  };
+
+  const handleShuffleAlbum = () => {
+    if (!currentAlbum) return;
+    if(isShuffle) return usePlayerStore.setState({isShuffle:false});
+    
+    usePlayerStore.setState({ isShuffle: true });
+    const randomIndex = Math.floor(Math.random() * currentAlbum.songs.length);
+    playAlbum(currentAlbum?.songs, randomIndex);
   };
 
   useEffect(() => {
@@ -117,17 +134,25 @@ const AlbumPage = () => {
                   <Play className="h-7 w-7 text-black" />
                 )}
               </Button>
+              {/* Add to playlist button */}
               {isAddedToPlaylist ? (
                 <CircleCheckBig
-                  className="size-9 cursor-pointer"
+                  className="size-7 cursor-pointer"
                   color="green"
                 />
               ) : (
                 <PlusCircle
                   onClick={handleAddAlbumToPlaylist}
-                  className="size-9 cursor-pointer"
+                  className="size-7 cursor-pointer"
                 />
               )}
+
+              <Shuffle
+                onClick={handleShuffleAlbum}
+                className={`size-5 cursor-pointer ${
+                  isShuffle && "text-green-500"
+                } `}
+              />
             </div>
 
             {/* Table section */}
@@ -185,7 +210,7 @@ const AlbumPage = () => {
                             </div>
                           </div>
                           <div className="flex items-center">
-                            {song.createdAt.split("T")[0]}
+                            {song.createdAt?.split("T")[0]}
                           </div>
                           <div className="flex items-center">
                             {formatDuration(song.duration)}
