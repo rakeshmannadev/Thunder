@@ -46,6 +46,7 @@ import { Link } from "react-router-dom";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
+import TooltipComponent from "@/components/Tooltip/TooltipComponent";
 
 const formatTime = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
@@ -61,7 +62,7 @@ export const PlaybackControls = () => {
   const { user } = useUser();
 
   const [volume, setVolume] = useState(20);
-  const [isMute,setMute] = useState(false);
+  const [isMute, setMute] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [playlistName, setPlaylistName] = useState("");
@@ -132,10 +133,8 @@ export const PlaybackControls = () => {
     }
   };
 
-  const handleAddToPlaylist = (playlistId=null) => {
+  const handleAddToPlaylist = (playlistId = null) => {
     if (!currentSong) return toast.error("Play a song first");
-
-  
 
     addSongToPlaylist(
       playlistId,
@@ -144,7 +143,7 @@ export const PlaybackControls = () => {
       artist,
       currentSong.imageUrl
     );
-    closeModal()
+    closeModal();
   };
 
   return (
@@ -177,13 +176,17 @@ export const PlaybackControls = () => {
         {/* player controls*/}
         <div className="flex flex-col items-center gap-2 flex-1 max-w-full sm:max-w-[45%]">
           <div className="flex items-center gap-4 sm:gap-6">
+            <TooltipComponent text="Suffle">
+
             <Button
               size="icon"
               variant="ghost"
               className="hidden sm:inline-flex hover:text-white text-zinc-400"
-            >
+              >
               <Shuffle className="h-4 w-4" />
             </Button>
+              </TooltipComponent>
+            <TooltipComponent text="Previous song">
 
             <Button
               size="icon"
@@ -191,38 +194,47 @@ export const PlaybackControls = () => {
               className="hover:text-white text-zinc-400"
               onClick={playPrevious}
               disabled={!currentSong}
-            >
+              >
               <SkipBack className="h-4 w-4" />
             </Button>
+              </TooltipComponent>
+            <TooltipComponent text={isPlaying ?'Pause song':'Play song'}>
 
             <Button
               size="icon"
               className="bg-white hover:bg-white/80 text-black rounded-full h-8 w-8"
               onClick={togglePlay}
               disabled={!currentSong}
-            >
+              >
               {isPlaying ? (
                 <Pause className="h-5 w-5" />
               ) : (
                 <Play className="h-5 w-5" />
               )}
             </Button>
+              </TooltipComponent>
+            <TooltipComponent text="Next song">
+
             <Button
               size="icon"
               variant="ghost"
               className="hover:text-white text-zinc-400"
               onClick={playNext}
               disabled={!currentSong}
-            >
+              >
               <SkipForward className="h-4 w-4" />
             </Button>
+              </TooltipComponent>
+            <TooltipComponent text="Repeat song">
+
             <Button
               size="icon"
               variant="ghost"
               className="hidden sm:inline-flex hover:text-white text-zinc-400"
-            >
+              >
               <Repeat className="h-4 w-4" />
             </Button>
+              </TooltipComponent>
           </div>
 
           <div className="hidden sm:flex items-center gap-2 w-full">
@@ -233,9 +245,8 @@ export const PlaybackControls = () => {
               value={[currentTime]}
               max={duration || 100}
               step={1}
-              className="w-full hover:cursor-grab active:cursor-grabbing"
+              className="w-full hover:cursor-pointer active:cursor-grabbing"
               onValueChange={handleSeek}
-              
             />
             <div className="text-xs text-zinc-400">{formatTime(duration)}</div>
           </div>
@@ -243,18 +254,24 @@ export const PlaybackControls = () => {
         {/* volume controls */}
         <div className="hidden sm:flex items-center gap-4 min-w-[180px] w-[30%] justify-end">
           {user && (
-            <Button
-              onClick={handleAddToFavorite}
-              size="icon"
-              variant="ghost"
-              className="hover:text-white text-zinc-400"
+            <TooltipComponent
+              text={
+                isAlreadyFavorite ? "Added to favorites" : "Add to favorite"
+              }
             >
-              <Heart
-                className="h-4 w-4"
-                fill={isAlreadyFavorite ? "green" : ""}
-                color={isAlreadyFavorite ? "green" : "gray"}
-              />
-            </Button>
+              <Button
+                onClick={handleAddToFavorite}
+                size="icon"
+                variant="ghost"
+                className="hover:text-white text-zinc-400"
+              >
+                <Heart
+                  className="h-4 w-4"
+                  fill={isAlreadyFavorite ? "green" : "#18181b"}
+                  color={isAlreadyFavorite ? "green" : "#a1a1aa"}
+                />
+              </Button>
+            </TooltipComponent>
           )}
           <Button
             size="icon"
@@ -263,20 +280,32 @@ export const PlaybackControls = () => {
           >
             <Mic2 className="h-4 w-4" />
           </Button>
+          <TooltipComponent text="Current queue">
+
           <Button
             size="icon"
             variant="ghost"
             className="hover:text-white text-zinc-400"
-          >
+            >
             <ListMusic className="h-4 w-4" />
           </Button>
+            </TooltipComponent>
 
           <Dialog open={isOpen} onOpenChange={closeModal}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button aria-haspopup="true" size="icon" variant="ghost">
-                  <ListPlus className="h-4 w-4" />
-                </Button>
+                {user && (
+                  <TooltipComponent text="Add to playlist">
+                    <Button
+                      aria-haspopup="true"
+                      size="icon"
+                      variant="ghost"
+                      className="hover:text-white text-zinc-400"
+                    >
+                      <ListPlus className="h-4 w-4" />
+                    </Button>
+                  </TooltipComponent>
+                )}
               </DropdownMenuTrigger>
 
               <DropdownMenuContent align="end">
@@ -292,14 +321,16 @@ export const PlaybackControls = () => {
                   </DropdownMenuSubTrigger>
                   <DropdownMenuPortal>
                     <DropdownMenuSubContent>
-                      {playlists && playlists.map((playlist)=>(
-                        <DropdownMenuItem
-                        className="cursor-pointer"
-                        key={playlist._id}
-                        onClick={()=>handleAddToPlaylist(playlist._id)}
-                        >{playlist.playListName}</DropdownMenuItem>
-
-                      ))}
+                      {playlists &&
+                        playlists.map((playlist) => (
+                          <DropdownMenuItem
+                            className="cursor-pointer"
+                            key={playlist._id}
+                            onClick={() => handleAddToPlaylist(playlist._id)}
+                          >
+                            {playlist.playListName}
+                          </DropdownMenuItem>
+                        ))}
                     </DropdownMenuSubContent>
                   </DropdownMenuPortal>
                 </DropdownMenuSub>
@@ -341,43 +372,47 @@ export const PlaybackControls = () => {
                 </div>
               </div>
               <DialogFooter>
-                <Button onClick={()=>handleAddToPlaylist(null)}>Create playlist</Button>
+                <Button onClick={() => handleAddToPlaylist(null)}>
+                  Create playlist
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
 
           <div className="flex items-center gap-2">
-            <Button
-            onClick={()=>{
-              if(audioRef.current){
-                
-                audioRef.current.volume = isMute ? volume/100 :0
-                setMute(!isMute)
-
-              }
-
-            }}
-              size="icon"
-              variant="ghost"
-              className="hover:text-white text-zinc-400"
-            >
-              {isMute ?<VolumeX className="size-4" /> :volume <= 20 ? (
-                
-                <Volume className="h-4 w-4"  />
-                
-                ):
-                (volume >20 && volume <=50) ?(<Volume1 className="size-4" />): volume >50 && (<Volume2 className="size-4" />)
-                }
-            </Button>
-
+            <TooltipComponent text={`Volume:${volume}`}>
+              <Button
+                onClick={() => {
+                  if (audioRef.current) {
+                    audioRef.current.volume = isMute ? volume / 100 : 0;
+                    setMute(!isMute);
+                  }
+                }}
+                size="icon"
+                variant="ghost"
+                className="hover:text-white text-zinc-400"
+              >
+                {isMute ? (
+                  <VolumeX className="size-4" />
+                ) : volume <= 20 ? (
+                  <Volume className="h-4 w-4" />
+                ) : volume > 20 && volume <= 50 ? (
+                  <Volume1 className="size-4" />
+                ) : (
+                  volume > 50 && <Volume2 className="size-4" />
+                )}
+              </Button>
+            </TooltipComponent>
             <Slider
               value={[volume]}
-              
               onWheel={(event) => {
                 const delta = event.deltaY; // Detect scroll direction
                 setVolume((prevVolume) => {
                   // Adjust the volume and clamp between 0 and 100
-                  const newVolume = Math.min(100, Math.max(0, prevVolume - delta / 20)); 
+                  const newVolume = Math.min(
+                    100,
+                    Math.max(0, prevVolume - delta / 20)
+                  );
                   if (audioRef.current) {
                     audioRef.current.volume = newVolume / 100; // Update audio volume
                   }
@@ -386,7 +421,7 @@ export const PlaybackControls = () => {
               }}
               max={100}
               step={1}
-              className="w-24 hover:cursor-grab active:cursor-grabbing"
+              className="w-24 hover:cursor-pointer active:cursor-grabbing"
               onValueChange={(value) => {
                 setVolume(value[0]);
                 if (audioRef.current) {

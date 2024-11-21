@@ -71,7 +71,7 @@ const AlbumPage = () => {
           />
           {/* content */}
           <div className="relative z-10">
-            <div className="flex p-6 gap-6 pb-8">
+            <div className="flex flex-col md:flex-row  p-6 gap-6 pb-8">
               {!isLoading && (
                 <img
                   src={currentAlbum?.imageUrl}
@@ -82,10 +82,10 @@ const AlbumPage = () => {
               {isLoading && (
                 <Skeleton className="h-[240px] w-[240px] rounded" />
               )}
-              <div className="flex flex-col justify-end">
+              <div className="flex flex-col  justify-end">
                 <p className="text-sm font-medium">Album</p>
                 {!isLoading && (
-                  <h1 className="text-7xl font-bold my-4">
+                  <h1 className="text-2xl md:text-7xl font-bold my-4">
                     {currentAlbum?.title}
                   </h1>
                 )}

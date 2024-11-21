@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 import usePlayerStore from "@/store/usePlayerStore";
 import useUserStore from "@/store/useUserStore";
 import { Clock, Pause, Play } from "lucide-react";
@@ -9,7 +10,7 @@ import { useParams } from "react-router-dom";
 const PlaylistPage = () => {
   const { id } = useParams();
   const { isPlaying, currentSong, togglePlay, playAlbum } = usePlayerStore();
-  const { currentPlaylist, getPlaylistSongs, playlists } = useUserStore();
+  const { currentPlaylist, getPlaylistSongs,isLoading, playlists } = useUserStore();
 
   const handlePlayAlbum = () => {
     if (!currentPlaylist) return;
@@ -48,21 +49,32 @@ const PlaylistPage = () => {
           />
           {/* content */}
           <div className="relative z-10">
-            <div className="flex p-6 gap-6 pb-8">
-              <img
-                src={currentPlaylist?.imageUrl}
-                alt=""
-                className="w-[240px] h-[240px] shadow-xl rounded"
-              />
+            <div className="flex flex-col md:flex-row p-6 gap-6 pb-8">
+            {!isLoading && (
+                <img
+                  src={currentPlaylist?.imageUrl}
+                  alt="playlist_img"
+                  className="w-[240px] h-[240px] shadow-xl rounded"
+                />
+              )}
+              {isLoading && (
+                <Skeleton className="h-[240px] w-[240px] rounded" />
+              )}
               <div className="flex flex-col justify-end">
-                <p className="text-sm font-medium">Playlist</p>
-                <h1 className="text-7xl font-bold my-4">
-                  {currentPlaylist?.playListName}
-                </h1>
-                <div className="flex items-center gap-2 text-sm text-zinc-100">
-                  <span>{currentPlaylist?.artist}</span>
-                  <span>● {currentPlaylist?.songs.length} Songs</span>
-                </div>
+              {!isLoading && (
+                  <h1 className=" text-2xl md:text-7xl font-bold my-4">
+                    {currentPlaylist?.playListName}
+                  </h1>
+                )}
+                {isLoading && <Skeleton className="h-10 w-[250px]" />}
+                {!isLoading && (
+                  <div className="flex items-center gap-2 text-sm text-zinc-100">
+                    <span>{currentPlaylist?.artist}</span>
+                    <span>● {currentPlaylist?.songs.length} Songs</span>
+                   
+                  </div>
+                )}
+                {isLoading && <Skeleton className="h-4 w-[250px] mt-5" />}
               </div>
             </div>
             {/* Play button */}
@@ -102,7 +114,7 @@ const PlaylistPage = () => {
               {/* Song lists */}
               <div className="px-6">
                 <div className="space-y-2 py-4">
-                  {currentPlaylist?.songs.map((song, index) => {
+                  {!isLoading && currentPlaylist?.songs.map((song, index) => {
                     const isCurrentSong = currentSong?._id === song._id;
                     return (
                       <div
@@ -112,7 +124,7 @@ const PlaylistPage = () => {
                       >
                         <div className="flex items-center justify-center">
                           {isCurrentSong && isPlaying ? (
-                            <div className="size-4 text-green-500">♫</div>
+                            <div className="size-4 text-green-500 animate-bounce">♫</div>
                           ) : (
                             <span className="group-hover:hidden">
                               {index + 1}
@@ -146,6 +158,29 @@ const PlaylistPage = () => {
                       </div>
                     );
                   })}
+                   {isLoading &&
+                    Array.from({ length: 10 }).map((_, index) => {
+                      return (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between gap-2 px-10 mt-5"
+                        >
+                          <div className="flex gap-2">
+                            <Skeleton className="h-[55px] size-10 " />
+                            <div className="space-y-2">
+                              <Skeleton className="h-[15px] w-20  " />
+                              <Skeleton className="h-[15px] w-12  " />
+                            </div>
+                          </div>
+                          <div>
+                            <Skeleton className="h-[15px] w-20  " />
+                          </div>
+                          <div>
+                            <Skeleton className="h-[15px] w-12  " />
+                          </div>
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
             </div>

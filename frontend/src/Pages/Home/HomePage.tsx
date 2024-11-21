@@ -5,6 +5,7 @@ import SectionGrid from "./components/SectionGrid";
 import useMusicStore from "@/store/useMusicStore";
 import { useEffect } from "react";
 import AlbumGrid from "./components/AlbumGrid";
+import { getGreetingMessage } from "@/utils/getGreetingMessage";
 
 
 
@@ -47,7 +48,7 @@ const HomePage = () => {
 			<Header />
 			<ScrollArea className='h-[calc(100vh-180px)]'>
 				<div className='p-4 sm:p-6'>
-					<h1 className='text-2xl sm:text-3xl font-bold mb-6'>Good afternoon</h1>
+					<h1 className='text-2xl sm:text-3xl font-bold mb-6'>{getGreetingMessage()}</h1>
 					<FeaturedSection />
 
 					<div className='space-y-8'>
