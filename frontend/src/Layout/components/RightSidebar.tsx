@@ -33,16 +33,21 @@ const RightSidebar = () => {
       roomId: 23452,
       roomName: "Sangeet",
       image: "/google.png",
-    }
-    
+    },{
+      _id: 423452,
+      roomId: 23452,
+      roomName: "Sangeet",
+      image: "/google.png",
+    },
   ];
   return (
     <aside className="h-full flex flex-col gap-2">
       <section className="rounded-lg bg-zinc-900 p-4">
-        <div className="flex gap-2">
+        <div className="flex  flex-col lg:flex-row  gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
+                title="Messages"
                 variant={"ghost"}
                 className="w-full justify-start text-white hover:bg-zinc-800 "
               >
@@ -66,7 +71,7 @@ const RightSidebar = () => {
                         <AvatarFallback>CN</AvatarFallback>
                       </Avatar>
 
-                      <div className="flex-1 min-w-0 hidden md:block">
+                      <div className="flex-1 min-w-0 block">
                         <p className="font-medium truncate">{room.roomName}</p>
                         <p className="text-sm text-zinc-400 truncate">
                           Text message
@@ -82,6 +87,7 @@ const RightSidebar = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
+                title="Requests"
                 variant={"ghost"}
                 className="w-full justify-start text-white hover:bg-zinc-800 "
               >
@@ -105,7 +111,7 @@ const RightSidebar = () => {
                         <AvatarFallback>CN</AvatarFallback>
                       </Avatar>
 
-                      <div className="flex-1  min-w-0 hidden md:flex gap-2 items-center">
+                      <div className="flex-1  min-w-0 flex gap-2 items-center">
                         <div>
                           <p className="font-medium truncate">
                             {room.roomName}
@@ -153,15 +159,16 @@ const RightSidebar = () => {
       </section>
       {/* Show public rooms */}
 
-      <section className="flex-1 rounded-lg bg-zinc-900 p-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className=" flex items-center text-white px-2">
+      <section className="flex-1 flex flex-col   items-center rounded-lg bg-zinc-900 p-4">
+        <div className="flex items-center justify-between md:float-start md:mr-auto mb-4 w-full border-b-2 ">
+          <div className=" flex flex-col md:flex-row text-center gap-2 items-center md:text-start text-white p-2  ">
             <Users2 className="size-5 mr-2" />
-            <span className="hidden md:inline">Public rooms</span>
+            <span className="">Public rooms</span>
           </div>
+         
         </div>
-        <ScrollArea className="h-[calc(100vh-300px)]">
-          <div className="space-y-2">
+        <ScrollArea className=" h-[calc(100vh-300px)] w-fit md:w-full pb-10  ">
+          <div className="space-y-2  ">
             {isLoading ? (
               <PlaylistSkeleton />
             ) : (
@@ -169,16 +176,17 @@ const RightSidebar = () => {
                 <Link
                   to={`/room/${room._id}`}
                   key={room._id}
-                  className="p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer"
+                  className="p-2 hover:bg-zinc-800 rounded-md flex flex-col md:flex-row justify-center items-center gap-3 group cursor-pointer"
                 >
-                  <img
-                    src={room.image}
-                    alt="room_img"
-                    className="size-12 rounded-md flex-shrink-0 object-cover "
-                  />
-                  <div className="flex-1 min-w-0 hidden md:block">
-                    <p className="font-medium truncate">{room.roomName}</p>
-                    <p className="text-sm text-zinc-400 truncate">
+                  <Avatar className="size-10">
+                    <AvatarImage src="https://github.com/shadcn.png" />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+
+                  <div className="flex-1 min-w-0 text-center md:text-start ">
+                    <p className=" font-medium truncate">{room.roomName}</p>
+
+                    <p className=" text-sm text-zinc-400 truncate">
                       Joined ● 100
                     </p>
                   </div>

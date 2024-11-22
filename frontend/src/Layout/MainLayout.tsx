@@ -44,19 +44,19 @@ const MainLayout = () => {
           <Outlet />
         </ResizablePanel>
         {/* Right side */}
-        {!isMobile && (
-          <>
+       
+          
             <ResizableHandle className="w-2 bg-black rounded-lg transition-colors" />
             <ResizablePanel
               defaultSize={isMobile ? 0 : 18}
               minSize={0}
-              maxSize={18}
+              maxSize={isMobile ? 25 :18}
               collapsedSize={0}
             >
               <RightSidebar />
             </ResizablePanel>
-          </>
-        )}
+          
+        
       </ResizablePanelGroup>
       <PlaybackControls />
     </div>

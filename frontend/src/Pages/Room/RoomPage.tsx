@@ -21,6 +21,7 @@ const RoomPage = () => {
 
   const [isMobile,setIsMobile] = useState(false);
 
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
