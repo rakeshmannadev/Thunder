@@ -20,7 +20,7 @@ const adminSockets = {}; // tracks admin socket ids by roomid
 
 io.on("connection", (socket) => {
   const { userId, roomId } = socket.handshake.query;
-
+console.log("User connected "+socket.id)
   // Add user to the active user list
   if (!activeUsers[roomId]) activeUsers[roomId] = [];
   activeUsers[roomId].push({ userId, socketId: socket.id });
@@ -31,23 +31,23 @@ io.on("connection", (socket) => {
   });
 
   // Initialize broadcast
-  socket.on("initializeBroadcast", async () => {
+  socket.on("initializeBroadcast", async ({userId,roomId}) => {
     const room = await Room.findOne({ roomId });
     if (!room) return;
-
+    
     if (room.admin.toString() !== userId.toString()) return;
-
+    
     const user = await User.findById(userId);
     if (!user) return;
-
+    
+    console.log("Initialize broadcast")
     // Store the admin's socket ID for tracking
     adminSockets[roomId] = socket.id;
     socket.join(roomId); // Admin joins the room
     socket.data.isAdmin = true; // Custom property to identify the admin
 
     io.to(roomId).emit("broadcastStarted", {
-      userId: user._id,
-      userName: user.name,
+     userName:'Test admin',
     });
 
     console.log(`Broadcast started by admin: ${user.name}`);
@@ -87,6 +87,7 @@ io.on("connection", (socket) => {
       io.to(roomId).emit("updateUsers", {
         users: activeUsers[roomId],
       });
+      console.log("user disconnected "+socket.id)
     }
 
     // If admin disconnects

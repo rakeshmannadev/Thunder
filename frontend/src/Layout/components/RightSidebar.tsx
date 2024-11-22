@@ -34,7 +34,7 @@ const RightSidebar = () => {
       roomName: "Sangeet",
       image: "/google.png",
     },{
-      _id: 423452,
+      _id: 4252,
       roomId: 23452,
       roomName: "Sangeet",
       image: "/google.png",
