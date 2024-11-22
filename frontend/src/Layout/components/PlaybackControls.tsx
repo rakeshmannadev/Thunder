@@ -34,7 +34,6 @@ import {
   PlusCircle,
   Repeat,
   Repeat1,
-  Repeat1Icon,
   Shuffle,
   SkipBack,
   SkipForward,
@@ -45,7 +44,6 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Label } from "@radix-ui/react-dropdown-menu";
 import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
 import TooltipComponent from "@/components/Tooltip/TooltipComponent";
@@ -403,9 +401,9 @@ export const PlaybackControls = () => {
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
+                  <label htmlFor="name" className="text-right">
                     Name
-                  </Label>
+                  </label>
                   <Input
                     onChange={(e) => setPlaylistName(e.target.value)}
                     id="name"
@@ -414,9 +412,9 @@ export const PlaybackControls = () => {
                   />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="username" className="text-right">
+                  <label htmlFor="username" className="text-right">
                     Artist name
-                  </Label>
+                  </label>
                   <Input
                     onChange={(e) => setArtist(e.target.value)}
                     id="username"

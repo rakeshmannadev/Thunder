@@ -98,7 +98,7 @@ const LeftSidebar = () => {
             <span className="hidden md:inline">Playlists</span>
           </div>
         </div>
-        <ScrollArea className="h-[calc(100vh-300px)] w-fit md:w-full pb-5">
+        <ScrollArea className="h-[calc(100vh-300px)] w-fit md:w-full pb-10">
           <div className="space-y-2 ">
             {playlistLoading ? (
               <PlaylistSkeleton />

@@ -3,10 +3,9 @@ import Chatheader from "./components/Chatheader";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import MessageInput from "./components/MessageInput";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import UsersList from "./components/UserLists";
-
 import CurrentlyPlaying from "./components/CurrentlyPlaying";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import { useEffect, useState } from "react";
 
 const formatTime = (date: string) => {
   return new Date(date).toLocaleTimeString("en-US", {
@@ -16,7 +15,22 @@ const formatTime = (date: string) => {
   });
 };
 
+
+
 const RoomPage = () => {
+
+  const [isMobile,setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+  
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   const selectedUser = {
     fullName: "Arijit Singh",
     imageUrl: "/Kesariya.jpg",
@@ -81,9 +95,8 @@ const RoomPage = () => {
     <main className="h-full rounded-lg bg-gradient-to-b from-zinc-800 to-zinc-900 overflow-hidden">
       <Header />
 
-      <div className="grid lg:grid-cols-[250px_1fr] grid-cols-[80px_1fr] h-[calc(100vh-130px)]">
-        {/* <UsersList /> */}
-        <UsersList/>
+      <div className="grid  grid-cols-[1fr] h-[calc(100vh-130px)]">
+       
         {/* chat message */}
         <div className=" flex flex-col h-full">
           {selectedUser ? (
@@ -91,8 +104,8 @@ const RoomPage = () => {
               <Chatheader />
               <ResizablePanelGroup direction="vertical" className=" flex flex-col h-full" >
 
-              <ResizablePanel defaultSize={18} maxSize={18} className="relative h-full" >
-              <CurrentlyPlaying/>
+              <ResizablePanel defaultSize={isMobile ? 27 :20} maxSize={isMobile?27:20}  className="relative h-full" >
+              <CurrentlyPlaying isMobile={isMobile}/>
 
               </ResizablePanel>
               <ResizableHandle withHandle />
