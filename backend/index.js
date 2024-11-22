@@ -1,3 +1,4 @@
+import cookieParser from "cookie-parser";
 import express from "express";
 import dotenv from "dotenv";
 import path from "path";
@@ -14,12 +15,12 @@ import songRoutes from "./routes/song.routes.js";
 import roomRoutes from "./routes/room.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import connectDb from "./db/connectDb.js";
-import cookieParser from "cookie-parser";
+import { app,server } from "./socket/socket.js";
 
 dotenv.config();
 const __dirname = path.resolve();
 
-const app = express();
+
 
 app.use(express.json());
 app.use(
@@ -62,7 +63,7 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is started at port: ${PORT}`);
   connectDb();
 });
