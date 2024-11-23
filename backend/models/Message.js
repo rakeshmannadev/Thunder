@@ -6,6 +6,9 @@ const messageSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    imageUrl: {
+      type: String,
+    },
     message: {
       type: String,
       required: true,

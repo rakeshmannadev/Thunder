@@ -15,6 +15,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import useUserStore from "@/store/useUserStore";
 import {
   Bell,
   Check,
@@ -23,23 +24,20 @@ import {
   Users2,
   X,
 } from "lucide-react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const RightSidebar = () => {
-  const isLoading = false;
-  const rooms = [
-    {
-      _id: 423452,
-      roomId: 23452,
-      roomName: "Sangeet",
-      image: "/google.png",
-    },{
-      _id: 4252,
-      roomId: 23452,
-      roomName: "Sangeet",
-      image: "/google.png",
-    },
-  ];
+const {isLoading,fetchPublicRooms,publicRooms} = useUserStore()
+
+useEffect(()=>{
+  if(publicRooms.length <=0){
+    fetchPublicRooms();
+  }
+},[])
+
+
+
   return (
     <aside className="h-full flex flex-col gap-2">
       <section className="rounded-lg bg-zinc-900 p-4">
@@ -60,7 +58,7 @@ const RightSidebar = () => {
               <DropdownMenuSeparator />
               <ScrollArea>
                 <div className="space-y-2">
-                  {rooms.map((room) => (
+                  {publicRooms.map((room) => (
                     <Link
                       to={`/room/${room._id}`}
                       key={room._id}
@@ -100,7 +98,7 @@ const RightSidebar = () => {
               <DropdownMenuSeparator />
               <ScrollArea>
                 <div className="space-y-2">
-                  {rooms.map((room) => (
+                  {publicRooms.map((room) => (
                     <Link
                       to={`/room/${room._id}`}
                       key={room._id}
@@ -172,9 +170,9 @@ const RightSidebar = () => {
             {isLoading ? (
               <PlaylistSkeleton />
             ) : (
-              rooms.map((room) => (
+              publicRooms.map((room) => (
                 <Link
-                  to={`/room/${room._id}`}
+                  to={`/room/${room.roomId}`}
                   key={room._id}
                   className="p-2 hover:bg-zinc-800 rounded-md flex flex-col md:flex-row justify-center items-center gap-3 group cursor-pointer"
                 >

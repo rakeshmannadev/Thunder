@@ -9,7 +9,6 @@ import {
   getPlaylists,
   getPlaylistSongs,
   getPublicRooms,
-  getRoomMembers,
   joinPublicRoom,
   leaveRoom,
   sendJoinRequest,
@@ -26,7 +25,7 @@ router.post("/addToPlaylist", protectRoute, addToPlaylist);
 router.post("/addAlbumToPlaylist", protectRoute, addAlbumToPlaylist);
 router.get("/getPlaylistSongs/:id", protectRoute, getPlaylistSongs);
 
-router.get("/getRoomMembers/:roomId", protectRoute, getRoomMembers);
+
 router.get("/getPublicRooms", getPublicRooms);
 router.put("/join-public-room/:roomId", protectRoute, joinPublicRoom);
 router.put("/leave-room/:roomId", protectRoute, leaveRoom);

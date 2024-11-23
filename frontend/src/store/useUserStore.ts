@@ -6,6 +6,7 @@ import { create } from "zustand";
 
 interface UserStore {
   fetchJoinedRooms: () => Promise<void>;
+  fetchPublicRooms: () => Promise<void>;
   fetchPlaylists: () => Promise<void>;
   getCurrentUser:()=>Promise<void>;
   addToFavorite:(artist:string,imageUrl:string,songId:string,playlistName:string)=>Promise<void>;
@@ -13,6 +14,7 @@ interface UserStore {
   addSongToPlaylist:(playlistId:string|any,songId:string,playListName:string,artist:string,imageUrl:string) =>Promise<void>;
   addAlbumToPlaylist:(playListName:string,artist:string,albumId:string |any,imageUrl:string,songs:Array<string>) =>Promise<void>;
   rooms: Room[];
+  publicRooms:Room[],
   currentUser:User | null;
   playlists: Playlist[];
   currentPlaylist:Playlist |null;
@@ -24,6 +26,7 @@ const useUserStore = create<UserStore>((set, get) => ({
   isLoading: true,
   playlistLoading:true,
   rooms: [],
+  publicRooms:[],
   playlists: [],
   currentPlaylist:null,
   currentUser:null,
@@ -37,6 +40,18 @@ const useUserStore = create<UserStore>((set, get) => ({
       console.log(error);
     } finally {
       set({ isLoading: false });
+    }
+  },
+  fetchPublicRooms:async()=>{
+    set({isLoading:true})
+    try {
+      const response = await axiosInstance.get("/user/getPublicRooms");
+      set({publicRooms:response.data.rooms})
+    } catch (error:any) {
+      console.log(error.response.data.message);
+
+    }finally{
+      set({isLoading:false})
     }
   },
   fetchPlaylists: async () => {

@@ -7,10 +7,11 @@ interface SocketState {
   activeUsers: string[];
   userName: string;
   roomId: string;
-  connectSocket: (userId: string, roomId: string) => void;
-  startBroadcast: () => void;
+  connectSocket: (roomId:string) => void;
+  startBroadcast: (userId: string, roomId: string) => void;
   endBroadcast: () => void;
-  updateUsers: (users: string[]) => void;
+  joinRoom: (roomId: string, userId: string) => void;
+  leaveRoom: (roomId: string, userId: string) => void;
 }
 
 const useSocketStore = create<SocketState>((set, get) => ({
@@ -19,16 +20,24 @@ const useSocketStore = create<SocketState>((set, get) => ({
   activeUsers: [],
   userName: "",
   roomId: "",
-
-  connectSocket: (userId: string, roomId: string) => {
+  connectSocket: (roomId) => {
     const socket = io("http://localhost:3000", {
-      query: { userId, roomId },
+      query:{
+        roomId
+      }
     });
-    set({ socket, roomId });
+    set({ socket });
 
     // Listen to socket events inside the store
     socket.on("connect", () => {
       console.log("Connected to server");
+    });
+
+    socket.on("adminJoins",(data)=>{
+      console.log(data.message);
+    })
+    socket.on("updateUsers", (data) => {
+      set({ activeUsers: data.users }); // Update Zustand state
     });
 
     socket.on("broadcastStarted", (data) => {
@@ -39,34 +48,44 @@ const useSocketStore = create<SocketState>((set, get) => ({
     socket.on("broadcastEnded", (data) => {
       console.log(data.message);
       set({ isBroadcasting: false });
+      // socket.close();
     });
 
-    socket.on("updateUsers", (data) => {
-      console.log("Active users:", data.users);
-      set({ activeUsers: data.users });
-    });
 
     socket.on("broadcastResumed", (data) => {
       console.log(`${data.userName} has resumed the broadcast.`);
     });
+    socket.on('disconnect', (reason) => {
+      set({socket:null})
+      console.log('Disconnected from server:', reason);
+    });
   },
 
-  startBroadcast: () => {
-    const { socket, roomId, userName } = get();
+  startBroadcast: (userId: string, roomId: string) => {
+    const { socket } = get();
     if (socket) {
-      socket.emit("initializeBroadcast", { userId: userName, roomId });
+      socket.emit("initializeBroadcast", { userId, roomId });
     }
   },
-
+  joinRoom: (userId: string, roomId: string) => {
+    const { socket } = get();
+    if (socket) {
+      socket.emit("joinRoom", { userId, roomId });
+    }
+  },
+  leaveRoom: (roomId: string, userId: string) => {
+    const { socket } = get();
+    if (socket) {
+      socket.emit("leaveRoom", { userId, roomId });
+    }
+    // socket?.close();
+    set({ activeUsers: [] });
+  },
   endBroadcast: () => {
     const { socket, roomId } = get();
     if (socket) {
       socket.emit("endBroadcast", { roomId });
     }
-  },
-
-  updateUsers: (users: string[]) => {
-    set({ activeUsers: users });
   },
 }));
 

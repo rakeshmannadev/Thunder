@@ -4,25 +4,27 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import React from "react";
+import React, { useEffect } from "react";
 import Members from "./Members";
+import useRoomStore from "@/store/useRoomStore";
 
-const Memberslist = ({ children }: { children: React.ReactNode }) => {
+const Memberslist = ({ children,roomId }: { children: React.ReactNode,roomId:string }) => {
+const {fetchRoomMembers,fetchActiveMembers,members,activeMembers,isLoading} = useRoomStore()
+  useEffect(()=>{
+    fetchRoomMembers(roomId);
+    
+  },[roomId])
+
   return (
     <Popover>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
       <PopoverContent className="w-72">
         <ScrollArea className="w-full h-[calc(100vh-280px)]">
-          <Members />
-          <Members />
-          <Members />
-          <Members />
-          <Members />
-          <Members />
-          <Members />
-          <Members />
-          <Members />
-          <Members />
+          {members && members.map((member)=>(
+            <Members key={member._id} member={member} isLoading={isLoading}  />
+
+          ))}
+          
          
         </ScrollArea>
       </PopoverContent>

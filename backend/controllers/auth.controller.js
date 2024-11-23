@@ -11,8 +11,10 @@ export const authCheck = async (req, res, next) => {
     // generate token
     let token = null;
     const secret = process.env.JWT_SECRET;
+    if(user){
+      token = jwt.sign({ userId: user._id }, secret);
 
-    token = jwt.sign({ userId: user._id }, secret);
+    }
 
     // signup process
     if (!user) {
@@ -21,8 +23,8 @@ export const authCheck = async (req, res, next) => {
         name: firstName + " " + lastName,
         image: imageUrl,
       });
-
       token = jwt.sign({ userId: newUser._id }, secret);
+
     }
     res.cookie("thunder", token, {
       maxAge: 15 * 24 * 60 * 60 * 1000,

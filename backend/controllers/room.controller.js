@@ -1,5 +1,4 @@
 import generateRandomCode from "../helper/generateRoomId.js";
-import { uploadeFiles } from "../helper/uploadeFIleToCloudinary.js";
 import Room from "../models/Room.js";
 import User from "../models/User.js";
 
@@ -19,11 +18,11 @@ export const createRoom = async (req, res, next) => {
     const room = await Room.create({
       roomId,
       roomName,
-     
-      admin: '67358fc7bc540ea5b27aa7de',
+      admin: req.user._id,
+      participants: req.user._id,
     });
     if (room) {
-      await User.findByIdAndUpdate('67358fc7bc540ea5b27aa7de', {
+      await User.findByIdAndUpdate(req.user._id, {
         $push: { rooms: room._id },
       });
     }
@@ -196,6 +195,53 @@ export const removeModarator = async (req, res, next) => {
       .json({ status: true, message: "Member is removed from modarator" });
   } catch (error) {
     console.log("Error in remove modarator controller");
+    next(error);
+  }
+};
+export const getRoomMembers = async (req, res, next) => {
+  try {
+    const { roomId } = req.params;
+
+    const room = await Room.findOne({ roomId }).populate("participants");
+
+    if (!room)
+      return res
+        .status(404)
+        .json({ status: false, message: "No room found with this roomId" });
+
+    res.status(200).json({ status: true, participants: room.participants });
+  } catch (error) {
+    console.log("Error in getall users controller", error.message);
+    next(error);
+  }
+};
+
+export const getActiveUsers = async (req, res, next) => {
+  try {
+    const { userIds } = req.body;
+    const users = await User.find(
+      { _id: { $in: userIds } },
+      { _id: 1, name: 1, role: 1 }
+    );
+    res.status(200).json({ status: true, users });
+  } catch (error) {
+    console.log("Error in getActiveUsers", error.message);
+    next(error);
+  }
+};
+
+export const getRoomById = async (req, res, next) => {
+  try {
+    const { roomId } = req.params;
+    if (!roomId)
+      return res
+        .status(400)
+        .json({ status: false, message: "No roomId provided" });
+
+    const room = await Room.findOne({ roomId });
+    res.status(200).json({ status: true, room });
+  } catch (error) {
+    console.log("Error in getRoombyId controller", error.message);
     next(error);
   }
 };
