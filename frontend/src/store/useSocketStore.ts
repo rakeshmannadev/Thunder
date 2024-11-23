@@ -1,66 +1,80 @@
 import { create } from "zustand";
 import { io, Socket } from "socket.io-client";
+import toast from "react-hot-toast";
 
 interface SocketState {
   socket: Socket | null;
+  isJoined:boolean;
   isBroadcasting: boolean;
+  isPlayingSong: boolean;
   activeUsers: string[];
   userName: string;
+  userId: string;
   roomId: string;
-  connectSocket: (roomId:string) => void;
+  connectSocket: (roomId: string, userId: string) => void;
   startBroadcast: (userId: string, roomId: string) => void;
-  endBroadcast: () => void;
+  endBroadcast: (userId: string, roomId: string) => void;
   joinRoom: (roomId: string, userId: string) => void;
   leaveRoom: (roomId: string, userId: string) => void;
+  disconnectSocket: () => void;
 }
 
 const useSocketStore = create<SocketState>((set, get) => ({
   socket: null,
+  isJoined:false,
   isBroadcasting: false,
+  isPlayingSong: false,
   activeUsers: [],
   userName: "",
+  userId: "",
   roomId: "",
-  connectSocket: (roomId) => {
+  connectSocket: (roomId, userId) => {
     const socket = io("http://localhost:3000", {
-      query:{
-        roomId
-      }
+      query: {
+        roomId,
+        userId,
+      },
     });
-    set({ socket });
+    set({ socket, roomId: roomId,isJoined:true });
 
     // Listen to socket events inside the store
     socket.on("connect", () => {
       console.log("Connected to server");
     });
 
-    socket.on("adminJoins",(data)=>{
-      console.log(data.message);
-    })
+    socket.on("adminJoins", (data) => {
+      toast.success(data.message);
+    });
     socket.on("updateUsers", (data) => {
       set({ activeUsers: data.users }); // Update Zustand state
     });
 
     socket.on("broadcastStarted", (data) => {
-      console.log(`${data.userName} has started the broadcast.`);
-      set({ isBroadcasting: true, userName: data.userName });
+      toast.success(`${data.userName} has started the broadcast.`);
+      set({
+        isBroadcasting: true,
+        userName: data.userName,
+        userId: data.userId,
+      });
     });
 
     socket.on("broadcastEnded", (data) => {
-      console.log(data.message);
+      toast.success(data.message);
       set({ isBroadcasting: false });
       // socket.close();
     });
-
-
-    socket.on("broadcastResumed", (data) => {
-      console.log(`${data.userName} has resumed the broadcast.`);
-    });
-    socket.on('disconnect', (reason) => {
-      set({socket:null})
-      console.log('Disconnected from server:', reason);
-    });
   },
+  disconnectSocket: () => {
+    const socket = get().socket;
+    if (socket) {
+      socket.disconnect();
+      set({isJoined:false,socket:null});
+      console.log("Socket disconnected.");
+      
+      
 
+    }
+  },
   startBroadcast: (userId: string, roomId: string) => {
     const { socket } = get();
     if (socket) {
@@ -77,14 +91,13 @@ const useSocketStore = create<SocketState>((set, get) => ({
     const { socket } = get();
     if (socket) {
       socket.emit("leaveRoom", { userId, roomId });
+      
     }
-    // socket?.close();
-    set({ activeUsers: [] });
   },
-  endBroadcast: () => {
-    const { socket, roomId } = get();
+  endBroadcast: (userId, roomId) => {
+    const { socket } = get();
     if (socket) {
-      socket.emit("endBroadcast", { roomId });
+      socket.emit("endBroadcast", { userId, roomId });
     }
   },
 }));

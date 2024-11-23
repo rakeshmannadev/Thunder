@@ -30,7 +30,6 @@ const Members = ({
 
   const isActive = Array.isArray(activeUsers) && activeUsers.includes(member._id.toString());
 
-  console.log('Is Active:', isActive);
 
   return (
     <div className="flex flex-col items-center gap-3 mt-2 hover:bg-zinc-600 rounded-md p-2 text-nowrap">
@@ -48,7 +47,7 @@ const Members = ({
             </Avatar>
             <div
               className={`absolute bottom-0 left-0 h-3 w-3 rounded-full ring-2  ${
-                activeUsers.includes(member._id.toString())
+                isActive
                   ? "bg-green-500"
                   : "ring-zinc-900"
               }   }`}

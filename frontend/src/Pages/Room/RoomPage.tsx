@@ -25,10 +25,11 @@ const formatTime = (date: string) => {
 
 const RoomPage = () => {
   const [isMobile, setIsMobile] = useState(false);
+  const { connectSocket, joinRoom, disconnectSocket, activeUsers,isJoined } =
+    useSocketStore();
+    const { currentUser } = useUserStore();
 
-  const { currentUser } = useUserStore();
   const { roomId } = useParams<string>();
-  const { connectSocket, joinRoom, leaveRoom } = useSocketStore();
   const { getRoomById, currentRoom } = useRoomStore();
 
   useEffect(() => {
@@ -48,19 +49,25 @@ const RoomPage = () => {
     }
   }, [roomId]);
 
-  console.log(currentRoom);
-
   // Socket Logics
 
   useEffect(() => {
-    if (currentUser && roomId) {
-      connectSocket(roomId);
+    if (currentUser && roomId && !isJoined ) {
+      connectSocket(roomId, currentUser._id);
       joinRoom(currentUser._id, roomId);
     }
-    return () => {
-      if (roomId && currentUser) leaveRoom(roomId, currentUser._id);
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      disconnectSocket();
+      event.preventDefault();
+      event.returnValue = "";
     };
-  }, [currentUser, roomId, connectSocket, joinRoom]);
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [currentUser, roomId, connectSocket, joinRoom, disconnectSocket]);
 
   return (
     <main className="h-full rounded-lg bg-gradient-to-b from-zinc-800 to-zinc-900 overflow-hidden">
