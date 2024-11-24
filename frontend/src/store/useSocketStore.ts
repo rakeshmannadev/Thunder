@@ -3,7 +3,7 @@ import { io, Socket } from "socket.io-client";
 import toast from "react-hot-toast";
 import { axiosInstance } from "@/lib/axios";
 import usePlayerStore from "./usePlayerStore";
-import { useRef } from "react";
+
 
 interface SocketState {
   socket: Socket | null;
@@ -72,7 +72,6 @@ const useSocketStore = create<SocketState>((set, get) => ({
         const response = await axiosInstance.get(`/songs/${songId}`);
         if (response.data.status) {
           const song = response.data.song;
-          usePlayerStore.setState({ queue: [] });
           usePlayerStore.getState().setCurrentSong(song);
           set({ isPlayingSong: true });
         }
@@ -96,10 +95,14 @@ const useSocketStore = create<SocketState>((set, get) => ({
     });
 
     socket.on("broadcastEnded", (data) => {
+      const audio = document.querySelector("audio");
       toast.success(data.message);
       set({ isBroadcasting: false, isPlayingSong: false });
       usePlayerStore.setState({ currentSong: null,isPlaying:false });
-
+      if(audio){
+        audio.load();
+        
+      }
     });
   },
   disconnectSocket: () => {

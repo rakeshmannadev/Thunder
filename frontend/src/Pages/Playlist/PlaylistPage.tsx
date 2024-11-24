@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import usePlayerStore from "@/store/usePlayerStore";
+import useSocketStore from "@/store/useSocketStore";
 import useUserStore from "@/store/useUserStore";
 import { Clock, Pause, Play, Shuffle } from "lucide-react";
 import { useEffect } from "react";
@@ -11,6 +12,8 @@ const PlaylistPage = () => {
   const { id } = useParams();
   const { isPlaying, currentSong, togglePlay, playAlbum,isShuffle } = usePlayerStore();
   const { currentPlaylist, getPlaylistSongs,isLoading, playlists } = useUserStore();
+  const {isPlayingSong,isBroadcasting,pauseSong,playSong,roomId,} = useSocketStore();
+  const {currentUser} = useUserStore();
 
   const handlePlayAlbum = () => {
     if (!currentPlaylist) return;
@@ -18,7 +21,15 @@ const PlaylistPage = () => {
     const iscurrentPlaylistPlaying = currentPlaylist?.songs.some(
       (song) => song._id === currentSong?._id
     );
-    if (iscurrentPlaylistPlaying) togglePlay();
+    if (currentUser && isBroadcasting) {
+      if (isPlayingSong && iscurrentPlaylistPlaying) {
+        pauseSong(currentUser._id, roomId, currentSong._id);
+      } else {
+        playSong(currentUser._id, roomId, currentSong._id);
+      }
+    } else if(iscurrentPlaylistPlaying) {
+      togglePlay();
+    }
     else {
       // start playing the album from the beginning
       playAlbum(currentPlaylist?.songs, 0);

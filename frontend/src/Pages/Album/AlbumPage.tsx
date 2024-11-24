@@ -3,6 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import useMusicStore from "@/store/useMusicStore";
 import usePlayerStore from "@/store/usePlayerStore";
+import useSocketStore from "@/store/useSocketStore";
 import useUserStore from "@/store/useUserStore";
 
 import {
@@ -21,14 +22,24 @@ const AlbumPage = () => {
   const { isPlaying, currentSong, togglePlay, playAlbum, isShuffle } =
     usePlayerStore();
   const { currentAlbum, fetchAlbumById, isLoading } = useMusicStore();
-  const { addAlbumToPlaylist, playlists } = useUserStore();
+  const { addAlbumToPlaylist, playlists,currentUser } = useUserStore();
+  const {isPlayingSong,isBroadcasting,pauseSong,playSong,roomId,} = useSocketStore();
+
   const handlePlayAlbum = () => {
     if (!currentAlbum) return;
 
     const isCurrentAlbumPlaying = currentAlbum?.songs.some(
       (song) => song._id === currentSong?._id
     );
-    if (isCurrentAlbumPlaying) togglePlay();
+    if (currentUser && isBroadcasting) {
+      if (isPlayingSong && isCurrentAlbumPlaying) {
+        pauseSong(currentUser._id, roomId, currentSong._id);
+      } else {
+        playSong(currentUser._id, roomId, currentSong._id);
+      }
+    } else if(isCurrentAlbumPlaying) {
+      togglePlay();
+    }
     else {
       // start playing the album from the beginning
       playAlbum(currentAlbum?.songs, 0);

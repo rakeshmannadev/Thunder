@@ -1,5 +1,7 @@
 import { Song } from "@/types";
 import { create } from "zustand";
+import useSocketStore from "./useSocketStore";
+
 
 interface PlayerStore {
   currentSong: Song | any;
@@ -43,6 +45,9 @@ const usePlayerStore = create<PlayerStore>((set, get) => ({
       currentIndex: startIndex,
       isPlaying: true,
     });
+    if(useSocketStore.getState().socket && useSocketStore.getState().isBroadcasting ){
+      useSocketStore.getState().playSong(useSocketStore.getState().userId,useSocketStore.getState().roomId,song._id)
+    }
   },
   setCurrentSong: (song: Song | null) => {
     if (!song) return;
@@ -63,6 +68,7 @@ const usePlayerStore = create<PlayerStore>((set, get) => ({
     });
   },
   playNext: () => {
+    
     const { currentIndex, queue, isShuffle,isRepeat } = get();
     let nextIndex;
 
@@ -87,6 +93,10 @@ const usePlayerStore = create<PlayerStore>((set, get) => ({
         currentIndex: nextIndex,
         isPlaying: true,
       });
+
+      if(useSocketStore.getState().socket && useSocketStore.getState().isBroadcasting ){
+        useSocketStore.getState().playSong(useSocketStore.getState().userId,useSocketStore.getState().roomId,nextSong._id)
+      }
     } else {
       // if no next song
 
@@ -120,6 +130,9 @@ const usePlayerStore = create<PlayerStore>((set, get) => ({
         currentIndex: previousIndex,
         isPlaying: true,
       });
+      if(useSocketStore.getState().socket && useSocketStore.getState().isBroadcasting ){
+        useSocketStore.getState().playSong(useSocketStore.getState().userId,useSocketStore.getState().roomId,prevSong._id)
+      }
     } else {
       // if no prev song
 

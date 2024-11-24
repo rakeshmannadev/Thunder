@@ -6,7 +6,7 @@ import { Song } from "@/types";
 import { Pause, Play } from "lucide-react";
 
 const PlayButton = ({ song }: { song: Song }) => {
-  const { isPlaying, currentSong, togglePlay } = usePlayerStore();
+  const { isPlaying, currentSong, togglePlay,setCurrentSong } = usePlayerStore();
   const { isBroadcasting, isPlayingSong, playSong, pauseSong, roomId } =
     useSocketStore();
   const { currentUser } = useUserStore();
@@ -19,8 +19,10 @@ const PlayButton = ({ song }: { song: Song }) => {
       } else {
         playSong(currentUser._id, roomId, song._id);
       }
-    } else {
+    } else if(currentSong) {
       togglePlay();
+    }else{
+      setCurrentSong(song)
     }
   };
 
