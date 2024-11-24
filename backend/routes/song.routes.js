@@ -1,6 +1,6 @@
 import express from "express";
 import { IsAdmin, protectRoute } from "../middleware/auth.middleware.js";
-import { getAllSongs, getFeaturedSongs, getMadeForYou, getTrending } from "../controllers/song.controller.js";
+import { getAllSongs, getFeaturedSongs, getMadeForYou, getSongById, getTrending } from "../controllers/song.controller.js";
 
 const router = express.Router();
 

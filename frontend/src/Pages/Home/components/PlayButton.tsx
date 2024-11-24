@@ -1,20 +1,26 @@
 import { Button } from "@/components/ui/button";
 import usePlayerStore from "@/store/usePlayerStore";
+import useSocketStore from "@/store/useSocketStore";
+import useUserStore from "@/store/useUserStore";
 import { Song } from "@/types";
 import { Pause, Play } from "lucide-react";
 
 const PlayButton = ({ song }: { song: Song }) => {
-  const { isPlaying, currentSong, togglePlay, setCurrentSong } =
-    usePlayerStore();
-
+  const { isPlaying, currentSong, togglePlay } = usePlayerStore();
+  const { isBroadcasting, isPlayingSong, playSong, pauseSong, roomId } =
+    useSocketStore();
+  const { currentUser } = useUserStore();
   const isCurrentSong = currentSong?._id === song._id;
 
   const handlePlay = () => {
-    if (isCurrentSong) {
-      togglePlay();
+    if (currentUser && isBroadcasting) {
+      if (isPlayingSong && isCurrentSong) {
+        pauseSong(currentUser._id, roomId, song._id);
+      } else {
+        playSong(currentUser._id, roomId, song._id);
+      }
     } else {
-		usePlayerStore.setState({queue:[]});
-      setCurrentSong(song);
+      togglePlay();
     }
   };
 

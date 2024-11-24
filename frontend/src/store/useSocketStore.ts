@@ -3,10 +3,11 @@ import { io, Socket } from "socket.io-client";
 import toast from "react-hot-toast";
 import { axiosInstance } from "@/lib/axios";
 import usePlayerStore from "./usePlayerStore";
+import { useRef } from "react";
 
 interface SocketState {
   socket: Socket | null;
-  isLoading:boolean;
+  isLoading: boolean;
   isJoined: boolean;
   isBroadcasting: boolean;
   isPlayingSong: boolean;
@@ -26,7 +27,7 @@ interface SocketState {
 
 const useSocketStore = create<SocketState>((set, get) => ({
   socket: null,
-  isLoading:false,
+  isLoading: false,
   isJoined: false,
   isBroadcasting: false,
   isPlayingSong: false,
@@ -66,43 +67,51 @@ const useSocketStore = create<SocketState>((set, get) => ({
 
     socket.on("songStarted", async (data) => {
       const { songId } = data;
-      set({isLoading:true})
+      set({ isLoading: true });
       try {
         const response = await axiosInstance.get(`/songs/${songId}`);
         if (response.data.status) {
           const song = response.data.song;
-          usePlayerStore.setState({ currentSong: song });
+          usePlayerStore.setState({ queue: [] });
+          usePlayerStore.getState().setCurrentSong(song);
           set({ isPlayingSong: true });
         }
-      } catch (error:any) {
+      } catch (error: any) {
         console.log(error.response.data.message);
-      }finally{
-        set({isLoading:false});
+      } finally {
+        set({ isLoading: false });
       }
     });
 
     socket.on("songPaused", (data) => {
-      const {songId} = data;
-      const {isPlayingSong} = get();
-      if(usePlayerStore.getState().currentSong._id === songId && isPlayingSong ){
-        usePlayerStore.setState({ isPlaying: false });
+      const { songId } = data;
+      const { isPlayingSong } = get();
+      if (
+        usePlayerStore.getState().currentSong._id === songId &&
+        isPlayingSong
+      ) {
         set({ isPlayingSong: false });
-
+        usePlayerStore.getState().togglePlay();
       }
-    });;
-
+    });
 
     socket.on("broadcastEnded", (data) => {
       toast.success(data.message);
-      set({ isBroadcasting: false,isPlayingSong:false });
-      // socket.close();
+      set({ isBroadcasting: false, isPlayingSong: false });
+      usePlayerStore.setState({ currentSong: null,isPlaying:false });
+
     });
   },
   disconnectSocket: () => {
     const socket = get().socket;
     if (socket) {
       socket.disconnect();
-      set({ isJoined: false, socket: null,isBroadcasting: false,isPlayingSong:false });
+      set({
+        isJoined: false,
+        socket: null,
+        isBroadcasting: false,
+        isPlayingSong: false,
+      });
       console.log("Socket disconnected.");
     }
   },
@@ -119,10 +128,10 @@ const useSocketStore = create<SocketState>((set, get) => ({
       socket.emit("playSong", { userId, roomId, songId });
     }
   },
-  pauseSong:(userId,roomId,songId)=>{
-    const {socket} = get();
-    if(socket){
-      socket.emit("pauseSong",{userId,roomId,songId});
+  pauseSong: (userId, roomId, songId) => {
+    const { socket } = get();
+    if (socket) {
+      socket.emit("pauseSong", { userId, roomId, songId });
     }
   },
   joinRoom: (userId: string, roomId: string) => {

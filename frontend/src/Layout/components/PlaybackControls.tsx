@@ -27,6 +27,7 @@ import {
   Heart,
   ListMusic,
   ListPlus,
+  Loader2,
   Mic2,
   Pause,
   Play,
@@ -48,6 +49,7 @@ import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
 import TooltipComponent from "@/components/Tooltip/TooltipComponent";
 import useMusicStore from "@/store/useMusicStore";
+import useSocketStore from "@/store/useSocketStore";
 
 const formatTime = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
@@ -59,16 +61,25 @@ export const PlaybackControls = () => {
   const {
     currentSong,
     isPlaying,
-    togglePlay,
     playNext,
     playPrevious,
     playAlbum,
+    togglePlay,
     isShuffle,
     isRepeat,
   } = usePlayerStore();
   const { featured, trending } = useMusicStore();
 
-  const { addToFavorite, playlists, addSongToPlaylist } = useUserStore();
+  const { addToFavorite, playlists, addSongToPlaylist, currentUser } =
+    useUserStore();
+  const {
+    isBroadcasting,
+    isPlayingSong,
+    playSong,
+    pauseSong,
+    roomId,
+    isLoading,
+  } = useSocketStore();
   const { user } = useUser();
 
   const [volume, setVolume] = useState(20);
@@ -103,21 +114,19 @@ export const PlaybackControls = () => {
     audio.addEventListener("loadedmetadata", updateDuration);
 
     const handleEnded = () => {
-      if(isRepeat && currentSong){
+      if (isRepeat && currentSong) {
         setCurrentTime(0);
         usePlayerStore.setState({ isPlaying: true });
-        if(audioRef.current){
+        if (audioRef.current) {
           audioRef.current.currentTime = 0;
           audioRef.current.play();
         }
-
-      }else{
+      } else {
         usePlayerStore.setState({ isPlaying: false });
-        if(audioRef.current){
+        if (audioRef.current) {
           audioRef.current.pause();
         }
       }
-      
     };
 
     audio.addEventListener("ended", handleEnded);
@@ -199,6 +208,25 @@ export const PlaybackControls = () => {
     closeModal();
   };
 
+  //Set the volume to the last saved volume
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume / 100;
+    }
+  }, [volume]);
+
+  const handleTogglePlay = () => {
+    if (currentUser && isBroadcasting) {
+      if (isPlayingSong) {
+        pauseSong(currentUser._id, roomId, currentSong._id);
+      } else {
+        playSong(currentUser._id, roomId, currentSong._id);
+      }
+    } else {
+      togglePlay();
+    }
+  };
+
   return (
     <footer className="h-20 sm:h-24 bg-zinc-900 border-t border-zinc-800 px-4">
       <div className="flex justify-between items-center h-full max-w-[1800px] mx-auto">
@@ -245,7 +273,7 @@ export const PlaybackControls = () => {
                 variant="ghost"
                 className="hover:text-white text-zinc-400"
                 onClick={playPrevious}
-                disabled={!currentSong}
+                disabled={!currentSong || (isBroadcasting && currentUser?.role!=='admin')}
               >
                 <SkipBack className="h-4 w-4" />
               </Button>
@@ -254,12 +282,15 @@ export const PlaybackControls = () => {
               <Button
                 size="icon"
                 className="bg-white hover:bg-white/80 text-black rounded-full h-8 w-8"
-                onClick={togglePlay}
-                disabled={!currentSong}
+                onClick={handleTogglePlay}
+                disabled={!currentSong || (isBroadcasting && currentUser?.role!=='admin')}
               >
-                {isPlaying ? (
+                {isLoading && 
+                  <Loader2 className="size-5 animate-spin" />
+                }
+                {isPlaying && !isLoading ? (
                   <Pause className="h-5 w-5" />
-                ) : (
+                )  :(!isLoading) && (
                   <Play className="h-5 w-5" />
                 )}
               </Button>
@@ -270,7 +301,7 @@ export const PlaybackControls = () => {
                 variant="ghost"
                 className="hover:text-white text-zinc-400"
                 onClick={playNext}
-                disabled={!currentSong}
+                disabled={!currentSong || (isBroadcasting && currentUser?.role!=='admin')}
               >
                 <SkipForward className="h-4 w-4" />
               </Button>
