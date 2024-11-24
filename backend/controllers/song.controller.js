@@ -79,3 +79,16 @@ export const getTrending = async (req, res, next) => {
     next(error);
   }
 };
+export const getSongById = async (req, res, next) => {
+  const {songId} = req.params;
+  try {
+    const song = await Song.findById(songId);
+    if(!song){
+      return res.status(404).json({status:false,message:"Song not found"});
+    }
+    res.status(200).json({status:true,song});
+  } catch (error) {
+    console.log("first error in getSongById controller",error.message);
+    next(error);
+  }
+}

@@ -10,5 +10,6 @@ router.get("/",protectRoute,IsAdmin,getAllSongs);
 router.get("/featured",getFeaturedSongs);
 router.get("/made-for-you",getMadeForYou);
 router.get("/trending",getTrending);
+router.get("/:songId",getSongById);
 
 export default router;
