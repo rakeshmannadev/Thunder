@@ -16,7 +16,8 @@ interface SocketState {
   roomId: string;
   connectSocket: (roomId: string, userId: string) => void;
   startBroadcast: (userId: string, roomId: string) => void;
-  playSong: (userId: string, roomId: string, songId: string) => Promise<void>;
+  playSong: (userId: string, roomId: string, songId: string) => void;
+  pauseSong: (userId: string, roomId: string, songId: string) => void;
   endBroadcast: (userId: string, roomId: string) => void;
   joinRoom: (roomId: string, userId: string) => void;
   leaveRoom: (roomId: string, userId: string) => void;
@@ -80,9 +81,20 @@ const useSocketStore = create<SocketState>((set, get) => ({
       }
     });
 
+    socket.on("songPaused", (data) => {
+      const {songId} = data;
+      const {isPlayingSong} = get();
+      if(usePlayerStore.getState().currentSong._id === songId && isPlayingSong ){
+        usePlayerStore.setState({ isPlaying: false });
+        set({ isPlayingSong: false });
+
+      }
+    });;
+
+
     socket.on("broadcastEnded", (data) => {
       toast.success(data.message);
-      set({ isBroadcasting: false });
+      set({ isBroadcasting: false,isPlayingSong:false });
       // socket.close();
     });
   },
@@ -90,7 +102,7 @@ const useSocketStore = create<SocketState>((set, get) => ({
     const socket = get().socket;
     if (socket) {
       socket.disconnect();
-      set({ isJoined: false, socket: null });
+      set({ isJoined: false, socket: null,isBroadcasting: false,isPlayingSong:false });
       console.log("Socket disconnected.");
     }
   },
@@ -100,11 +112,17 @@ const useSocketStore = create<SocketState>((set, get) => ({
       socket.emit("initializeBroadcast", { userId, roomId });
     }
   },
-  playSong: async (userId, roomId, songId) => {
+  playSong: (userId, roomId, songId) => {
     const { socket } = get();
 
     if (socket) {
       socket.emit("playSong", { userId, roomId, songId });
+    }
+  },
+  pauseSong:(userId,roomId,songId)=>{
+    const {socket} = get();
+    if(socket){
+      socket.emit("pauseSong",{userId,roomId,songId});
     }
   },
   joinRoom: (userId: string, roomId: string) => {
