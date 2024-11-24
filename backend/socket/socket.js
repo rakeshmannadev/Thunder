@@ -92,6 +92,28 @@ io.on("connection", (socket) => {
     console.log(`Broadcast started by admin: ${user.name}`);
   });
 
+  socket.on("playSong", async ({ userId, roomId, songId }) => {
+    const room = await Room.findOne({ roomId });
+    if (!room) return;
+
+    if (room.admin.toString() !== userId.toString()) return;
+
+    io.to(roomId).emit("songStarted", { songId });
+
+    console.log(`Song played by admin: ${songId}`);
+  })
+
+  socket.on("pauseSong",async({userId,roomId,songId})=>{
+    const room = await Room.findOne({ roomId });
+    if (!room) return;
+
+    if (room.admin.toString() !== userId.toString()) return;
+
+    io.to(roomId).emit("songPaused", { songId });
+
+    console.log(`Song paused by admin: ${songId}`);
+  })
+
   socket.on("endBroadcast", async ({ userId, roomId }) => {
     const room = await Room.findOne({ roomId });
     if (!room) return;
