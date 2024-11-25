@@ -66,6 +66,7 @@ const useSocketStore = create<SocketState>((set, get) => ({
     });
 
     socket.on("songStarted", async (data) => {
+      console.log("Song started")
       const { songId } = data;
       set({ isLoading: true });
       try {
@@ -73,7 +74,7 @@ const useSocketStore = create<SocketState>((set, get) => ({
         if (response.data.status) {
           const song = response.data.song;
           usePlayerStore.getState().setCurrentSong(song);
-          set({ isPlayingSong: true });
+          set({ isPlayingSong: true,isBroadcasting:true });
         }
       } catch (error: any) {
         console.log(error.response.data.message);
@@ -107,6 +108,7 @@ const useSocketStore = create<SocketState>((set, get) => ({
   },
   disconnectSocket: () => {
     const socket = get().socket;
+    const audio = document.querySelector("audio");
     if (socket) {
       socket.disconnect();
       set({
@@ -115,6 +117,11 @@ const useSocketStore = create<SocketState>((set, get) => ({
         isBroadcasting: false,
         isPlayingSong: false,
       });
+      usePlayerStore.setState({currentSong:null,isPlaying:false});
+      if(audio){
+        audio.load();
+        
+      }
       console.log("Socket disconnected.");
     }
   },

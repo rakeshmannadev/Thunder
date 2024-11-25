@@ -17,6 +17,7 @@ const io = new Server(server, {
 
 const activeUsers = {}; // tracks active users by roomid
 const adminSockets = {}; // tracks admin socket ids by roomid
+const currentSong={}; // tracks current song by roomid
 
 io.on("connection", (socket) => {
   const { roomId, userId } = socket.handshake.query;
@@ -44,6 +45,16 @@ io.on("connection", (socket) => {
     activeUsers[roomId].push(userId);
     console.log(`${userId} joined room ${roomId}`);
 
+    // Check if there is any current song playing 
+    console.log(`current songId ${currentSong[roomId]}`);
+    if(currentSong[roomId]){
+      io.to(socket.id).emit("songStarted", { songId:currentSong[roomId] });
+
+    }
+
+
+
+
     // Emit the active users in that room
     const activeUsersInRoom = activeUsers[roomId] || [];
     io.to(roomId).emit("updateUsers", { users: activeUsersInRoom });
@@ -57,6 +68,7 @@ io.on("connection", (socket) => {
       delete adminSockets[roomId];
       // Notify users that the broadcast has ended
       io.to(roomId).emit("broadcastEnded", { message: "Broadcast ended" });
+      currentSong[roomId] = '';
     }
 
     // Leave the room // if users
@@ -100,6 +112,13 @@ io.on("connection", (socket) => {
 
     io.to(roomId).emit("songStarted", { songId });
 
+    // push songId into currentSong map
+    if(!currentSong[roomId]){
+      currentSong[roomId] =''
+    }
+
+    currentSong[roomId] = songId;
+    console.log(`current songId ${currentSong[roomId]}`);
     console.log(`Song played by admin: ${songId}`);
   })
 
@@ -126,6 +145,8 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("broadcastEnded", {
       message: `Broadcast has ended by ${user.name}`,
     });
+
+    currentSong[roomId] ='';
 
     console.log(`Broadcast ended by admin: ${user.name}`);
   });
