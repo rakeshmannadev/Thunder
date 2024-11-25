@@ -18,7 +18,7 @@ const io = new Server(server, {
 const activeUsers = {}; // tracks active users by roomid
 const adminSockets = {}; // tracks admin socket ids by roomid
 const currentSong={}; // tracks current song by roomid
-
+const currentSongTime={} // tracks current song time by songId
 io.on("connection", (socket) => {
   const { roomId, userId } = socket.handshake.query;
   console.log("User connected " + socket.id);
@@ -49,7 +49,7 @@ io.on("connection", (socket) => {
     console.log(`current songId ${currentSong[roomId]}`);
     if(currentSong[roomId]){
       io.to(socket.id).emit("songStarted", { songId:currentSong[roomId] });
-
+      io.to(socket.id).emit("timeUpdated",{currentTime:currentSongTime[currentSong[roomId]]})
     }
 
 
@@ -121,7 +121,10 @@ io.on("connection", (socket) => {
     console.log(`current songId ${currentSong[roomId]}`);
     console.log(`Song played by admin: ${songId}`);
   })
-
+  socket.on("updateTime",({roomId,currentTime})=>{
+    currentSongTime[currentSong[roomId]] = currentTime;
+    console.log("Time updated")
+  })
   socket.on("pauseSong",async({userId,roomId,songId})=>{
     const room = await Room.findOne({ roomId });
     if (!room) return;

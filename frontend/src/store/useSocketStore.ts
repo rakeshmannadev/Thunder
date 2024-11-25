@@ -20,6 +20,7 @@ interface SocketState {
   playSong: (userId: string, roomId: string, songId: string) => void;
   pauseSong: (userId: string, roomId: string, songId: string) => void;
   endBroadcast: (userId: string, roomId: string) => void;
+  updateTime:(roomId:string,songId:string,currentTime:number)=>void;
   joinRoom: (roomId: string, userId: string) => void;
   leaveRoom: (roomId: string, userId: string) => void;
   disconnectSocket: () => void;
@@ -55,7 +56,13 @@ const useSocketStore = create<SocketState>((set, get) => ({
     socket.on("updateUsers", (data) => {
       set({ activeUsers: data.users }); // Update Zustand state
     });
-
+    socket.on("timeUpdated",(data)=>{
+      const audio = document.querySelector("audio");
+      if(audio){
+        audio.currentTime = parseInt(data.currentTime);
+      }
+      console.log("Time updated")
+    })
     socket.on("broadcastStarted", (data) => {
       toast.success(`${data.userName} has started the broadcast.`);
       set({
@@ -66,7 +73,6 @@ const useSocketStore = create<SocketState>((set, get) => ({
     });
 
     socket.on("songStarted", async (data) => {
-      console.log("Song started")
       const { songId } = data;
       set({ isLoading: true });
       try {
@@ -129,6 +135,12 @@ const useSocketStore = create<SocketState>((set, get) => ({
     const { socket } = get();
     if (socket) {
       socket.emit("initializeBroadcast", { userId, roomId });
+    }
+  },
+  updateTime:(roomId, songId, currentTime)=> {
+    const {socket} = get();
+    if(socket){
+      socket.emit("updateTime",{roomId,songId,currentTime})
     }
   },
   playSong: (userId, roomId, songId) => {

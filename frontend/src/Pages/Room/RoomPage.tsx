@@ -14,6 +14,7 @@ import { useParams } from "react-router-dom";
 import useUserStore from "@/store/useUserStore";
 import useSocketStore from "@/store/useSocketStore";
 import useRoomStore from "@/store/useRoomStore";
+import usePlayerStore from "@/store/usePlayerStore";
 
 const formatTime = (date: string) => {
   return new Date(date).toLocaleTimeString("en-US", {
@@ -25,12 +26,14 @@ const formatTime = (date: string) => {
 
 const RoomPage = () => {
   const [isMobile, setIsMobile] = useState(false);
-  const { connectSocket, joinRoom, disconnectSocket, activeUsers,isJoined } =
+  const { connectSocket, joinRoom, disconnectSocket,isJoined,updateTime,isPlayingSong } =
     useSocketStore();
+    const {currentSong} = usePlayerStore()
     const { currentUser } = useUserStore();
 
   const { roomId } = useParams<string>();
   const { getRoomById, currentRoom } = useRoomStore();
+  const audio = document.querySelector("audio");
 
   useEffect(() => {
     const checkMobile = () => {
@@ -68,6 +71,17 @@ const RoomPage = () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [currentUser, roomId, connectSocket, joinRoom, disconnectSocket]);
+
+  // send socket event for updateTime
+  useEffect(()=>{
+    let intervalId:any;
+    if(isPlayingSong && currentUser && currentUser.role==='admin'){
+       intervalId = setInterval(() => {
+        updateTime(roomId,currentSong._id,audio?.currentTime)
+      }, 1000);
+    }
+    return ()=> clearInterval(intervalId);
+  },[isPlayingSong,currentUser,currentSong])
 
   return (
     <main className="h-full rounded-lg bg-gradient-to-b from-zinc-800 to-zinc-900 overflow-hidden">
