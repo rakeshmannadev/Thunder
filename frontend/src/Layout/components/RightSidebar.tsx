@@ -171,8 +171,7 @@ useEffect(()=>{
               <PlaylistSkeleton />
             ) : (
               publicRooms.map((room) => (
-                <Link
-                  to={`/room/${room.roomId}`}
+                <div
                   key={room._id}
                   className="p-2 hover:bg-zinc-800 rounded-md flex flex-col md:flex-row justify-center items-center gap-3 group cursor-pointer"
                 >
@@ -185,10 +184,16 @@ useEffect(()=>{
                     <p className=" font-medium truncate">{room.roomName}</p>
 
                     <p className=" text-sm text-zinc-400 truncate">
-                      Joined ● 100
+                      Joined ● {room.participants.length}
                     </p>
                   </div>
-                </Link>
+                  <Button
+                 
+                  size={'sm'}
+                  >
+                    Join
+                  </Button>
+                </div>
               ))
             )}
           </div>

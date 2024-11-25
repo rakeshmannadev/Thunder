@@ -17,16 +17,10 @@ const Members = ({
   member: User;
   isLoading: boolean;
 }) => {
-  const [isOnline, setIsOnline] = useState(false);
   const { activeUsers } = useSocketStore();
-  const { activeMembers, fetchActiveMembers } = useRoomStore();
   const {currentUser} = useUserStore();
 
-  useEffect(() => {
-    if (activeUsers) {
-      fetchActiveMembers(activeUsers);
-    }
-  }, [activeUsers]);
+
 
   const isActive = Array.isArray(activeUsers) && activeUsers.includes(member._id.toString());
 
@@ -36,7 +30,7 @@ const Members = ({
       {isLoading ? (
         <UsersListSkeleton />
       ) : (
-        <div className="flex items-center">
+        <div className="flex items-center ">
           <Link
             to={`/profile/${member._id}`}
             className=" relative flex items-center gap-3"

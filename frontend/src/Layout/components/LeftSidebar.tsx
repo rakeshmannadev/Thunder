@@ -1,17 +1,38 @@
 import PlaylistSkeleton from "@/components/Skeleton/PlaylistSkeleton";
 import TooltipComponent from "@/components/Tooltip/TooltipComponent";
-import { buttonVariants } from "@/components/ui/button";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import useSocketStore from "@/store/useSocketStore";
 import useUserStore from "@/store/useUserStore";
 import { SignedIn, useAuth } from "@clerk/clerk-react";
-import { Group, Home, Library, PlusCircle } from "lucide-react";
+import { AvatarFallback } from "@radix-ui/react-avatar";
+import { Camera, Group, Home, Library, PlusCircle } from "lucide-react";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const LeftSidebar = () => {
   const { userId } = useAuth();
-
+  const { roomId, isPlayingSong } = useSocketStore();
   const {
     playlistLoading,
     rooms,
@@ -50,26 +71,76 @@ const LeftSidebar = () => {
 
           <SignedIn>
             <TooltipComponent text="Create room">
-              <Link
-                to={"/"}
-                className={cn(
-                  buttonVariants({
-                    variant: "ghost",
-                    className:
-                      "w-full justify-start text-white hover:bg-zinc-800 ",
-                  })
-                )}
-              >
-                <PlusCircle className="md:mr-2 size-5" />
-                <span className="hidden md:inline">Create Room</span>
-              </Link>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <div
+                    className={cn(
+                      buttonVariants({
+                        variant: "ghost",
+                        className:
+                          "w-full cursor-pointer justify-start text-white hover:bg-zinc-800 ",
+                      })
+                    )}
+                  >
+                    <PlusCircle className="md:mr-2 size-5" />
+                    <span className="hidden md:inline">Create Room</span>
+                  </div>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Create room</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid  gap-4 py-4">
+                    <div className=" relative group flex justify-center w-full pb-5">
+                      <Avatar className="size-28">
+                        <AvatarImage src="https://github.com/shadcn.png" />
+                        <AvatarFallback>R</AvatarFallback>
+                      </Avatar>
+                      <div className="size-28 absolute items-center justify-center bg-gray-500/75 rounded-full hidden group-hover:flex cursor-pointer transition-transform ease-in-out duration-300">
+                        <Camera />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="name" className="text-right text-nowrap">
+                        Room name
+                      </label>
+                      <Input
+                        id="name"
+                        defaultValue="room name"
+                        className="col-span-3"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <label htmlFor="username" className="text-right">
+                        Visability
+                      </label>
+                      <Select>
+                        <SelectTrigger className="w-fit">
+                          <SelectValue placeholder="Choose room visablity" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Visability</SelectLabel>
+                            <SelectItem value="apple">Public</SelectItem>
+                            <SelectItem value="banana">Private</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button type="submit">Create room</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </TooltipComponent>
           </SignedIn>
 
           {rooms &&
             rooms.length > 0 &&
             rooms.map((room) => (
-              <div key={room._id}>
+              <div key={room._id} className="relative">
                 <TooltipComponent text={room.roomName}>
                   <Link
                     to={`/room/${room.roomId}`}
@@ -85,6 +156,11 @@ const LeftSidebar = () => {
                     <span className="hidden md:inline"> {room.roomName}</span>
                   </Link>
                 </TooltipComponent>
+                {isPlayingSong && roomId == room.roomId && (
+                  <div className="absolute  bottom-4 right-4 ">
+                    <div className="circle"></div>
+                  </div>
+                )}
               </div>
             ))}
         </div>

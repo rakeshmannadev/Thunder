@@ -141,8 +141,8 @@ const RoomPage = () => {
 export default RoomPage;
 
 const NoConversationPlaceholder = () => (
-  <div className="flex flex-col items-center justify-center h-full space-y-6 ">
-    <img src="/google.png" alt="Thunder" className="size-16 animate-bounce" />
+  <div className="flex flex-col items-center justify-center h-full space-y-6 mt-10 ">
+    <img src="/headphones.png" alt="Thunder" className="size-16 animate-bounce" />
     <div className="text-center">
       <h3 className="text-zinc-300 text-lg font-medium mb-1">
         No Conversation till now

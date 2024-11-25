@@ -9,7 +9,7 @@ import Members from "./Members";
 import useRoomStore from "@/store/useRoomStore";
 
 const Memberslist = ({ children,roomId }: { children: React.ReactNode,roomId:string }) => {
-const {fetchRoomMembers,fetchActiveMembers,members,activeMembers,isLoading} = useRoomStore()
+const {fetchRoomMembers,members,isLoading} = useRoomStore()
   useEffect(()=>{
     fetchRoomMembers(roomId);
     
@@ -19,7 +19,7 @@ const {fetchRoomMembers,fetchActiveMembers,members,activeMembers,isLoading} = us
     <Popover>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
       <PopoverContent className="w-72">
-        <ScrollArea className="w-full h-[calc(100vh-280px)]">
+        <ScrollArea className="w-full h-fit">
           {members && members.map((member)=>(
             <Members key={member._id} member={member} isLoading={isLoading}  />
 

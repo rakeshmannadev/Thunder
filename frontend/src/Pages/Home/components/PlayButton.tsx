@@ -19,7 +19,7 @@ const PlayButton = ({ song }: { song: Song }) => {
       } else {
         playSong(currentUser._id, roomId, song._id);
       }
-    } else if(currentSong) {
+    } else if(isCurrentSong) {
       togglePlay();
     }else{
       setCurrentSong(song)
