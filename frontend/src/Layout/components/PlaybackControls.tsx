@@ -260,7 +260,7 @@ export const PlaybackControls = () => {
             <TooltipComponent text={isShuffle ?"Suffle on":"Shuffle off"}>
               <Button
                 onClick={handleShuffle}
-                disabled={!currentSong || (isBroadcasting && currentUser?.role!=='admin')}
+                disabled={(isBroadcasting && currentUser?.role!=='admin')}
                 size="icon"
                 variant="ghost"
                 className="hidden sm:inline-flex hover:text-white text-zinc-400"
@@ -310,7 +310,7 @@ export const PlaybackControls = () => {
             <TooltipComponent text={isRepeat ? "Repeat on":"Repeat off"}>
               <Button
                 onClick={handleRepeat}
-                disabled={!currentSong || (isBroadcasting && currentUser?.role!=='admin')}
+                disabled={ (isBroadcasting && currentUser?.role!=='admin')}
                 size="icon"
                 variant="ghost"
                 className="hidden sm:inline-flex hover:text-white text-zinc-400"

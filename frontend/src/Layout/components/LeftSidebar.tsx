@@ -152,7 +152,7 @@ const LeftSidebar = () => {
                       })
                     )}
                   >
-                    <Group className="md:mr-2 size-5" />
+                    <Group className="md:mr-2 size-5 " />
                     <span className="hidden md:inline"> {room.roomName}</span>
                   </Link>
                 </TooltipComponent>

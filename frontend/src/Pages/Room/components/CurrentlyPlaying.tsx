@@ -29,7 +29,7 @@ const CurrentlyPlaying = ({ isMobile }: { isMobile: boolean }) => {
             >
               {isBroadcasting
                 ? isPlayingSong
-                  ? <Link className="hover:underline" to={`/song/${currentSong._id}`}>{currentSong.title} </Link> 
+                  ? <Link className="hover:underline" to={`/album/${currentSong.albumId}`}>{currentSong.title} </Link> 
                   : "Admin is about to broadcast"
                 : "Currently no song is broadcasting!"}
             </marquee>
@@ -37,7 +37,7 @@ const CurrentlyPlaying = ({ isMobile }: { isMobile: boolean }) => {
             <p className="text-emerald-100 font-bold ">
               {isBroadcasting
                 ? isPlayingSong
-                  ? <Link className="hover:underline" to={`/song/${currentSong._id}`}>{currentSong.title} </Link> 
+                  ? <Link className="hover:underline" to={`/album/${currentSong.albumId}`}>{currentSong.title} </Link> 
                   : "Admin is about to broadcast"
                 : "Currently no song is broadcasting!"}
             </p>

@@ -1,10 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
+  Check,
+  ChevronsUpDown,
   EllipsisVertical,
   LogOut,
   Music,
-  Music2,
   RouteOffIcon,
   SatelliteDish,
   Trash,
@@ -16,11 +17,6 @@ import useSocketStore from "@/store/useSocketStore";
 import useRoomStore from "@/store/useRoomStore";
 import useUserStore from "@/store/useUserStore";
 import { useNavigate } from "react-router-dom";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import {
   Menubar,
@@ -33,6 +29,29 @@ import {
   MenubarSubTrigger,
   MenubarTrigger,
 } from "@/components/ui/menubar";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 
 const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
   const {
@@ -41,10 +60,20 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
     disconnectSocket,
     isBroadcasting,
     activeUsers,
-    roomId: storeRoomId,
   } = useSocketStore();
   const { currentRoom } = useRoomStore();
   const { currentUser } = useUserStore();
+  const [isOpen, setIsOpen] = useState(false);
+  const [open, setOpen] = useState(false)
+  const [value, setValue] = useState("")
+
+  const closeModal = () => {
+    setIsOpen(false);
+  };
+
+  const openModal = () => {
+    setIsOpen(true);
+  };
 
   const navigate = useNavigate();
   const isAlreadyJoined =
@@ -59,7 +88,20 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
     disconnectSocket();
     navigate("/");
   };
-
+  const frameworks = [
+    {
+      value: "next.js",
+      label: "Next.js",
+    },
+    {
+      value: "sveltekit",
+      label: "SvelteKit",
+    },
+    {
+      value: "nuxt.js",
+      label: "Nuxt.js",
+    },
+  ];
   if (!currentUser) return null;
 
   return (
@@ -78,91 +120,155 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
           </Memberslist>
         </div>
       </div>
-      <div className="flex gap-2 items-center">
-        <Menubar>
-          <MenubarMenu>
-            <MenubarTrigger asChild className="  cursor-pointer">
-              <Button size={"icon"} variant={"ghost"}>
-                <EllipsisVertical className="size-5 cursor-pointer" />
+      <div>
+        {/* Dialog for room menu */}
+        <Dialog open={isOpen} onOpenChange={closeModal}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                title="Open menu"
+                aria-haspopup="true"
+                size="icon"
+                variant="ghost"
+                className="hover:bg-gray-700/75 "
+              >
+                <EllipsisVertical className="h-4 w-4" />
               </Button>
-            </MenubarTrigger>
-            <MenubarContent className="w-fit">
-              {currentUser && isAlreadyJoined && !isAdmin && (
-                <>
-                  <MenubarItem>
-                    <Button variant={"ghost"} onClick={handleEndSession}>
-                      <Unplug className="size-4" />
-                      <span>End session</span>
-                    </Button>
-                  </MenubarItem>
-                  <MenubarItem>
-                    <Button variant={"ghost"}>
-                      <Music className="size-4" />
-                      <span>Request song</span>
-                    </Button>
-                  </MenubarItem>
-                  <MenubarItem>
-                    <Button variant={"ghost"}>
-                      <UserCog className="size-4" />
-                      <span>Be modarator</span>
-                    </Button>
-                  </MenubarItem>
-                  <MenubarItem className="text-red-400">
-                    <Button variant={"ghost"}>
-                      <LogOut className="size-4" />
-                      <span>Leave room</span>
-                    </Button>
-                  </MenubarItem>
-                </>
-              )}
+            </DropdownMenuTrigger>
 
-              {currentUser && isAlreadyJoined && isAdmin && (
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+
+              {!isAdmin && isAlreadyJoined ? (
                 <>
-                  <MenubarItem className="">
-                    {currentUser && !isBroadcasting && isAdmin && (
-                      <Button
-                        onClick={() => startBroadcast(userId, roomId)}
-                        title="Broadcast song"
-                        variant="ghost"
-                      >
-                        <SatelliteDish className="size-4" />
-                        <span>Broadcast Song</span>
-                      </Button>
-                    )}
-                    {currentUser && isBroadcasting && isAdmin && (
-                      <Button
-                        onClick={() => endBroadcast(userId, roomId)}
-                        title="End Broadcast "
-                        variant="ghost"
-                      >
-                        <RouteOffIcon className="size-4" />
-                        <span>End broadcast </span>
-                      </Button>
-                    )}
-                  </MenubarItem>
-                  {isBroadcasting && <MenubarSeparator />}
-                  {currentUser && isBroadcasting && isAdmin && (
-                    <MenubarSub>
-                      <MenubarSubTrigger>Song requests</MenubarSubTrigger>
-                      <MenubarSubContent>
-                        <MenubarItem>Email link</MenubarItem>
-                        <MenubarItem>Messages</MenubarItem>
-                        <MenubarItem>Notes</MenubarItem>
-                      </MenubarSubContent>
-                    </MenubarSub>
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={handleEndSession}
+                  >
+                    <Unplug className="size-4" /> End session
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem
+                    onClick={openModal}
+                    className="cursor-pointer"
+                  >
+                    <Music className="size-4" /> Request song
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
+                    <UserCog className="size-4" /> Be modaretor
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer text-red-400">
+                    <LogOut className="size-4" /> Leave room
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  {isBroadcasting ? (
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={() => endBroadcast(userId, roomId)}
+                    >
+                      <SatelliteDish className="size-4" /> End broadcast
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={() => startBroadcast(userId, roomId)}
+                    >
+                      <RouteOffIcon className="size-4" /> Start broadcast
+                    </DropdownMenuItem>
                   )}
-                  <MenubarSeparator />
-                  <MenubarItem className="flex justify-center items-center gap-4 text-red-400">
-                    <Button variant={"ghost"} onClick={handleEndSession}>
-                      <Trash className="size-4" />
-                      <span>Delete room</span>
-                    </Button>
-                  </MenubarItem>
+
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                      <Music className="size-4" />
+                      <span>Song requests</span>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent>
+                        <DropdownMenuItem>list 1</DropdownMenuItem>
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+                  <DropdownMenuItem className="text-red-400">
+                    <Trash className="size-4" />
+                    <span>Delete room</span>
+                  </DropdownMenuItem>
                 </>
               )}
-            </MenubarContent>
-          </MenubarMenu>
-        </Menubar>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Dialog for searching song and send request */}
+          <DialogContent
+            className="sm:max-w-[425px]"
+            onEscapeKeyDown={closeModal}
+          >
+            <DialogHeader>
+              <DialogTitle>Request song</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="name" className="text-right">
+                  Select song
+                </label>
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={open}
+                      className="w-[200px] justify-between"
+                    >
+                      {value
+                        ? frameworks.find(
+                            (framework) => framework.value === value
+                          )?.label
+                        : "Select song..."}
+                      <ChevronsUpDown className="opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[200px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Search a song..." />
+                      <CommandList >
+                        <CommandEmpty>No song found.</CommandEmpty>
+                        <CommandGroup>
+                          {frameworks.map((framework) => (
+                            <CommandItem
+                              key={framework.value}
+                              value={framework.value}
+                              onSelect={(currentValue) => {
+                                setValue(
+                                  currentValue === value ? "" : currentValue
+                                );
+                                setOpen(false);
+                              }}
+                            >
+                              {framework.label}
+                              <Check
+                                className={cn(
+                                  "ml-auto",
+                                  value === framework.value
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4"></div>
+            </div>
+            <DialogFooter>
+              <Button>Send request</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
