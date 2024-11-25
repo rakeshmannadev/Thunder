@@ -263,7 +263,7 @@ export const PlaybackControls = () => {
                 disabled={(isBroadcasting && currentUser?.role!=='admin')}
                 size="icon"
                 variant="ghost"
-                className="hidden sm:inline-flex hover:text-white text-zinc-400"
+                className="inline-flex hover:text-white text-zinc-400"
               >
                 <Shuffle className={`size-4 ${isShuffle && "text-white"}`} />
               </Button>
@@ -313,7 +313,7 @@ export const PlaybackControls = () => {
                 disabled={ (isBroadcasting && currentUser?.role!=='admin')}
                 size="icon"
                 variant="ghost"
-                className="hidden sm:inline-flex hover:text-white text-zinc-400"
+                className="inline-flex hover:text-white text-zinc-400"
               >
                 {isRepeat ? (
                   <Repeat1 className="h-4 w-4 text-white" />
@@ -324,7 +324,7 @@ export const PlaybackControls = () => {
             </TooltipComponent>
           </div>
 
-          <div className="hidden sm:flex items-center gap-2 w-full">
+          <div className="flex items-center gap-2 w-full">
             <div className="text-xs text-zinc-400">
               {formatTime(currentTime)}
             </div>
