@@ -1,12 +1,19 @@
 import { axiosInstance } from "@/lib/axios";
 import { Room, User } from "@/types";
 import { create } from "zustand";
+import useUserStore from "./useUserStore";
+import toast from "react-hot-toast";
 
 interface RoomStore {
   activeMembers: User[];
   members: User[];
   currentRoom: Room | null;
   isLoading: boolean;
+  createRoom: (
+    roomName: string,
+    visability: string,
+    imageFile: string
+  ) => Promise<void>;
   fetchActiveMembers: (users: string[]) => Promise<void>;
   fetchRoomMembers: (roomId: string) => Promise<void>;
   getRoomById: (roomId: string) => Promise<void>;
@@ -17,6 +24,35 @@ const useRoomStore = create<RoomStore>((set) => ({
   members: [],
   currentRoom: null,
   isLoading: false,
+  createRoom: async (roomName, visability, imageFile) => {
+    set({ isLoading: true });
+    try {
+      const response = await axiosInstance.post(
+        "/rooms/create-room",
+        {
+          roomName,
+          visability,
+          imageFile,
+        },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      if (response.data.status) {
+        useUserStore.setState({
+          rooms: [...useUserStore.getState().rooms, response.data.room],
+        });
+        toast.success(response.data.message);
+      }
+    } catch (error: any) {
+      console.log(error.message);
+      toast.error(error.response.data.message);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
   fetchActiveMembers: async (users) => {
     set({ isLoading: true });
     try {

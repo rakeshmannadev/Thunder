@@ -37,8 +37,19 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 
 const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
@@ -52,8 +63,8 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
   const { currentRoom } = useRoomStore();
   const { currentUser } = useUserStore();
   const [isOpen, setIsOpen] = useState(false);
-  const [open, setOpen] = useState(false)
-  const [value, setValue] = useState("")
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("");
 
   const closeModal = () => {
     setIsOpen(false);
@@ -96,7 +107,7 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
     <div className=" flex justify-between p-4 border-b border-zinc-900">
       <div className="flex items-center gap-3 text-nowrap">
         <Avatar>
-          <AvatarImage />
+          <AvatarImage src={currentRoom?.image} />
           <AvatarFallback>{currentRoom?.roomName.charAt(0)}</AvatarFallback>
         </Avatar>
         <div>
@@ -219,7 +230,7 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
                   <PopoverContent className="w-[200px] p-0">
                     <Command>
                       <CommandInput placeholder="Search a song..." />
-                      <CommandList >
+                      <CommandList>
                         <CommandEmpty>No song found.</CommandEmpty>
                         <CommandGroup>
                           {frameworks.map((framework) => (

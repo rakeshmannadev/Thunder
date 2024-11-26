@@ -1,23 +1,29 @@
 import generateRandomCode from "../helper/generateRoomId.js";
+import { uploadeFiles } from "../helper/uploadeFIleToCloudinary.js";
 import Room from "../models/Room.js";
 import User from "../models/User.js";
 
 export const createRoom = async (req, res, next) => {
   try {
-    const { roomName } = req.body;
-    if (!roomName) {
+    console.log(req.body);
+    const { roomName, visability } = req.body;
+    if (!roomName || !visability) {
       return res.status(401).json({
         status: false,
-        message: "Please provide room name",
+        message: "Please provide all details",
       });
     }
-    // const { imageFile } = req.files;
-
-    // const imageUrl = await uploadeFiles(imageFile);
+    const { imageFile } = req.files;
+    let imageUrl = null;
+    if (imageFile) {
+      imageUrl = await uploadeFiles(imageFile);
+    }
     const roomId = generateRandomCode(8);
     const room = await Room.create({
       roomId,
       roomName,
+      visability,
+      image: imageUrl ? imageUrl : "",
       admin: req.user._id,
       participants: req.user._id,
     });
@@ -28,7 +34,7 @@ export const createRoom = async (req, res, next) => {
     }
     res.status(201).json({ status: true, message: "Room is created", room });
   } catch (error) {
-    console.log("Error in create room controller");
+    console.log("Error in create room controller", error.message);
     next(error);
   }
 };
