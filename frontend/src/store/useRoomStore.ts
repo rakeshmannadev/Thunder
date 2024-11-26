@@ -17,6 +17,7 @@ interface RoomStore {
   fetchActiveMembers: (users: string[]) => Promise<void>;
   fetchRoomMembers: (roomId: string) => Promise<void>;
   getRoomById: (roomId: string) => Promise<void>;
+  joinPublicRoom: (roomId: string) => Promise<void>;
 }
 
 const useRoomStore = create<RoomStore>((set) => ({
@@ -90,6 +91,22 @@ const useRoomStore = create<RoomStore>((set) => ({
       console.log(error.response.data.message);
     } finally {
       set({ isLoading: false });
+    }
+  },
+  joinPublicRoom: async (roomId) => {
+    try {
+      const response = await axiosInstance.put(
+        `/user/join-public-room/${roomId}`
+      );
+      if (response.data.status) {
+        useUserStore.setState({
+          rooms: [...useUserStore.getState().rooms, response.data.room],
+        });
+        toast.success(response.data.message);
+      }
+    } catch (error: any) {
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message);
     }
   },
 }));

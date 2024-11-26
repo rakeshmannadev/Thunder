@@ -1,9 +1,12 @@
 import express from "express";
 import {
+  acceptJoinRequest,
   createAlbum,
   createSong,
   deleteAlbum,
   deleteSong,
+  getJoinRequests,
+  rejectJoinRequest,
 } from "../controllers/admin.controller.js";
 import { IsAdmin, protectRoute } from "../middleware/auth.middleware.js";
 
@@ -15,5 +18,9 @@ router.delete("/songs/:id", deleteSong);
 
 router.post("/albums", createAlbum);
 router.delete("/albums/:id", deleteAlbum);
+
+router.get("/getJoinRequests/:roomId", protectRoute, getJoinRequests);
+router.post("/accept-join-requests", acceptJoinRequest);
+router.post("/reject-join-requests", rejectJoinRequest);
 
 export default router;

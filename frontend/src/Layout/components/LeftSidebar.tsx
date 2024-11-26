@@ -27,7 +27,7 @@ import useUserStore from "@/store/useUserStore";
 import { SignedIn, useAuth } from "@clerk/clerk-react";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { Camera, Group, Home, Library, PlusCircle } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 
@@ -35,8 +35,8 @@ const LeftSidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [roomName, setRoomName] = useState<{ roomName: string }>();
   const [visablity, setVisability] = useState<{ visability: string }>();
-  const [imageFile, setImageFile] = useState<{ imageFile: string }>();
-  const [imageUrl, setImageUrl] = useState<{ imageUrl: string }>();
+  const [imageFile, setImageFile] = useState<File |null>();
+  const [imageUrl, setImageUrl] = useState<string|null>();
   const imageRef = useRef<HTMLInputElement>(null);
 
   const { userId } = useAuth();
@@ -65,9 +65,11 @@ const LeftSidebar = () => {
     }
   }, [userId, rooms.length, playlists.length]);
 
-  const handleImageSelect = (e) => {
-    const image = e.target.files[0];
-    setImageFile(image);
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const image = e.target.files?.[0];
+    if (image) {
+      setImageFile(image);
+    }
 
     if (image) {
       const reader = new FileReader();
@@ -145,7 +147,7 @@ const LeftSidebar = () => {
                       <AvatarFallback>R</AvatarFallback>
                     </Avatar>
                     <div
-                      onClick={() => imageRef.current.click()}
+                      onClick={() => imageRef.current?.click()}
                       className="size-28 absolute items-center justify-center bg-gray-500/75 rounded-full hidden group-hover:flex cursor-pointer transition-transform ease-in-out duration-300"
                     >
                       <Camera />
@@ -189,8 +191,8 @@ const LeftSidebar = () => {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button disabled={isLoading} onClick={handleCreateRoom}>
-                    Create room
+                  <Button disabled={isLoading || !imageFile || !roomName ||!visablity} onClick={handleCreateRoom}>
+                   {isLoading? 'Creating room...':'Create room'}
                   </Button>
                 </DialogFooter>
               </DialogContent>

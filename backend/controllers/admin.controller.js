@@ -1,5 +1,6 @@
 import { uploadeFiles } from "../helper/uploadeFIleToCloudinary.js";
 import Album from "../models/Album.js";
+import Room from "../models/Room.js";
 import Song from "../models/Song.js";
 import User from "../models/User.js";
 
@@ -121,9 +122,73 @@ export const checkAdmin = async (req, res, next) => {
         .status(401)
         .json({ status: false, message: "Unauthorized! User is not admin" });
     }
-    res.status(200).json({ status: true, admin:true });
+    res.status(200).json({ status: true, admin: true });
   } catch (error) {
     console.log("Error in check Admin controller", error.message);
+    next(error);
+  }
+};
+
+export const getJoinRequests = async (req, res, next) => {
+  try {
+    const { roomId } = req.params;
+
+    const room = await Room.findOne({ roomId });
+    if (!room)
+      return res.status(404).json({ status: false, message: "No room found " });
+
+    res.status(200).json({ status: true, requests: room.requests });
+  } catch (error) {
+    console.log("Error in getjoinRequests user controller", error.message);
+    next(error);
+  }
+};
+
+export const acceptJoinRequest = async (req, res, next) => {
+  try {
+    const { roomId, userId } = req.body;
+    const room = await Room.findOne({ roomId });
+    if (!room)
+      return res.status(404).json({ status: false, message: "No room found " });
+
+    if (room.participants.includes(userId))
+      return res
+        .status(400)
+        .json({
+          status: false,
+          message: "User is already a member of this room",
+        });
+
+    room.participants.push(userId);
+
+    await room.save();
+    res.status(200).json({ status: true, message: "Request accepted" });
+  } catch (error) {
+    console.log("Error in acceptJoinRequest admin controller", error.message);
+    next(error);
+  }
+};
+export const rejectJoinRequest = async (req, res, next) => {
+  try {
+    const { roomId, userId } = req.body;
+    const room = await Room.findOne({ roomId });
+    if (!room)
+      return res.status(404).json({ status: false, message: "No room found " });
+
+    if (room.participants.includes(userId))
+      return res
+        .status(400)
+        .json({
+          status: false,
+          message: "User is already a member of this room",
+        });
+
+    room.requests.pull(userId);
+
+    await room.save();
+    res.status(200).json({ status: true, message: "Request rejected" });
+  } catch (error) {
+    console.log("Error in rejectJoinRequest admin controller", error.message);
     next(error);
   }
 };

@@ -20,11 +20,10 @@ export const getPlaylists = async (req, res, next) => {
   }
 };
 
-
 export const getPublicRooms = async (req, res, next) => {
   try {
     const rooms = await Room.find().limit(10);
-    res.status(200).json({rooms});
+    res.status(200).json({ rooms });
   } catch (error) {
     console.log("Error in get public rooms controller", error.message);
     next(error);
@@ -34,7 +33,8 @@ export const getPublicRooms = async (req, res, next) => {
 export const joinPublicRoom = async (req, res, next) => {
   try {
     const { roomId } = req.params;
-    const room = await Room.findOne({ roomId });
+    const room = await Room.findById(roomId);
+
     if (!room)
       return res.status(404).json({ status: false, message: "No room found " });
 
@@ -51,7 +51,9 @@ export const joinPublicRoom = async (req, res, next) => {
       room.participants.push(req.user._id);
       await room.save();
     }
-    res.status(200).json({ status: true, message: "You have joined the room" });
+    res
+      .status(200)
+      .json({ status: true, message: "You have joined the room", room });
   } catch (error) {
     console.log("Error in get joinRoom user controller", error.message);
     next(error);
@@ -110,20 +112,7 @@ export const leaveRoom = async (req, res, next) => {
     next(error);
   }
 };
-export const getJoinRequests = async (req, res, next) => {
-  try {
-    const { roomId } = req.params;
 
-    const room = await Room.findOne({ roomId });
-    if (!room)
-      return res.status(404).json({ status: false, message: "No room found " });
-
-    res.status(200).json({ status: true, requests: room.requests });
-  } catch (error) {
-    console.log("Error in getjoinRequests user controller", error.message);
-    next(error);
-  }
-};
 export const getCurrentUser = async (req, res) => {
   try {
     res.status(200).json({ user: req.user });
@@ -199,7 +188,10 @@ export const addToPlaylist = async (req, res, next) => {
     const user = req.user;
 
     if (!playlistId) {
-      if(!playListName || !artist || !songId) return res.status(400).json({status:false,message:"Please provide all details"})
+      if (!playListName || !artist || !songId)
+        return res
+          .status(400)
+          .json({ status: false, message: "Please provide all details" });
       const playlist = await User.findOneAndUpdate(
         {
           _id: req.user._id,
@@ -219,12 +211,10 @@ export const addToPlaylist = async (req, res, next) => {
     user.playlists.map((playlist) => {
       if (playlist._id.toString() === playlistId.toString()) {
         if (playlist.songs.includes(songId)) {
-          return res
-            .status(400)
-            .json({
-              status: false,
-              message: "Song is already in this playlist",
-            });
+          return res.status(400).json({
+            status: false,
+            message: "Song is already in this playlist",
+          });
         }
         playlist.songs.push(songId);
       }

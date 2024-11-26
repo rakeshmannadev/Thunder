@@ -15,7 +15,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import useRoomStore from "@/store/useRoomStore";
 import useUserStore from "@/store/useUserStore";
+import { useAuth } from "@clerk/clerk-react";
 import {
   Bell,
   Check,
@@ -25,20 +27,25 @@ import {
   X,
 } from "lucide-react";
 import { useEffect } from "react";
+import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 
 const RightSidebar = () => {
-const {isLoading,fetchPublicRooms,publicRooms} = useUserStore()
+  const { isLoading, fetchPublicRooms, publicRooms, rooms } = useUserStore();
+  const { joinPublicRoom } = useRoomStore();
+  const { userId } = useAuth();
+  useEffect(() => {
+    if (publicRooms.length <= 0) {
+      fetchPublicRooms();
+    }
+  }, []);
 
-useEffect(()=>{
-  if(publicRooms.length <=0){
-    fetchPublicRooms();
-  }
-},[])
-
-
-
-  return (
+  const handleJoinPublicRoom = (roomId: string) => {
+    if (!userId) return toast.error("Please login to join rooms");
+    joinPublicRoom(roomId);
+  };
+  const handleSendRequest = () => {};
+  return userId ? (
     <aside className="h-full flex flex-col gap-2">
       <section className="rounded-lg bg-zinc-900 p-4">
         <div className="flex  flex-col lg:flex-row  gap-2">
@@ -56,6 +63,7 @@ useEffect(()=>{
             <DropdownMenuContent className="w-56">
               <DropdownMenuLabel>Messages</DropdownMenuLabel>
               <DropdownMenuSeparator />
+
               <ScrollArea>
                 <div className="space-y-2">
                   {publicRooms.map((room) => (
@@ -155,7 +163,7 @@ useEffect(()=>{
           </DropdownMenu>
         </div>
       </section>
-      {/* Show public rooms */}
+      {/* Show rooms */}
 
       <section className="flex-1 flex flex-col   items-center rounded-lg bg-zinc-900 p-4">
         <div className="flex items-center justify-between md:float-start md:mr-auto mb-4 w-full border-b-2 ">
@@ -163,7 +171,6 @@ useEffect(()=>{
             <Users2 className="size-5 mr-2" />
             <span className="">Public rooms</span>
           </div>
-         
         </div>
         <ScrollArea className=" h-[calc(100vh-300px)] w-fit md:w-full pb-10  ">
           <div className="space-y-2  ">
@@ -176,7 +183,9 @@ useEffect(()=>{
                   className="p-2 hover:bg-zinc-800 rounded-md flex flex-col md:flex-row justify-center items-center gap-3 group cursor-pointer"
                 >
                   <Avatar className="size-10">
-                    <AvatarImage src="https://github.com/shadcn.png" />
+                    <AvatarImage
+                      src={room.image || "https://github.com/shadcn.png"}
+                    />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
 
@@ -184,15 +193,25 @@ useEffect(()=>{
                     <p className=" font-medium truncate">{room.roomName}</p>
 
                     <p className=" text-sm text-zinc-400 truncate">
-                      Joined ● {room.participants.length}
+                      {room.visability.charAt(0).toUpperCase() +
+                        room.visability.slice(1)}{" "}
+                      ● {room.participants.length}
                     </p>
                   </div>
-                  <Button
-                 
-                  size={'sm'}
-                  >
-                    Join
-                  </Button>
+                  {room.visability === "public" ? (
+                    <Button
+                      onClick={() => handleJoinPublicRoom(room._id)}
+                      size={"sm"}
+                    >
+                      {rooms.find((r) => r._id === room._id)
+                        ? "Joined"
+                        : "Join"}
+                    </Button>
+                  ) : (
+                    <Button onClick={() => handleSendRequest()} size={"sm"}>
+                      Request
+                    </Button>
+                  )}
                 </div>
               ))
             )}
@@ -200,13 +219,15 @@ useEffect(()=>{
         </ScrollArea>
       </section>
     </aside>
+  ) : (
+    <LoginPrompt />
   );
 };
 
 export default RightSidebar;
 
 const LoginPrompt = () => (
-  <div className="h-full flex flex-col items-center justify-center p-6 text-center space-y-4">
+  <div className="h-full flex flex-col items-center justify-center p-6 text-center space-y-4 rounded-lg bg-zinc-900">
     <div className="relative">
       <div
         className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-sky-500 rounded-full blur-lg
