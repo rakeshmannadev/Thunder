@@ -2,14 +2,14 @@ import mongoose from "mongoose";
 
 const roomSchema = mongoose.Schema(
   {
-    roomId:{
-      type:String,
-      unique:true,
-      required:true,
+    roomId: {
+      type: String,
+      unique: true,
+      required: true,
     },
-    visability:{
-      type:String,
-      default:"public"
+    visability: {
+      type: String,
+      default: "public",
     },
     roomName: {
       type: String,
@@ -24,7 +24,26 @@ const roomSchema = mongoose.Schema(
       required: true,
     },
     modarators: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    requests:[{type:mongoose.Schema.Types.ObjectId,ref:"User"}],
+    requests: [
+      {
+        user: {
+          userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+          },
+          userName: {
+            type: String,
+          },
+        },
+        status: {
+          type: String,
+        },
+        room: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Room",
+        },
+      },
+    ],
     participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     messages: [
       { type: mongoose.Schema.Types.ObjectId, ref: "Message", default: [] },

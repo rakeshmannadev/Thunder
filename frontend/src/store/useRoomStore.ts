@@ -1,5 +1,5 @@
 import { axiosInstance } from "@/lib/axios";
-import { Room, User } from "@/types";
+import { Requests, Room, User } from "@/types";
 import { create } from "zustand";
 import useUserStore from "./useUserStore";
 import toast from "react-hot-toast";
@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 interface RoomStore {
   activeMembers: User[];
   members: User[];
+  joinRequests: Requests[];
   currentRoom: Room | null;
   isLoading: boolean;
   createRoom: (
@@ -19,11 +20,13 @@ interface RoomStore {
   getRoomById: (roomId: string) => Promise<void>;
   joinPublicRoom: (roomId: string) => Promise<void>;
   sendJoinRequest: (roomId: string) => Promise<void>;
+  fetchJoinRequests: (roomIds: string[]) => Promise<void>;
 }
 
 const useRoomStore = create<RoomStore>((set) => ({
   activeMembers: [],
   members: [],
+  joinRequests: [],
   currentRoom: null,
   isLoading: false,
   createRoom: async (roomName, visability, imageFile) => {
@@ -120,6 +123,19 @@ const useRoomStore = create<RoomStore>((set) => ({
     } catch (error: any) {
       console.log(error.response.data.message);
       toast.error(error.response.data.message);
+    }
+  },
+  fetchJoinRequests: async (roomIds) => {
+    set({ isLoading: true });
+    try {
+      const response = await axiosInstance.post(`/admin/getJoinRequests/`, {
+        roomIds,
+      });
+      set({ joinRequests: response.data.requests });
+    } catch (error: any) {
+      console.log(error.response.data.message);
+    } finally {
+      set({ isLoading: false });
     }
   },
 }));

@@ -20,9 +20,9 @@ export const getPlaylists = async (req, res, next) => {
   }
 };
 
-export const getPublicRooms = async (req, res, next) => {
+export const getRooms = async (req, res, next) => {
   try {
-    const rooms = await Room.find().limit(10);
+    const rooms = await Room.find({ _id: { $nin: req.user.rooms } }).limit(10);
     res.status(200).json({ rooms });
   } catch (error) {
     console.log("Error in get public rooms controller", error.message);
@@ -76,14 +76,23 @@ export const sendJoinRequest = async (req, res, next) => {
         });
       }
 
-      if (room.requests.includes(req.user._id)) {
-        return res.status(400).json({
-          status: false,
-          message: "You have already send join request",
-        });
-      }
+      room.requests.forEach((request) => {
+        if (request.user.userId.toString() === req.user._id.toString()) {
+          return res.status(400).json({
+            status: false,
+            message: "Already send join request",
+          });
+        }
+      });
 
-      room.requests.push(req.user._id);
+      room.requests.push({
+        user: {
+          userId: req.user._id,
+          userName: req.user.name,
+        },
+        status: "pending",
+        room: roomId,
+      });
       await room.save();
     }
     res.status(200).json({ status: true, message: "Join request send" });

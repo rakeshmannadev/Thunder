@@ -35,8 +35,8 @@ const LeftSidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [roomName, setRoomName] = useState<{ roomName: string }>();
   const [visablity, setVisability] = useState<{ visability: string }>();
-  const [imageFile, setImageFile] = useState<File |null>();
-  const [imageUrl, setImageUrl] = useState<string|null>();
+  const [imageFile, setImageFile] = useState<File | null>();
+  const [imageUrl, setImageUrl] = useState<string | null>();
   const imageRef = useRef<HTMLInputElement>(null);
 
   const { userId } = useAuth();
@@ -191,40 +191,52 @@ const LeftSidebar = () => {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button disabled={isLoading || !imageFile || !roomName ||!visablity} onClick={handleCreateRoom}>
-                   {isLoading? 'Creating room...':'Create room'}
+                  <Button
+                    disabled={
+                      isLoading || !imageFile || !roomName || !visablity
+                    }
+                    onClick={handleCreateRoom}
+                  >
+                    {isLoading ? "Creating room..." : "Create room"}
                   </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
           </SignedIn>
 
-          {rooms &&
-            rooms.length > 0 &&
-            rooms.map((room) => (
-              <div key={room._id} className="relative">
-                <TooltipComponent text={room.roomName}>
-                  <Link
-                    to={`/room/${room.roomId}`}
-                    className={cn(
-                      buttonVariants({
-                        variant: "ghost",
-                        className:
-                          "w-full justify-start text-white hover:bg-zinc-800 ",
-                      })
-                    )}
-                  >
-                    <Group className="md:mr-2 size-5 " />
-                    <span className="hidden md:inline"> {room.roomName}</span>
-                  </Link>
-                </TooltipComponent>
-                {isPlayingSong && roomId == room.roomId && (
-                  <div className="absolute  bottom-4 right-4 ">
-                    <div className="circle"></div>
-                  </div>
-                )}
-              </div>
-            ))}
+          <ScrollArea className="h-[calc(100vh-500px)] w-fit md:w-full pb-2">
+            {rooms &&
+              rooms.length > 0 &&
+              rooms.map((room) => (
+                <div key={room._id} className="relative mt-3">
+                  <TooltipComponent text={room.roomName}>
+                    <Link
+                      to={`/room/${room.roomId}`}
+                      className={cn(
+                        buttonVariants({
+                          variant: "ghost",
+                          className:
+                            "w-full justify-start text-white hover:bg-zinc-800 ",
+                        })
+                      )}
+                    >
+                      <Avatar>
+                        <AvatarImage src={room.image} />
+                        <AvatarFallback>
+                          {room.roomName.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="hidden md:inline"> {room.roomName}</span>
+                    </Link>
+                  </TooltipComponent>
+                  {isPlayingSong && roomId == room.roomId && (
+                    <div className="absolute  bottom-4 right-4 ">
+                      <div className="circle"></div>
+                    </div>
+                  )}
+                </div>
+              ))}
+          </ScrollArea>
         </div>
       </section>
 

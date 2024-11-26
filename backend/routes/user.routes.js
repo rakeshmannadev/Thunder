@@ -7,7 +7,7 @@ import {
   getJoinedRooms,
   getPlaylists,
   getPlaylistSongs,
-  getPublicRooms,
+  getRooms,
   joinPublicRoom,
   leaveRoom,
   sendJoinRequest,
@@ -24,7 +24,7 @@ router.post("/addToPlaylist", protectRoute, addToPlaylist);
 router.post("/addAlbumToPlaylist", protectRoute, addAlbumToPlaylist);
 router.get("/getPlaylistSongs/:id", protectRoute, getPlaylistSongs);
 
-router.get("/getPublicRooms", protectRoute, getPublicRooms);
+router.get("/getPublicRooms", protectRoute, getRooms);
 router.put("/join-public-room/:roomId", protectRoute, joinPublicRoom);
 router.put("/leave-room/:roomId", protectRoute, leaveRoom);
 router.get("/send-join-request/:roomId", protectRoute, sendJoinRequest);

@@ -131,13 +131,26 @@ export const checkAdmin = async (req, res, next) => {
 
 export const getJoinRequests = async (req, res, next) => {
   try {
-    const { roomId } = req.params;
-
-    const room = await Room.findOne({ roomId });
+    const { roomIds } = req.body;
+    console.log(roomIds);
+    const room = await Room.find({
+      _id: { $in: roomIds },
+      requests: { $ne: [] },
+      "requests.status": "pending",
+    });
+    console.log(room);
     if (!room)
       return res.status(404).json({ status: false, message: "No room found " });
 
-    res.status(200).json({ status: true, requests: room.requests });
+    let requests = [];
+
+    room.forEach((room) => {
+      requests.push({
+        requests: room.requests,
+      });
+    });
+
+    res.status(200).json({ status: true, requests });
   } catch (error) {
     console.log("Error in getjoinRequests user controller", error.message);
     next(error);

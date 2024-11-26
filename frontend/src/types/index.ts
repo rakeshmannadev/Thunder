@@ -47,12 +47,18 @@ export interface User {
   clerkId: string;
   name: string;
   image: string;
+  rooms: Array<Room>;
   role: string;
   playlists: Array<Playlist>;
   followers: Array<any>;
   following: Array<any>;
 }
 
+export interface Requests {
+  user: User;
+  status: string;
+  room: Room;
+}
 
 export interface ClientToServerEvents {
   initializeBroadcast: () => void;

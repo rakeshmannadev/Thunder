@@ -17,23 +17,48 @@ import {
 } from "@/components/ui/tooltip";
 import useRoomStore from "@/store/useRoomStore";
 import useUserStore from "@/store/useUserStore";
+import { Room } from "@/types";
 import { useAuth } from "@clerk/clerk-react";
 import {
   Bell,
+  BellDot,
   Check,
   HeadphonesIcon,
   MessageSquare,
   Users2,
   X,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 
 const RightSidebar = () => {
+  const [notification, setNotification] = useState(false);
   const { isLoading, fetchPublicRooms, publicRooms, rooms } = useUserStore();
   const { joinPublicRoom, sendJoinRequest } = useRoomStore();
   const { userId } = useAuth();
+  const { currentUser } = useUserStore();
+
+  const userCreatedRooms: Room[] = [];
+
+  if (userId && currentUser) {
+    rooms.forEach((room) => {
+      if (room.admin === currentUser._id) {
+        userCreatedRooms.push(room);
+      }
+    });
+  }
+
+  useEffect(() => {
+    if (userCreatedRooms.length > 0) {
+      userCreatedRooms.forEach((room) => {
+        if (room.requests.length > 0) {
+          setNotification(true);
+        }
+      });
+    }
+  }, [userCreatedRooms]);
+
   useEffect(() => {
     if (publicRooms.length <= 0) {
       fetchPublicRooms();
@@ -48,80 +73,41 @@ const RightSidebar = () => {
     if (!userId) return toast.error("Please login to send request");
     sendJoinRequest(roomId);
   };
+
   return userId ? (
     <aside className="h-full flex flex-col gap-2">
       <section className="rounded-lg bg-zinc-900 p-4">
         <div className="flex  flex-col lg:flex-row  gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                title="Messages"
-                variant={"ghost"}
-                className="w-full justify-start text-white hover:bg-zinc-800 "
-              >
-                <MessageSquare className=" size-5" />
-                <span className="hidden md:inline">Messages</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel>Messages</DropdownMenuLabel>
-              <DropdownMenuSeparator />
+          {userId && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  title="Messages"
+                  variant={"ghost"}
+                  className="w-full justify-start text-white hover:bg-zinc-800 "
+                >
+                  <MessageSquare className=" size-5" />
+                  <span className="hidden md:inline">Messages</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56">
+                <DropdownMenuLabel>Messages</DropdownMenuLabel>
+                <DropdownMenuSeparator />
 
-              <ScrollArea>
-                <div className="space-y-2">
-                  {publicRooms.map((room) => (
-                    <Link
-                      to={`/room/${room._id}`}
-                      key={room._id}
-                      className="p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer"
-                    >
-                      <Avatar>
-                        <AvatarImage src="https://github.com/shadcn.png" />
-                        <AvatarFallback>CN</AvatarFallback>
-                      </Avatar>
+                <ScrollArea>
+                  <div className="space-y-2">
+                    {publicRooms.map((room) => (
+                      <Link
+                        to={`/room/${room._id}`}
+                        key={room._id}
+                        className="p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer"
+                      >
+                        <Avatar>
+                          <AvatarImage src="https://github.com/shadcn.png" />
+                          <AvatarFallback>CN</AvatarFallback>
+                        </Avatar>
 
-                      <div className="flex-1 min-w-0 block">
-                        <p className="font-medium truncate">{room.roomName}</p>
-                        <p className="text-sm text-zinc-400 truncate">
-                          Text message
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </ScrollArea>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                title="Requests"
-                variant={"ghost"}
-                className="w-full justify-start text-white hover:bg-zinc-800 "
-              >
-                <Bell className=" size-5" />
-                <span className="hidden md:inline">Requests</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-64">
-              <DropdownMenuLabel>Join Requests</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <ScrollArea>
-                <div className="space-y-2">
-                  {publicRooms.map((room) => (
-                    <Link
-                      to={`/room/${room._id}`}
-                      key={room._id}
-                      className="p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer"
-                    >
-                      <Avatar>
-                        <AvatarImage src="https://github.com/shadcn.png" />
-                        <AvatarFallback>CN</AvatarFallback>
-                      </Avatar>
-
-                      <div className="flex-1  min-w-0 flex gap-2 items-center">
-                        <div>
+                        <div className="flex-1 min-w-0 block">
                           <p className="font-medium truncate">
                             {room.roomName}
                           </p>
@@ -129,41 +115,95 @@ const RightSidebar = () => {
                             Text message
                           </p>
                         </div>
+                      </Link>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
 
-                        <div className="flex gap-2">
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <Button variant={"outline"} size={"icon"}>
-                                  <Check color="green" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Accept</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+          {userId && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  title="Requests"
+                  variant={"ghost"}
+                  className="w-full justify-start text-white hover:bg-zinc-800 "
+                >
+                  {notification ? (
+                    <BellDot className=" text-green-400 size-5" />
+                  ) : (
+                    <Bell className="size-5" />
+                  )}
+                  <span className="hidden md:inline">Requests</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-64">
+                <DropdownMenuLabel>Join Requests</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <ScrollArea>
+                  <div className="space-y-2">
+                    {userCreatedRooms.map((room) =>
+                      room.requests.map((request) => (
+                        <Link
+                          to={`/profile/${request.user.userId}`}
+                          key={request.user.userId}
+                          className="p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer"
+                        >
+                          <Avatar>
+                            <AvatarImage src={room.image} />
+                            <AvatarFallback>
+                              {room.roomName.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
 
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <Button variant={"outline"} size={"icon"}>
-                                  <X color="red" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Decline</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </ScrollArea>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                          <div className="flex-1  min-w-0 flex gap-2 items-center">
+                            <div>
+                              <p className="font-medium truncate">
+                                {room.roomName}
+                              </p>
+                              <p className="text-sm text-zinc-400 truncate">
+                                {request.user.userName}
+                              </p>
+                            </div>
+
+                            <div className="flex gap-2">
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <Button variant={"outline"} size={"icon"}>
+                                      <Check color="green" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Accept</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <Button variant={"outline"} size={"icon"}>
+                                      <X color="red" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Decline</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
+                          </div>
+                        </Link>
+                      ))
+                    )}
+                  </div>
+                </ScrollArea>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </section>
       {/* Show rooms */}
@@ -186,10 +226,10 @@ const RightSidebar = () => {
                   className="p-2 hover:bg-zinc-800 rounded-md flex flex-col md:flex-row justify-center items-center gap-3 group cursor-pointer"
                 >
                   <Avatar className="size-10">
-                    <AvatarImage
-                      src={room.image || "https://github.com/shadcn.png"}
-                    />
-                    <AvatarFallback>CN</AvatarFallback>
+                    <AvatarImage src={room.image} />
+                    <AvatarFallback>
+                      {room.roomName.charAt(0).toUpperCase()}
+                    </AvatarFallback>
                   </Avatar>
 
                   <div className="flex-1 min-w-0 text-center md:text-start ">
@@ -215,7 +255,11 @@ const RightSidebar = () => {
                       onClick={() => handleSendRequest(room._id)}
                       size={"sm"}
                     >
-                      Request
+                      {room.requests.find(
+                        (r) => r.user.userId === currentUser?._id
+                      )
+                        ? "Pending"
+                        : "Request"}
                     </Button>
                   )}
                 </div>
