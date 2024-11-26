@@ -27,6 +27,6 @@ router.get("/getPlaylistSongs/:id", protectRoute, getPlaylistSongs);
 router.get("/getPublicRooms", protectRoute, getPublicRooms);
 router.put("/join-public-room/:roomId", protectRoute, joinPublicRoom);
 router.put("/leave-room/:roomId", protectRoute, leaveRoom);
-router.put("/send-request/:roomId", protectRoute, sendJoinRequest);
+router.get("/send-join-request/:roomId", protectRoute, sendJoinRequest);
 
 export default router;

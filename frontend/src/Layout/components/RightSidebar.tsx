@@ -32,7 +32,7 @@ import { Link } from "react-router-dom";
 
 const RightSidebar = () => {
   const { isLoading, fetchPublicRooms, publicRooms, rooms } = useUserStore();
-  const { joinPublicRoom } = useRoomStore();
+  const { joinPublicRoom, sendJoinRequest } = useRoomStore();
   const { userId } = useAuth();
   useEffect(() => {
     if (publicRooms.length <= 0) {
@@ -44,7 +44,10 @@ const RightSidebar = () => {
     if (!userId) return toast.error("Please login to join rooms");
     joinPublicRoom(roomId);
   };
-  const handleSendRequest = () => {};
+  const handleSendRequest = (roomId: string) => {
+    if (!userId) return toast.error("Please login to send request");
+    sendJoinRequest(roomId);
+  };
   return userId ? (
     <aside className="h-full flex flex-col gap-2">
       <section className="rounded-lg bg-zinc-900 p-4">
@@ -208,7 +211,10 @@ const RightSidebar = () => {
                         : "Join"}
                     </Button>
                   ) : (
-                    <Button onClick={() => handleSendRequest()} size={"sm"}>
+                    <Button
+                      onClick={() => handleSendRequest(room._id)}
+                      size={"sm"}
+                    >
                       Request
                     </Button>
                   )}

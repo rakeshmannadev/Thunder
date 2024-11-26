@@ -64,7 +64,7 @@ export const sendJoinRequest = async (req, res, next) => {
   try {
     const { roomId } = req.params;
 
-    const room = await Room.findOne({ roomId });
+    const room = await Room.findById(roomId);
     if (!room)
       return res.status(404).json({ status: false, message: "No room found " });
 
