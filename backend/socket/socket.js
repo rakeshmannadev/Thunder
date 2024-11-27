@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import express from "express";
-import http from "http";
+import http, { request } from "http";
 import Room from "../models/Room.js";
 import User from "../models/User.js";
 const app = express();
@@ -185,6 +185,58 @@ io.on("connection", (socket) => {
       }
     } catch (error) {
       console.log("Error in send join request socket event", error.message);
+    }
+  });
+
+  // accept join request
+  socket.on("acceptJoinRequest", async ({ userId, roomId }) => {
+    try {
+      if (!roomId || !userId)
+        return io.to(socket.id).emit("joinRequestStatus", {
+          status: false,
+          message: "Please provide roomId and userId",
+        });
+
+      const room = await Room.findById(roomId);
+      if (!room)
+        return io.to(socket.id).emit("joinRequestStatus", {
+          status: false,
+          message: "No room is available with this roomid",
+        });
+
+      const adminUserId = getKeyByValue(adminSockets, socket.id);
+
+      if (adminUserId.toString() !== room.admin.toString())
+        return io.to(socket.id).emit("joinRequestStatus", {
+          status: false,
+          message: "Only room admin can do that",
+        });
+
+      if (room.participants.includes(userId)) {
+        return io.to(socket.id).emit("joinRequestStatus", {
+          status: false,
+          message: "User is already a member of this group",
+        });
+      }
+
+      room.participants.push(userId);
+      room.requests = room.requests.filter((request) => {
+        if (request.user.userId.toString() === userId) {
+          request.status = "accepted";
+        }
+      });
+
+      const otherUser = await User.findById(userId);
+      if (otherUser) {
+        otherUser.rooms.push(roomId);
+      }
+      Promise.all([room.save(), otherUser.save()]);
+      const userSocketId = adminSockets[userId];
+      if (userSocketId) {
+        io.to([userSocketId,socket.id]).emit("joinRequestAccepted", { room });
+      }
+    } catch (error) {
+      console.log("Error in accept request socket event", error.message);
     }
   });
 

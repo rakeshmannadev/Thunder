@@ -115,12 +115,12 @@ const useRoomStore = create<RoomStore>((set) => ({
   fetchJoinRequests: async (roomIds) => {
     set({ isLoading: true });
     try {
-      const response = await axiosInstance.post(`/user/getJoinRequests/`, {
+      const response = await axiosInstance.post(`/user/getJoinRequests`, {
         roomIds,
       });
-      set({ joinRequests: response.data.requests[0].requests });
+      set({ joinRequests: response.data?.requests[0].requests });
     } catch (error: any) {
-      console.log(error.response.data.message);
+      console.log(error.response.data?.message);
     } finally {
       set({ isLoading: false });
     }

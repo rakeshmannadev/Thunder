@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { axiosInstance } from "@/lib/axios";
 import usePlayerStore from "./usePlayerStore";
 import useRoomStore from "./useRoomStore";
+import useUserStore from "./useUserStore";
 
 interface SocketState {
   socket: Socket | null;
@@ -24,6 +25,7 @@ interface SocketState {
   joinRoom: (roomId: string, userId: string) => void;
   leaveRoom: (roomId: string, userId: string) => void;
   sendJoinRequest: (userId: string, roomId: string) => void;
+  acceptJoinRequest: (userId: string, roomId: string) => void;
   disconnectSocket: () => void;
 }
 
@@ -53,7 +55,7 @@ const useSocketStore = create<SocketState>((set, get) => ({
       useRoomStore.setState({
         joinRequests: [...useRoomStore.getState().joinRequests, data.request],
       });
-      toast.success("New join request received.");
+      toast.success("New join request received for "+data.request.room.roomName);
     });
 
     socket.on("joinRequestStatus", (data) => {
@@ -63,7 +65,23 @@ const useSocketStore = create<SocketState>((set, get) => ({
         toast.error(data.message);
       }
     });
-
+    socket.on("joinRequestAccepted", (data) => {
+      useUserStore.setState({
+        rooms: [...useUserStore.getState().rooms, data.room],
+      });
+      useUserStore.setState((state) => ({
+        publicRooms: state.publicRooms.filter(
+          (room) => room._id !== data.room._id
+        ),
+      }));
+      useRoomStore.setState((state) => ({
+        joinRequests: state.joinRequests.filter((request) => {
+          request.room._id !== data.room._id &&
+            request.user.userId !== data.room.requests.user.userId;
+        }),
+      }));
+      toast.success("Join request accepted for " + data.room.roomName);
+    });
     socket.on("adminJoins", (data) => {
       toast.success(data.message);
       set({ roomId: data.roomId, isJoined: true });
@@ -186,7 +204,13 @@ const useSocketStore = create<SocketState>((set, get) => ({
       socket.emit("joinRoom", { userId, roomId });
     }
   },
+  acceptJoinRequest: (userId, roomId) => {
+    const { socket } = get();
 
+    if (socket) {
+      socket.emit("acceptJoinRequest", { userId, roomId });
+    }
+  },
   leaveRoom: (roomId: string, userId: string) => {
     const audio = document.querySelector("audio");
     const { socket } = get();

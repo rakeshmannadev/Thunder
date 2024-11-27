@@ -36,7 +36,7 @@ const RightSidebar = () => {
   const [notification, setNotification] = useState(false);
   const { isLoading, fetchPublicRooms, publicRooms, rooms } = useUserStore();
   const { joinPublicRoom, fetchJoinRequests, joinRequests } = useRoomStore();
-  const { sendJoinRequest } = useSocketStore();
+  const { sendJoinRequest, acceptJoinRequest } = useSocketStore();
   const { userId } = useAuth();
   const { currentUser } = useUserStore();
 
@@ -57,6 +57,8 @@ const RightSidebar = () => {
   useEffect(() => {
     if (joinRequests.length > 0) {
       setNotification(true);
+    } else {
+      setNotification(false);
     }
   }, [joinRequests.length]);
 
@@ -146,9 +148,8 @@ const RightSidebar = () => {
                 <DropdownMenuSeparator />
                 <ScrollArea>
                   <div className="space-y-2">
-                    {joinRequests.map((request) => (
-                      <Link
-                        to={`/profile/${request.user.userId}`}
+                    {joinRequests.length>0 ? joinRequests.map((request) => (
+                      <div
                         key={request.user.userId}
                         className="p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer"
                       >
@@ -161,19 +162,34 @@ const RightSidebar = () => {
 
                         <div className="flex-1  min-w-0 flex gap-2 items-center">
                           <div>
-                            <p className="font-medium truncate">
+                            <Link
+                              to={`/room/${request.room.roomId}`}
+                              className="font-medium block truncate hover:underline"
+                            >
                               {request.room.roomName}
-                            </p>
-                            <p className="text-sm text-zinc-400 truncate">
+                            </Link>
+                            <Link
+                              to={`/profile/${request.user.userId}`}
+                              className="text-sm hover:underline text-zinc-400 truncate"
+                            >
                               {request.user.userName}
-                            </p>
+                            </Link>
                           </div>
 
                           <div className="flex gap-2">
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger>
-                                  <Button variant={"outline"} size={"icon"}>
+                                  <Button
+                                    onClick={() =>
+                                      acceptJoinRequest(
+                                        request.user.userId,
+                                        request.room._id
+                                      )
+                                    }
+                                    variant={"outline"}
+                                    size={"icon"}
+                                  >
                                     <Check color="green" />
                                   </Button>
                                 </TooltipTrigger>
@@ -197,8 +213,8 @@ const RightSidebar = () => {
                             </TooltipProvider>
                           </div>
                         </div>
-                      </Link>
-                    ))}
+                      </div>
+                    )):<p className="text-center p-3">No requests</p>}
                   </div>
                 </ScrollArea>
               </DropdownMenuContent>

@@ -129,44 +129,6 @@ export const checkAdmin = async (req, res, next) => {
   }
 };
 
-export const acceptJoinRequest = async (req, res, next) => {
-  try {
-    const { roomId, userId } = req.body;
-    if (!roomId || !userId)
-      return res
-        .status(401)
-        .json({ status: false, message: "Please provide roomId and userId" });
-
-    const room = await Room.findOne({ roomId });
-    if (!room)
-      return res.status(404).json({
-        status: false,
-        message: "No room is available with this roomid",
-      });
-
-    if (req.user.role !== "admin")
-      return res
-        .status(401)
-        .json({ status: false, message: "Only room admin can do that" });
-
-    if (room.participants.includes(userId)) {
-      return res.status(401).json({
-        status: false,
-        message: "User is already a member of this group",
-      });
-    }
-
-    room.participants.push(userId);
-    const otherUser = await User.findById(userId);
-    if (otherUser) {
-      otherUser.rooms.push(roomId);
-    }
-    Promise.all([room.save(), otherUser.save()]);
-  } catch (error) {
-    console.log("Error in accept request controller");
-    next(error);
-  }
-};
 export const rejectJoinRequest = async (req, res, next) => {
   try {
     const { roomId, userId } = req.body;
