@@ -106,7 +106,7 @@ const LeftSidebar = () => {
                 buttonVariants({
                   variant: "ghost",
                   className:
-                    "w-full justify-start text-white hover:bg-zinc-800 ",
+                    "w-full justify-center md:justify-start text-white hover:bg-zinc-800 ",
                 })
               )}
             >
@@ -121,7 +121,7 @@ const LeftSidebar = () => {
                 buttonVariants({
                   variant: "ghost",
                   className:
-                    "w-full cursor-pointer justify-start text-white hover:bg-zinc-800 ",
+                    "w-full cursor-pointer justify-center md:justify-start text-white hover:bg-zinc-800 ",
                 })
               )}
             >
@@ -204,7 +204,7 @@ const LeftSidebar = () => {
             </Dialog>
           </SignedIn>
 
-          <ScrollArea className="h-[calc(100vh-500px)] w-fit md:w-full pb-2">
+          <ScrollArea className="h-[calc(100vh-500px)] w-full pb-2">
             {rooms &&
               rooms.length > 0 &&
               rooms.map((room) => (
@@ -216,7 +216,7 @@ const LeftSidebar = () => {
                         buttonVariants({
                           variant: "ghost",
                           className:
-                            "w-full justify-start text-white hover:bg-zinc-800 ",
+                            "w-full justify-center md:justify-start text-white hover:bg-zinc-800 ",
                         })
                       )}
                     >

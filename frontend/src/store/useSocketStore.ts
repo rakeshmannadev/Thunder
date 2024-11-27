@@ -26,6 +26,7 @@ interface SocketState {
   leaveRoom: (roomId: string, userId: string) => void;
   sendJoinRequest: (userId: string, roomId: string) => void;
   acceptJoinRequest: (userId: string, roomId: string) => void;
+  rejectJoinRequest: (userId: string, roomId: string) => void;
   disconnectSocket: () => void;
 }
 
@@ -55,15 +56,35 @@ const useSocketStore = create<SocketState>((set, get) => ({
       useRoomStore.setState({
         joinRequests: [...useRoomStore.getState().joinRequests, data.request],
       });
-      toast.success("New join request received for "+data.request.room.roomName);
+      toast.success(
+        "New join request received for " + data.request.room.roomName
+      );
     });
 
     socket.on("joinRequestStatus", (data) => {
       if (data.status) {
         toast.success(data.message);
+        useUserStore.setState((state) => ({
+          publicRooms: state.publicRooms.map((room) =>
+            room._id === data.room._id
+              ? { ...room, requests: [...room.requests, ...data.room.requests] }
+              : room
+          ),
+        }));
       } else {
         toast.error(data.message);
       }
+    });
+
+    socket.on("joinRequestRejected", (data) => {
+      useRoomStore.setState((state) => ({
+        joinRequests: state.joinRequests.filter(
+          (request) =>
+            request.room._id !== data.room._id &&
+            request.user.userId !== data.room.requests.user.userId
+        ),
+      }));
+      toast.error(data.message);
     });
     socket.on("joinRequestAccepted", (data) => {
       useUserStore.setState({
@@ -209,6 +230,12 @@ const useSocketStore = create<SocketState>((set, get) => ({
 
     if (socket) {
       socket.emit("acceptJoinRequest", { userId, roomId });
+    }
+  },
+  rejectJoinRequest: (userId, roomId) => {
+    const { socket } = get();
+    if (socket) {
+      socket.emit("rejectJoinRequest", { userId, roomId });
     }
   },
   leaveRoom: (roomId: string, userId: string) => {

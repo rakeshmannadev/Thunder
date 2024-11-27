@@ -36,7 +36,8 @@ const RightSidebar = () => {
   const [notification, setNotification] = useState(false);
   const { isLoading, fetchPublicRooms, publicRooms, rooms } = useUserStore();
   const { joinPublicRoom, fetchJoinRequests, joinRequests } = useRoomStore();
-  const { sendJoinRequest, acceptJoinRequest } = useSocketStore();
+  const { sendJoinRequest, acceptJoinRequest, rejectJoinRequest } =
+    useSocketStore();
   const { userId } = useAuth();
   const { currentUser } = useUserStore();
 
@@ -77,7 +78,7 @@ const RightSidebar = () => {
       return toast.error("Please login to send request");
     sendJoinRequest(currentUser?._id, roomId);
   };
-
+console.log('rooms',publicRooms)
   return userId ? (
     <aside className="h-full flex flex-col gap-2">
       <section className="rounded-lg bg-zinc-900 p-4">
@@ -88,7 +89,7 @@ const RightSidebar = () => {
                 <Button
                   title="Messages"
                   variant={"ghost"}
-                  className="w-full justify-start text-white hover:bg-zinc-800 "
+                  className="w-full justify-center md:justify-start text-white hover:bg-zinc-800 "
                 >
                   <MessageSquare className=" size-5" />
                   <span className="hidden md:inline">Messages</span>
@@ -133,7 +134,7 @@ const RightSidebar = () => {
                 <Button
                   title="Requests"
                   variant={"ghost"}
-                  className="w-full justify-start text-white hover:bg-zinc-800 "
+                  className="w-full justify-center md:justify-start text-white hover:bg-zinc-800 "
                 >
                   {notification ? (
                     <BellDot className=" text-green-400 size-5" />
@@ -148,73 +149,86 @@ const RightSidebar = () => {
                 <DropdownMenuSeparator />
                 <ScrollArea>
                   <div className="space-y-2">
-                    {joinRequests.length>0 ? joinRequests.map((request) => (
-                      <div
-                        key={request.user.userId}
-                        className="p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer"
-                      >
-                        <Avatar>
-                          <AvatarImage src={request.room.image} />
-                          <AvatarFallback>
-                            {request.room.roomName.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
+                    {joinRequests.length > 0 ? (
+                      joinRequests.map((request) => (
+                        <div
+                          key={request.user.userId}
+                          className="p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer"
+                        >
+                          <Avatar>
+                            <AvatarImage src={request.room.image} />
+                            <AvatarFallback>
+                              {request.room.roomName.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
 
-                        <div className="flex-1  min-w-0 flex gap-2 items-center">
-                          <div>
-                            <Link
-                              to={`/room/${request.room.roomId}`}
-                              className="font-medium block truncate hover:underline"
-                            >
-                              {request.room.roomName}
-                            </Link>
-                            <Link
-                              to={`/profile/${request.user.userId}`}
-                              className="text-sm hover:underline text-zinc-400 truncate"
-                            >
-                              {request.user.userName}
-                            </Link>
-                          </div>
+                          <div className="flex-1  min-w-0 flex gap-2 items-center">
+                            <div>
+                              <Link
+                                to={`/room/${request.room.roomId}`}
+                                className="font-medium block truncate hover:underline"
+                              >
+                                {request.room.roomName}
+                              </Link>
+                              <Link
+                                to={`/profile/${request.user.userId}`}
+                                className="text-sm hover:underline text-zinc-400 truncate"
+                              >
+                                {request.user.userName}
+                              </Link>
+                            </div>
 
-                          <div className="flex gap-2">
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <Button
-                                    onClick={() =>
-                                      acceptJoinRequest(
-                                        request.user.userId,
-                                        request.room._id
-                                      )
-                                    }
-                                    variant={"outline"}
-                                    size={"icon"}
-                                  >
-                                    <Check color="green" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Accept</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
+                            <div className="flex gap-2">
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <Button
+                                      onClick={() =>
+                                        acceptJoinRequest(
+                                          request.user.userId,
+                                          request.room._id
+                                        )
+                                      }
+                                      variant={"outline"}
+                                      size={"icon"}
+                                    >
+                                      <Check color="green" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Accept</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
 
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <Button variant={"outline"} size={"icon"}>
-                                    <X color="red" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Decline</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <Button
+                                      onClick={() =>
+                                        rejectJoinRequest(
+                                          request.user.userId,
+                                          request.room._id
+                                        )
+                                      }
+                                      variant={"outline"}
+                                      size={"icon"}
+                                    >
+                                      <X color="red" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Decline</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )):<p className="text-center p-3">No requests</p>}
+                      ))
+                    ) : (
+                      <p className="text-center p-3">No requests</p>
+                    )}
                   </div>
                 </ScrollArea>
               </DropdownMenuContent>

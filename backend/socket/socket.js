@@ -159,7 +159,7 @@ io.on("connection", (socket) => {
 
         // send notification to admin
         const adminSocket = adminSockets[room.admin.toString()];
-        console.log(adminSocket);
+
         if (adminSocket) {
           io.to(adminSocket).emit("joinRequest", {
             request: {
@@ -181,6 +181,7 @@ io.on("connection", (socket) => {
         io.to(socket.id).emit("joinRequestStatus", {
           status: true,
           message: "Request send successfully",
+          room
         });
       }
     } catch (error) {
@@ -220,11 +221,9 @@ io.on("connection", (socket) => {
       }
 
       room.participants.push(userId);
-      room.requests = room.requests.filter((request) => {
-        if (request.user.userId.toString() === userId) {
-          request.status = "accepted";
-        }
-      });
+      room.requests = room.requests.filter(
+        (request) => request.user.userId.toString() !== userId.toString()
+      );
 
       const otherUser = await User.findById(userId);
       if (otherUser) {
@@ -233,10 +232,57 @@ io.on("connection", (socket) => {
       Promise.all([room.save(), otherUser.save()]);
       const userSocketId = adminSockets[userId];
       if (userSocketId) {
-        io.to([userSocketId,socket.id]).emit("joinRequestAccepted", { room });
+        io.to([userSocketId, socket.id]).emit("joinRequestAccepted", { room });
       }
     } catch (error) {
       console.log("Error in accept request socket event", error.message);
+    }
+  });
+
+  // reject join request
+  socket.on("rejectJoinRequest", async ({ userId, roomId }) => {
+    try {
+      if (!roomId || !userId)
+        return io.to(socket.id).emit("joinRequestStatus", {
+          status: false,
+          message: "Please provide roomId and userId",
+        });
+
+      const room = await Room.findById(roomId);
+      if (!room)
+        return io.to(socket.id).emit("joinRequestStatus", {
+          status: false,
+          message: "No room is available with this roomid",
+        });
+
+      const adminUserId = getKeyByValue(adminSockets, socket.id);
+
+      if (adminUserId.toString() !== room.admin.toString())
+        return io.to(socket.id).emit("joinRequestStatus", {
+          status: false,
+          message: "Only room admin can do that",
+        });
+
+      if (room.participants.includes(userId)) {
+        return io.to(socket.id).emit("joinRequestStatus", {
+          status: false,
+          message: "User is already a member of this group",
+        });
+      }
+      room.requests = room.requests.filter(
+        (request) => request.user.userId.toString() !== userId.toString()
+      );
+
+      await room.save();
+      const userSocketId = adminSockets[userId];
+      if (userSocketId) {
+        io.to([userSocketId, socket.id]).emit("joinRequestRejected", {
+          room,
+          message: "Join request rejected by admin 🙁",
+        });
+      }
+    } catch (error) {
+      console.log("Error in reject join request socket event", error.message);
     }
   });
 
