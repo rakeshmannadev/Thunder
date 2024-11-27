@@ -3,6 +3,7 @@ import express from "express";
 import http, { request } from "http";
 import Room from "../models/Room.js";
 import User from "../models/User.js";
+import { deleteRoom } from "../controllers/room.controller.js";
 const app = express();
 
 const server = http.createServer(app);
@@ -181,7 +182,7 @@ io.on("connection", (socket) => {
         io.to(socket.id).emit("joinRequestStatus", {
           status: true,
           message: "Request send successfully",
-          room
+          room,
         });
       }
     } catch (error) {
@@ -283,6 +284,23 @@ io.on("connection", (socket) => {
       }
     } catch (error) {
       console.log("Error in reject join request socket event", error.message);
+    }
+  });
+
+  // delete room
+
+  socket.on("deleteRoom", async ({ userId, roomId, room_id }) => {
+    try {
+      const response = await deleteRoom(userId, roomId);
+      if (response.status) {
+        console.log(response.message);
+        io.to(room_id).emit("roomDeleted", {
+          message: response.message,
+          roomId,
+        });
+      }
+    } catch (error) {
+      console.log(error.message);
     }
   });
 

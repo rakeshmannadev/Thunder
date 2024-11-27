@@ -15,6 +15,7 @@ import useUserStore from "@/store/useUserStore";
 import useSocketStore from "@/store/useSocketStore";
 import useRoomStore from "@/store/useRoomStore";
 import usePlayerStore from "@/store/usePlayerStore";
+import { Bird, Loader } from "lucide-react";
 
 const formatTime = (date: string) => {
   return new Date(date).toLocaleTimeString("en-US", {
@@ -31,7 +32,7 @@ const RoomPage = () => {
   const { currentUser } = useUserStore();
 
   const { roomId } = useParams<string>();
-  const { getRoomById, currentRoom } = useRoomStore();
+  const { getRoomById, currentRoom, fetchingRoom } = useRoomStore();
   const audio = document.querySelector("audio");
 
   useEffect(() => {
@@ -69,6 +70,29 @@ const RoomPage = () => {
     }
     return () => clearInterval(intervalId);
   }, [isPlayingSong, currentUser, currentSong]);
+
+  if (fetchingRoom)
+    return (
+      <main className="h-full rounded-lg bg-gradient-to-b from-zinc-800 to-zinc-900 overflow-hidden">
+        <Header />
+        <div className="flex justify-center items-center  h-[calc(100vh-130px)]">
+          <Loader className="size-6 text-emerald-500 animate-spin" />
+        </div>
+      </main>
+    );
+
+  if (!currentRoom && !fetchingRoom)
+    return (
+      <main className="h-full rounded-lg bg-gradient-to-b from-zinc-800 to-zinc-900 overflow-hidden">
+        <Header />
+        <div className="grid justify-center items-center w-full text-center  grid-cols-[1fr] h-[calc(100vh-130px)]">
+          <div className="flex flex-col items-center justify-center">
+            <Bird className="size-10" />
+            <p className="text-xl">Opps! Room not found</p>
+          </div>
+        </div>
+      </main>
+    );
 
   return (
     <main className="h-full rounded-lg bg-gradient-to-b from-zinc-800 to-zinc-900 overflow-hidden">

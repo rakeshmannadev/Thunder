@@ -10,6 +10,7 @@ interface RoomStore {
   joinRequests: Requests[];
   currentRoom: Room | null;
   isLoading: boolean;
+  fetchingRoom: boolean;
   createRoom: (
     roomName: string,
     visability: string,
@@ -28,6 +29,7 @@ const useRoomStore = create<RoomStore>((set) => ({
   joinRequests: [],
   currentRoom: null,
   isLoading: false,
+  fetchingRoom: false,
   createRoom: async (roomName, visability, imageFile) => {
     set({ isLoading: true });
     try {
@@ -84,7 +86,7 @@ const useRoomStore = create<RoomStore>((set) => ({
     }
   },
   getRoomById: async (roomId) => {
-    set({ isLoading: true });
+    set({ fetchingRoom: true });
     try {
       const response = await axiosInstance.get(`/rooms/getRoomById/${roomId}`);
       if (response.data.status) {
@@ -93,7 +95,7 @@ const useRoomStore = create<RoomStore>((set) => ({
     } catch (error: any) {
       console.log(error.response.data.message);
     } finally {
-      set({ isLoading: false });
+      set({ fetchingRoom: false });
     }
   },
   joinPublicRoom: async (roomId) => {
@@ -118,7 +120,6 @@ const useRoomStore = create<RoomStore>((set) => ({
       const response = await axiosInstance.post(`/user/getJoinRequests`, {
         roomIds,
       });
-      console.log(response.data)
       set({ joinRequests: response.data.requests });
     } catch (error: any) {
       console.log(error.message);

@@ -5,7 +5,6 @@ import User from "../models/User.js";
 
 export const createRoom = async (req, res, next) => {
   try {
-    console.log(req.body);
     const { roomName, visability } = req.body;
     if (!roomName || !visability) {
       return res.status(401).json({
@@ -39,28 +38,23 @@ export const createRoom = async (req, res, next) => {
   }
 };
 
-export const deleteRoom = async (req, res, next) => {
+export const deleteRoom = async (userId, roomId) => {
   try {
-    const { roomId } = req.params;
+    console.log(roomId);
+    const room = await Room.findById(roomId);
 
-    const room = await Room.findOne({ roomId });
+    if (!room) return { status: false, message: "Room not found" };
 
-    if (!room)
-      return res.status(404).json({ status: false, message: "Room not found" });
-
-    if (req.user.role !== "admin") {
-      return res
-        .status(401)
-        .json({ status: false, message: "You are not an admin." });
+    if (userId.toString() !== room.admin.toString()) {
+      return { status: false, message: "You are not an admin." };
     }
-    await User.findByIdAndUpdate(req.user._id, {
+    await User.findByIdAndUpdate(userId, {
       $pull: { rooms: roomId },
     });
-    await Room.findOneAndDelete({ roomId });
-    res.status(200).json({ status: true, message: "Room is deleted" });
+    await Room.findByIdAndDelete(roomId);
+    return { status: true, message: "Room is deleted" };
   } catch (error) {
-    console.log("Error in deleteRoom controller");
-    next(error);
+    throw new Error(error);
   }
 };
 

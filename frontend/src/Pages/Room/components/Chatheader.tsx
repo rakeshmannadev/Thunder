@@ -59,6 +59,7 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
     leaveRoom,
     isBroadcasting,
     activeUsers,
+    deleteRoom,
   } = useSocketStore();
   const { currentRoom } = useRoomStore();
   const { currentUser } = useUserStore();
@@ -79,8 +80,8 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
     Array.isArray(activeUsers) &&
     activeUsers.includes(currentUser?._id.toString());
 
-  const isAdmin = currentUser?._id === currentRoom?.admin;
-
+  const isAdmin = currentUser?._id.toString() === currentRoom?.admin.toString();
+  console.log(currentUser?._id, currentRoom?.admin);
   const handleEndSession = () => {
     if (!isAlreadyJoined) return;
     leaveRoom(roomId, userId);
@@ -189,7 +190,12 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
                       </DropdownMenuSubContent>
                     </DropdownMenuPortal>
                   </DropdownMenuSub>
-                  <DropdownMenuItem className="text-red-400">
+                  <DropdownMenuItem
+                    className="text-red-400"
+                    onClick={() =>
+                      deleteRoom(currentUser._id, currentRoom?._id, roomId)
+                    }
+                  >
                     <Trash className="size-4" />
                     <span>Delete room</span>
                   </DropdownMenuItem>

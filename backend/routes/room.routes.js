@@ -3,7 +3,6 @@ import { protectRoute } from "../middleware/auth.middleware.js";
 import {
   addModarator,
   createRoom,
-  deleteRoom,
   getActiveUsers,
   getRoomById,
   getRoomMembers,
@@ -14,7 +13,6 @@ import {
 const router = express.Router();
 
 router.post("/create-room", protectRoute, createRoom);
-router.delete("/delete-room/:roomId", protectRoute, deleteRoom);
 router.delete("/remove-member/", protectRoute, removeMember);
 router.put("/add-modarator", protectRoute, addModarator);
 router.delete("/remove-modarator", protectRoute, removeModarator);

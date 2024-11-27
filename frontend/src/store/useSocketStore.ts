@@ -27,6 +27,7 @@ interface SocketState {
   sendJoinRequest: (userId: string, roomId: string) => void;
   acceptJoinRequest: (userId: string, roomId: string) => void;
   rejectJoinRequest: (userId: string, roomId: string) => void;
+  deleteRoom: (userId: string, roomId: string, room_id: string) => void;
   disconnectSocket: () => void;
 }
 
@@ -168,6 +169,15 @@ const useSocketStore = create<SocketState>((set, get) => ({
         audio.load();
       }
     });
+    socket.on("roomDeleted", (data) => {
+      console.log("room deleted");
+      useUserStore.setState((state) => ({
+        rooms: state.rooms.filter((room) => room._id !== data.roomId),
+      }));
+      useRoomStore.getState().currentRoom?._id === data.roomId &&
+        useRoomStore.setState({ currentRoom: null });
+      toast.success("Sorry this room is deleted by admin");
+    });
   },
   disconnectSocket: () => {
     const socket = get().socket;
@@ -254,6 +264,12 @@ const useSocketStore = create<SocketState>((set, get) => ({
     const { socket } = get();
     if (socket) {
       socket.emit("endBroadcast", { userId, roomId });
+    }
+  },
+  deleteRoom: async (userId, roomId, room_id) => {
+    const { socket } = get();
+    if (socket) {
+      socket.emit("deleteRoom", { userId, roomId, room_id });
     }
   },
 }));
