@@ -26,7 +26,7 @@ import useSocketStore from "@/store/useSocketStore";
 import useUserStore from "@/store/useUserStore";
 import { SignedIn, useAuth } from "@clerk/clerk-react";
 import { AvatarFallback } from "@radix-ui/react-avatar";
-import { Camera, Group, Home, Library, PlusCircle } from "lucide-react";
+import { Camera, Home, Library, PlusCircle } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";

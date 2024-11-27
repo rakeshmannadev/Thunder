@@ -5,12 +5,12 @@ import {
   addToPlaylist,
   getCurrentUser,
   getJoinedRooms,
+  getJoinRequests,
   getPlaylists,
   getPlaylistSongs,
   getRooms,
   joinPublicRoom,
   leaveRoom,
-  sendJoinRequest,
 } from "../controllers/user.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 
@@ -24,9 +24,9 @@ router.post("/addToPlaylist", protectRoute, addToPlaylist);
 router.post("/addAlbumToPlaylist", protectRoute, addAlbumToPlaylist);
 router.get("/getPlaylistSongs/:id", protectRoute, getPlaylistSongs);
 
-router.get("/getPublicRooms", protectRoute, getRooms);
+router.post("/getJoinRequests", protectRoute, getJoinRequests);
+router.get("/getRooms", protectRoute, getRooms);
 router.put("/join-public-room/:roomId", protectRoute, joinPublicRoom);
 router.put("/leave-room/:roomId", protectRoute, leaveRoom);
-router.get("/send-join-request/:roomId", protectRoute, sendJoinRequest);
 
 export default router;

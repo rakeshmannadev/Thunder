@@ -59,45 +59,30 @@ export const joinPublicRoom = async (req, res, next) => {
     next(error);
   }
 };
-
-export const sendJoinRequest = async (req, res, next) => {
+export const getJoinRequests = async (req, res, next) => {
   try {
-    const { roomId } = req.params;
-
-    const room = await Room.findById(roomId);
+    const { roomIds } = req.body;
+    console.log(roomIds);
+    const room = await Room.find({
+      _id: { $in: roomIds },
+      requests: { $ne: [] },
+      "requests.status": "pending",
+    }).populate("requests.room");
+   
     if (!room)
       return res.status(404).json({ status: false, message: "No room found " });
 
-    if (room.visability === "private") {
-      if (room.participants.includes(req.user._id)) {
-        return res.status(400).json({
-          status: false,
-          message: "You are already a member of this room",
-        });
-      }
+    let requests = [];
 
-      room.requests.forEach((request) => {
-        if (request.user.userId.toString() === req.user._id.toString()) {
-          return res.status(400).json({
-            status: false,
-            message: "Already send join request",
-          });
-        }
+    room.forEach((room) => {
+      requests.push({
+        requests: room.requests,
       });
+    });
 
-      room.requests.push({
-        user: {
-          userId: req.user._id,
-          userName: req.user.name,
-        },
-        status: "pending",
-        room: roomId,
-      });
-      await room.save();
-    }
-    res.status(200).json({ status: true, message: "Join request send" });
+    res.status(200).json({ status: true, requests });
   } catch (error) {
-    console.log("Error in sendJoinRequrest user controller", error.message);
+    console.log("Error in getjoinRequests user controller", error.message);
     next(error);
   }
 };

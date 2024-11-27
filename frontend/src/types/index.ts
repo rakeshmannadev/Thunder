@@ -55,7 +55,10 @@ export interface User {
 }
 
 export interface Requests {
-  user: User;
+  user: {
+    userId: string;
+    userName: string;
+  };
   status: string;
   room: Room;
 }

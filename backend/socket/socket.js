@@ -15,11 +15,13 @@ const io = new Server(server, {
   },
 });
 
-// Function to get keys by value
 function getKeysByValue(obj, value) {
-  return Object.keys(obj)
-    .filter((key) => obj[key] === value)
-    .toString();
+  return Object.keys(obj).filter((key) => obj[key] === value);
+}
+
+// Function to get the key by value
+function getKeyByValue(obj, value) {
+  return Object.keys(obj).find((key) => obj[key].includes(value));
 }
 
 const activeUsers = {}; // tracks active users by roomid
@@ -31,6 +33,7 @@ const currentSongTime = {}; // tracks current song time by songId
 io.on("connection", (socket) => {
   const { userId } = socket.handshake.query;
   console.log("User connected " + socket.id);
+  adminSockets[userId] = socket.id; // { userId: socketId}
 
   // When a user joins a room
   socket.on("joinRoom", async ({ userId, roomId }) => {
@@ -41,7 +44,6 @@ io.on("connection", (socket) => {
 
     if (user.role === "admin") {
       // Store the admin's socket ID for tracking
-      adminSockets[roomId] = socket.id; // { roomId: socketId}
       socket.join(roomId);
       socket.data.isAdmin = true;
       io.to(roomId).emit("adminJoins", {
@@ -58,7 +60,7 @@ io.on("connection", (socket) => {
     activeUsers[roomId].push(userId); // { roomId: [userId]}
     userSockets[roomId].push(socket.id); // { roomId: [socketId]}
     io.to(socket.id).emit("userJoins", {
-      message: "User joins with userId " + userId,
+      message: "You have joined the room " + userId,
       roomId,
     });
     console.log(`${userId} joined room ${roomId}`);
@@ -81,7 +83,6 @@ io.on("connection", (socket) => {
     // check if admin
     if (socket.data.isAdmin) {
       console.log(`Admin has disconnected from room: ${roomId}`);
-      delete adminSockets[roomId];
       // Notify users that the broadcast has ended
       io.to(roomId).emit("broadcastEnded", { message: "Broadcast ended" });
       currentSong[roomId] = "";
@@ -100,6 +101,90 @@ io.on("connection", (socket) => {
       io.to(roomId).emit("updateUsers", { users: activeUsersInRoom });
       socket.leave(roomId);
       console.log(`${userId} left room ${roomId}`);
+    }
+  });
+
+  // send join request to admin
+  socket.on("sendJoinRequest", async ({ userId, roomId }) => {
+    try {
+      const room = await Room.findById(roomId);
+      if (!room) {
+        io.to(socket.id).emit("joinRequestStatus", {
+          status: false,
+          message: "Room not found",
+        });
+        return;
+      }
+
+      const user = await User.findById(userId);
+      if (!user) {
+        io.to(socket.id).emit("joinRequestStatus", {
+          status: false,
+          message: "User not found",
+        });
+        return;
+      }
+
+      if (room.visability === "private") {
+        if (room.participants.includes(userId)) {
+          io.to(socket.id).emit("joinRequestStatus", {
+            status: false,
+            message: "You are already a member of this room",
+          });
+          return;
+        }
+
+        const existRequest = room.requests.some(
+          (request) => request.user.userId.toString() === userId.toString()
+        );
+
+        if (existRequest) {
+          io.to(socket.id).emit("joinRequestStatus", {
+            status: false,
+            message: "Request already send",
+          });
+
+          return;
+        }
+
+        room.requests.push({
+          user: {
+            userId,
+            userName: user.name,
+          },
+          status: "pending",
+          room: roomId,
+        });
+        await room.save();
+
+        // send notification to admin
+        const adminSocket = adminSockets[room.admin.toString()];
+        console.log(adminSocket);
+        if (adminSocket) {
+          io.to(adminSocket).emit("joinRequest", {
+            request: {
+              user: {
+                userId,
+                userName: user.name,
+              },
+              status: "pending",
+              room: {
+                _id: room._id,
+                roomId: roomId,
+                image: room.image,
+                roomName: room.roomName,
+              },
+            },
+          });
+        }
+
+        io.to(socket.id).emit("joinRequestStatus", {
+          status: true,
+          message: "Request send successfully",
+        });
+      }
+    } catch (error) {
+      console.log("Error in send join request socket event", error.message);
     }
   });
 
@@ -176,16 +261,16 @@ io.on("connection", (socket) => {
   // Handle disconnect event
   socket.on("disconnect", () => {
     if (socket.data.isAdmin) {
-      const roomId = getKeysByValue(adminSockets, socket.id);
+      const roomId = getKeyByValue(userSockets, socket.id);
       console.log("RoomId: " + roomId);
       console.log(`Admin has disconnected from room: ${roomId}`);
       // Notify users that the broadcast has ended
       io.to(roomId).emit("broadcastEnded", { message: "Broadcast has ended" });
-      delete adminSockets[roomId];
+      delete adminSockets[userId];
     }
 
     // Leave the room // if users
-    const roomId = getKeysByValue(userSockets, socket.id);
+    const roomId = getKeyByValue(userSockets, socket.id);
     if (activeUsers[roomId]) {
       activeUsers[roomId] = activeUsers[roomId].filter(
         (user) => user !== userId

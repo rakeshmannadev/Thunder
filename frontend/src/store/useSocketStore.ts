@@ -3,6 +3,7 @@ import { io, Socket } from "socket.io-client";
 import toast from "react-hot-toast";
 import { axiosInstance } from "@/lib/axios";
 import usePlayerStore from "./usePlayerStore";
+import useRoomStore from "./useRoomStore";
 
 interface SocketState {
   socket: Socket | null;
@@ -22,6 +23,7 @@ interface SocketState {
   updateTime: (roomId: string, songId: string, currentTime: number) => void;
   joinRoom: (roomId: string, userId: string) => void;
   leaveRoom: (roomId: string, userId: string) => void;
+  sendJoinRequest: (userId: string, roomId: string) => void;
   disconnectSocket: () => void;
 }
 
@@ -46,6 +48,20 @@ const useSocketStore = create<SocketState>((set, get) => ({
     // Listen to socket events inside the store
     socket.on("connect", () => {
       console.log("Connected to server");
+    });
+    socket.on("joinRequest", (data) => {
+      useRoomStore.setState({
+        joinRequests: [...useRoomStore.getState().joinRequests, data.request],
+      });
+      toast.success("New join request received.");
+    });
+
+    socket.on("joinRequestStatus", (data) => {
+      if (data.status) {
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
     });
 
     socket.on("adminJoins", (data) => {
@@ -138,6 +154,13 @@ const useSocketStore = create<SocketState>((set, get) => ({
       socket.emit("initializeBroadcast", { userId, roomId });
     }
   },
+  sendJoinRequest: async (userId, roomId) => {
+    const { socket } = get();
+
+    if (socket) {
+      socket.emit("sendJoinRequest", { userId, roomId });
+    }
+  },
   updateTime: (roomId, songId, currentTime) => {
     const { socket } = get();
     if (socket) {
@@ -163,6 +186,7 @@ const useSocketStore = create<SocketState>((set, get) => ({
       socket.emit("joinRoom", { userId, roomId });
     }
   },
+
   leaveRoom: (roomId: string, userId: string) => {
     const audio = document.querySelector("audio");
     const { socket } = get();

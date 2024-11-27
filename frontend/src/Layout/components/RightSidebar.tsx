@@ -16,8 +16,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import useRoomStore from "@/store/useRoomStore";
+import useSocketStore from "@/store/useSocketStore";
 import useUserStore from "@/store/useUserStore";
-import { Room } from "@/types";
 import { useAuth } from "@clerk/clerk-react";
 import {
   Bell,
@@ -35,29 +35,30 @@ import { Link } from "react-router-dom";
 const RightSidebar = () => {
   const [notification, setNotification] = useState(false);
   const { isLoading, fetchPublicRooms, publicRooms, rooms } = useUserStore();
-  const { joinPublicRoom, sendJoinRequest } = useRoomStore();
+  const { joinPublicRoom, fetchJoinRequests, joinRequests } = useRoomStore();
+  const { sendJoinRequest } = useSocketStore();
   const { userId } = useAuth();
   const { currentUser } = useUserStore();
 
-  const userCreatedRooms: Room[] = [];
+  const userCreatedRooms: string[] = [];
 
   if (userId && currentUser) {
     rooms.forEach((room) => {
       if (room.admin === currentUser._id) {
-        userCreatedRooms.push(room);
+        userCreatedRooms.push(room._id);
       }
     });
   }
 
   useEffect(() => {
-    if (userCreatedRooms.length > 0) {
-      userCreatedRooms.forEach((room) => {
-        if (room.requests.length > 0) {
-          setNotification(true);
-        }
-      });
+    fetchJoinRequests(userCreatedRooms);
+  }, [fetchJoinRequests, userCreatedRooms.length]);
+
+  useEffect(() => {
+    if (joinRequests.length > 0) {
+      setNotification(true);
     }
-  }, [userCreatedRooms]);
+  }, [joinRequests.length]);
 
   useEffect(() => {
     if (publicRooms.length <= 0) {
@@ -70,8 +71,9 @@ const RightSidebar = () => {
     joinPublicRoom(roomId);
   };
   const handleSendRequest = (roomId: string) => {
-    if (!userId) return toast.error("Please login to send request");
-    sendJoinRequest(roomId);
+    if (!userId || !currentUser)
+      return toast.error("Please login to send request");
+    sendJoinRequest(currentUser?._id, roomId);
   };
 
   return userId ? (
@@ -144,61 +146,59 @@ const RightSidebar = () => {
                 <DropdownMenuSeparator />
                 <ScrollArea>
                   <div className="space-y-2">
-                    {userCreatedRooms.map((room) =>
-                      room.requests.map((request) => (
-                        <Link
-                          to={`/profile/${request.user.userId}`}
-                          key={request.user.userId}
-                          className="p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer"
-                        >
-                          <Avatar>
-                            <AvatarImage src={room.image} />
-                            <AvatarFallback>
-                              {room.roomName.charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
+                    {joinRequests.map((request) => (
+                      <Link
+                        to={`/profile/${request.user.userId}`}
+                        key={request.user.userId}
+                        className="p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer"
+                      >
+                        <Avatar>
+                          <AvatarImage src={request.room.image} />
+                          <AvatarFallback>
+                            {request.room.roomName.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
 
-                          <div className="flex-1  min-w-0 flex gap-2 items-center">
-                            <div>
-                              <p className="font-medium truncate">
-                                {room.roomName}
-                              </p>
-                              <p className="text-sm text-zinc-400 truncate">
-                                {request.user.userName}
-                              </p>
-                            </div>
-
-                            <div className="flex gap-2">
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger>
-                                    <Button variant={"outline"} size={"icon"}>
-                                      <Check color="green" />
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>Accept</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger>
-                                    <Button variant={"outline"} size={"icon"}>
-                                      <X color="red" />
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>Decline</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            </div>
+                        <div className="flex-1  min-w-0 flex gap-2 items-center">
+                          <div>
+                            <p className="font-medium truncate">
+                              {request.room.roomName}
+                            </p>
+                            <p className="text-sm text-zinc-400 truncate">
+                              {request.user.userName}
+                            </p>
                           </div>
-                        </Link>
-                      ))
-                    )}
+
+                          <div className="flex gap-2">
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <Button variant={"outline"} size={"icon"}>
+                                    <Check color="green" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Accept</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <Button variant={"outline"} size={"icon"}>
+                                    <X color="red" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Decline</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
                   </div>
                 </ScrollArea>
               </DropdownMenuContent>
@@ -212,7 +212,7 @@ const RightSidebar = () => {
         <div className="flex items-center justify-between md:float-start md:mr-auto mb-4 w-full border-b-2 ">
           <div className=" flex flex-col md:flex-row text-center gap-2 items-center md:text-start text-white p-2  ">
             <Users2 className="size-5 mr-2" />
-            <span className="">Public rooms</span>
+            <span className="">Rooms</span>
           </div>
         </div>
         <ScrollArea className=" h-[calc(100vh-300px)] w-fit md:w-full pb-10  ">
