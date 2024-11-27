@@ -128,26 +128,3 @@ export const checkAdmin = async (req, res, next) => {
     next(error);
   }
 };
-
-export const rejectJoinRequest = async (req, res, next) => {
-  try {
-    const { roomId, userId } = req.body;
-    const room = await Room.findOne({ roomId });
-    if (!room)
-      return res.status(404).json({ status: false, message: "No room found " });
-
-    if (room.participants.includes(userId))
-      return res.status(400).json({
-        status: false,
-        message: "User is already a member of this room",
-      });
-
-    room.requests.pull(userId);
-
-    await room.save();
-    res.status(200).json({ status: true, message: "Request rejected" });
-  } catch (error) {
-    console.log("Error in rejectJoinRequest admin controller", error.message);
-    next(error);
-  }
-};

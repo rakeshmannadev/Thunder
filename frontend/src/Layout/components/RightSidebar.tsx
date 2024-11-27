@@ -78,7 +78,7 @@ const RightSidebar = () => {
       return toast.error("Please login to send request");
     sendJoinRequest(currentUser?._id, roomId);
   };
-console.log('rooms',publicRooms)
+
   return userId ? (
     <aside className="h-full flex flex-col gap-2">
       <section className="rounded-lg bg-zinc-900 p-4">

@@ -62,7 +62,7 @@ export const joinPublicRoom = async (req, res, next) => {
 export const getJoinRequests = async (req, res, next) => {
   try {
     const { roomIds } = req.body;
-    console.log(roomIds);
+
     const room = await Room.find({
       _id: { $in: roomIds },
       requests: { $ne: [] },
@@ -80,7 +80,7 @@ export const getJoinRequests = async (req, res, next) => {
       });
     });
 
-    res.status(200).json({ status: true, requests });
+    res.status(200).json({ status: true, requests:requests[0]?.requests || [] });
   } catch (error) {
     console.log("Error in getjoinRequests user controller", error.message);
     next(error);

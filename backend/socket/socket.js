@@ -60,7 +60,7 @@ io.on("connection", (socket) => {
     activeUsers[roomId].push(userId); // { roomId: [userId]}
     userSockets[roomId].push(socket.id); // { roomId: [socketId]}
     io.to(socket.id).emit("userJoins", {
-      message: "You have joined the room " + userId,
+      message: "You have joined the room ",
       roomId,
     });
     console.log(`${userId} joined room ${roomId}`);
@@ -232,7 +232,7 @@ io.on("connection", (socket) => {
       Promise.all([room.save(), otherUser.save()]);
       const userSocketId = adminSockets[userId];
       if (userSocketId) {
-        io.to([userSocketId, socket.id]).emit("joinRequestAccepted", { room });
+        io.to([userSocketId]).emit("joinRequestAccepted", { room });
       }
     } catch (error) {
       console.log("Error in accept request socket event", error.message);
