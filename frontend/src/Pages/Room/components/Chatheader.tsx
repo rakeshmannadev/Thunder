@@ -56,7 +56,7 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
   const {
     startBroadcast,
     endBroadcast,
-    disconnectSocket,
+    leaveRoom,
     isBroadcasting,
     activeUsers,
   } = useSocketStore();
@@ -83,8 +83,8 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
 
   const handleEndSession = () => {
     if (!isAlreadyJoined) return;
+    leaveRoom(roomId, userId);
 
-    disconnectSocket();
     navigate("/");
   };
   const frameworks = [

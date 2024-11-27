@@ -50,6 +50,7 @@ import toast from "react-hot-toast";
 import TooltipComponent from "@/components/Tooltip/TooltipComponent";
 import useMusicStore from "@/store/useMusicStore";
 import useSocketStore from "@/store/useSocketStore";
+import useRoomStore from "@/store/useRoomStore";
 
 const formatTime = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
@@ -80,6 +81,7 @@ export const PlaybackControls = () => {
     roomId,
     isLoading,
   } = useSocketStore();
+  const { currentRoom } = useRoomStore();
   const { user } = useUser();
 
   const [volume, setVolume] = useState(20);
@@ -257,10 +259,12 @@ export const PlaybackControls = () => {
         {/* player controls*/}
         <div className="flex flex-col items-center gap-2 flex-1 max-w-full sm:max-w-[45%]">
           <div className="flex items-center gap-4 sm:gap-6">
-            <TooltipComponent text={isShuffle ?"Suffle on":"Shuffle off"}>
+            <TooltipComponent text={isShuffle ? "Suffle on" : "Shuffle off"}>
               <Button
                 onClick={handleShuffle}
-                disabled={(isBroadcasting && currentUser?.role!=='admin')}
+                disabled={
+                  isBroadcasting && currentRoom?.admin !== currentUser?._id
+                }
                 size="icon"
                 variant="ghost"
                 className="inline-flex hover:text-white text-zinc-400"
@@ -274,7 +278,10 @@ export const PlaybackControls = () => {
                 variant="ghost"
                 className="hover:text-white text-zinc-400"
                 onClick={playPrevious}
-                disabled={!currentSong || (isBroadcasting && currentUser?.role!=='admin')}
+                disabled={
+                  !currentSong ||
+                  (isBroadcasting && currentRoom?.admin !== currentUser?._id)
+                }
               >
                 <SkipBack className="h-4 w-4" />
               </Button>
@@ -284,15 +291,16 @@ export const PlaybackControls = () => {
                 size="icon"
                 className="bg-white hover:bg-white/80 text-black rounded-full h-8 w-8"
                 onClick={handleTogglePlay}
-                disabled={!currentSong || (isBroadcasting && currentUser?.role!=='admin')}
-              >
-                {isLoading && 
-                  <Loader2 className="size-5 animate-spin" />
+                disabled={
+                  !currentSong ||
+                  (isBroadcasting && currentRoom?.admin !== currentUser?._id)
                 }
+              >
+                {isLoading && <Loader2 className="size-5 animate-spin" />}
                 {isPlaying && !isLoading ? (
                   <Pause className="h-5 w-5" />
-                )  :(!isLoading) && (
-                  <Play className="h-5 w-5" />
+                ) : (
+                  !isLoading && <Play className="h-5 w-5" />
                 )}
               </Button>
             </TooltipComponent>
@@ -302,15 +310,20 @@ export const PlaybackControls = () => {
                 variant="ghost"
                 className="hover:text-white text-zinc-400"
                 onClick={playNext}
-                disabled={!currentSong || (isBroadcasting && currentUser?.role!=='admin')}
+                disabled={
+                  !currentSong ||
+                  (isBroadcasting && currentRoom?.admin !== currentUser?._id)
+                }
               >
                 <SkipForward className="h-4 w-4" />
               </Button>
             </TooltipComponent>
-            <TooltipComponent text={isRepeat ? "Repeat on":"Repeat off"}>
+            <TooltipComponent text={isRepeat ? "Repeat on" : "Repeat off"}>
               <Button
                 onClick={handleRepeat}
-                disabled={ (isBroadcasting && currentUser?.role!=='admin')}
+                disabled={
+                  isBroadcasting && currentRoom?.admin !== currentUser?._id
+                }
                 size="icon"
                 variant="ghost"
                 className="inline-flex hover:text-white text-zinc-400"

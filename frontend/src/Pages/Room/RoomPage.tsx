@@ -26,10 +26,9 @@ const formatTime = (date: string) => {
 
 const RoomPage = () => {
   const [isMobile, setIsMobile] = useState(false);
-  const { connectSocket, joinRoom, disconnectSocket,isJoined,updateTime,isPlayingSong } =
-    useSocketStore();
-    const {currentSong} = usePlayerStore()
-    const { currentUser } = useUserStore();
+  const { joinRoom, isJoined, updateTime, isPlayingSong } = useSocketStore();
+  const { currentSong } = usePlayerStore();
+  const { currentUser } = useUserStore();
 
   const { roomId } = useParams<string>();
   const { getRoomById, currentRoom } = useRoomStore();
@@ -55,33 +54,21 @@ const RoomPage = () => {
   // Socket Logics
 
   useEffect(() => {
-    if (currentUser && roomId && !isJoined ) {
-      connectSocket(roomId, currentUser._id);
+    if (currentUser && roomId && !isJoined) {
       joinRoom(currentUser._id, roomId);
     }
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      disconnectSocket();
-      event.preventDefault();
-      event.returnValue = "";
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [currentUser, roomId, connectSocket, joinRoom, disconnectSocket]);
+  }, [currentUser, roomId, joinRoom, isJoined]);
 
   // send socket event for updateTime
-  useEffect(()=>{
-    let intervalId:any;
-    if(isPlayingSong && currentUser && currentUser.role==='admin'){
-       intervalId = setInterval(() => {
-        updateTime(roomId,currentSong._id,audio?.currentTime)
+  useEffect(() => {
+    let intervalId: any;
+    if (isPlayingSong && currentUser && currentUser.role === "admin") {
+      intervalId = setInterval(() => {
+        updateTime(roomId, currentSong._id, audio?.currentTime);
       }, 1000);
     }
-    return ()=> clearInterval(intervalId);
-  },[isPlayingSong,currentUser,currentSong])
+    return () => clearInterval(intervalId);
+  }, [isPlayingSong, currentUser, currentSong]);
 
   return (
     <main className="h-full rounded-lg bg-gradient-to-b from-zinc-800 to-zinc-900 overflow-hidden">
@@ -156,7 +143,11 @@ export default RoomPage;
 
 const NoConversationPlaceholder = () => (
   <div className="flex flex-col items-center justify-center h-full space-y-6 mt-10 ">
-    <img src="/headphones.png" alt="Thunder" className="size-16 animate-bounce" />
+    <img
+      src="/headphones.png"
+      alt="Thunder"
+      className="size-16 animate-bounce"
+    />
     <div className="text-center">
       <h3 className="text-zinc-300 text-lg font-medium mb-1">
         No Conversation till now

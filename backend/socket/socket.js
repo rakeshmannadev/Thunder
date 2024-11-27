@@ -15,16 +15,25 @@ const io = new Server(server, {
   },
 });
 
+// Function to get keys by value
+function getKeysByValue(obj, value) {
+  return Object.keys(obj)
+    .filter((key) => obj[key] === value)
+    .toString();
+}
+
 const activeUsers = {}; // tracks active users by roomid
+const userSockets = {}; // tracks active users sockets by roomid
 const adminSockets = {}; // tracks admin socket ids by roomid
-const currentSong={}; // tracks current song by roomid
-const currentSongTime={} // tracks current song time by songId
+const currentSong = {}; // tracks current song by roomid
+const currentSongTime = {}; // tracks current song time by songId
+
 io.on("connection", (socket) => {
-  const { roomId, userId } = socket.handshake.query;
+  const { userId } = socket.handshake.query;
   console.log("User connected " + socket.id);
+
   // When a user joins a room
   socket.on("joinRoom", async ({ userId, roomId }) => {
-    // Join the room
     socket.join(roomId);
 
     const user = await User.findById(userId);
@@ -32,28 +41,35 @@ io.on("connection", (socket) => {
 
     if (user.role === "admin") {
       // Store the admin's socket ID for tracking
-      adminSockets[roomId] = socket.id;
-      socket.join(roomId); // Admin joins the room
+      adminSockets[roomId] = socket.id; // { roomId: socketId}
+      socket.join(roomId);
       socket.data.isAdmin = true;
-      io.to(roomId).emit("adminJoins", { message: "Admin joined room" });
+      io.to(roomId).emit("adminJoins", {
+        message: "Admin joined room",
+        roomId,
+      });
     }
 
     // Add user to activeUsers
     if (!activeUsers[roomId]) {
       activeUsers[roomId] = [];
+      userSockets[roomId] = [];
     }
-    activeUsers[roomId].push(userId);
+    activeUsers[roomId].push(userId); // { roomId: [userId]}
+    userSockets[roomId].push(socket.id); // { roomId: [socketId]}
+    io.to(socket.id).emit("userJoins", {
+      message: "User joins with userId " + userId,
+      roomId,
+    });
     console.log(`${userId} joined room ${roomId}`);
 
-    // Check if there is any current song playing 
-    console.log(`current songId ${currentSong[roomId]}`);
-    if(currentSong[roomId]){
-      io.to(socket.id).emit("songStarted", { songId:currentSong[roomId] });
-      io.to(socket.id).emit("timeUpdated",{currentTime:currentSongTime[currentSong[roomId]]})
+    // Check if there is any current song playing
+    if (currentSong[roomId]) {
+      io.to(socket.id).emit("songStarted", { songId: currentSong[roomId] });
+      io.to(socket.id).emit("timeUpdated", {
+        currentTime: currentSongTime[currentSong[roomId]],
+      });
     }
-
-
-
 
     // Emit the active users in that room
     const activeUsersInRoom = activeUsers[roomId] || [];
@@ -68,13 +84,16 @@ io.on("connection", (socket) => {
       delete adminSockets[roomId];
       // Notify users that the broadcast has ended
       io.to(roomId).emit("broadcastEnded", { message: "Broadcast ended" });
-      currentSong[roomId] = '';
+      currentSong[roomId] = "";
     }
 
     // Leave the room // if users
     if (activeUsers[roomId]) {
       activeUsers[roomId] = activeUsers[roomId].filter(
         (user) => user !== userId
+      );
+      userSockets[roomId] = userSockets[roomId].filter(
+        (socketId) => socketId !== socket.id
       );
       // Update the active users and broadcast it
       const activeUsersInRoom = activeUsers[roomId] || [];
@@ -113,19 +132,19 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("songStarted", { songId });
 
     // push songId into currentSong map
-    if(!currentSong[roomId]){
-      currentSong[roomId] =''
+    if (!currentSong[roomId]) {
+      currentSong[roomId] = "";
     }
 
     currentSong[roomId] = songId;
     console.log(`current songId ${currentSong[roomId]}`);
     console.log(`Song played by admin: ${songId}`);
-  })
-  socket.on("updateTime",({roomId,currentTime})=>{
+  });
+  socket.on("updateTime", ({ roomId, currentTime }) => {
     currentSongTime[currentSong[roomId]] = currentTime;
-    console.log("Time updated")
-  })
-  socket.on("pauseSong",async({userId,roomId,songId})=>{
+    console.log("Time updated");
+  });
+  socket.on("pauseSong", async ({ userId, roomId, songId }) => {
     const room = await Room.findOne({ roomId });
     if (!room) return;
 
@@ -134,7 +153,7 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("songPaused", { songId });
 
     console.log(`Song paused by admin: ${songId}`);
-  })
+  });
 
   socket.on("endBroadcast", async ({ userId, roomId }) => {
     const room = await Room.findOne({ roomId });
@@ -149,7 +168,7 @@ io.on("connection", (socket) => {
       message: `Broadcast has ended by ${user.name}`,
     });
 
-    currentSong[roomId] ='';
+    currentSong[roomId] = "";
 
     console.log(`Broadcast ended by admin: ${user.name}`);
   });
@@ -157,6 +176,8 @@ io.on("connection", (socket) => {
   // Handle disconnect event
   socket.on("disconnect", () => {
     if (socket.data.isAdmin) {
+      const roomId = getKeysByValue(adminSockets, socket.id);
+      console.log("RoomId: " + roomId);
       console.log(`Admin has disconnected from room: ${roomId}`);
       // Notify users that the broadcast has ended
       io.to(roomId).emit("broadcastEnded", { message: "Broadcast has ended" });
@@ -164,6 +185,7 @@ io.on("connection", (socket) => {
     }
 
     // Leave the room // if users
+    const roomId = getKeysByValue(userSockets, socket.id);
     if (activeUsers[roomId]) {
       activeUsers[roomId] = activeUsers[roomId].filter(
         (user) => user !== userId
