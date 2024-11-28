@@ -268,9 +268,11 @@ const useSocketStore = create<SocketState>((set, get) => ({
   },
   deleteRoom: async (userId, roomId, room_id) => {
     const { socket } = get();
+    set({ isLoading: true });
     if (socket) {
       socket.emit("deleteRoom", { userId, roomId, room_id });
     }
+    set({ isLoading: false });
   },
 }));
 

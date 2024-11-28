@@ -298,6 +298,8 @@ io.on("connection", (socket) => {
           message: response.message,
           roomId,
         });
+        delete activeUsers[room_id];
+        socket.leave(room_id);
       }
     } catch (error) {
       console.log(error.message);

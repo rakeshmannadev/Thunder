@@ -33,6 +33,7 @@ const RoomPage = () => {
 
   const { roomId } = useParams<string>();
   const { getRoomById, currentRoom, fetchingRoom } = useRoomStore();
+
   const audio = document.querySelector("audio");
 
   useEffect(() => {

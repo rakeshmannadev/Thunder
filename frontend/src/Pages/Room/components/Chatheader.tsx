@@ -51,6 +51,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import Alertdialog from "@/components/Alertdialog/Alertdialog";
 
 const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
   const {
@@ -63,9 +64,11 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
   } = useSocketStore();
   const { currentRoom } = useRoomStore();
   const { currentUser } = useUserStore();
+
   const [isOpen, setIsOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
+  const [isAlertOpen, setAlertOpen] = useState(false);
 
   const closeModal = () => {
     setIsOpen(false);
@@ -81,13 +84,19 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
     activeUsers.includes(currentUser?._id.toString());
 
   const isAdmin = currentUser?._id.toString() === currentRoom?.admin.toString();
-  console.log(currentUser?._id, currentRoom?.admin);
   const handleEndSession = () => {
     if (!isAlreadyJoined) return;
     leaveRoom(roomId, userId);
 
     navigate("/");
   };
+
+  const handleDeleteRoom = () => {
+    if (currentUser && currentRoom) {
+      deleteRoom(currentUser._id, currentRoom._id, roomId);
+    }
+  };
+
   const frameworks = [
     {
       value: "next.js",
@@ -190,15 +199,25 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
                       </DropdownMenuSubContent>
                     </DropdownMenuPortal>
                   </DropdownMenuSub>
-                  <DropdownMenuItem
-                    className="text-red-400"
-                    onClick={() =>
-                      deleteRoom(currentUser._id, currentRoom?._id, roomId)
-                    }
-                  >
+
+                  <DropdownMenuItem className="text-red-400">
                     <Trash className="size-4" />
-                    <span>Delete room</span>
+                    <span
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setAlertOpen(true);
+                      }}
+                    >
+                      Delete room
+                    </span>
                   </DropdownMenuItem>
+                  <Alertdialog
+                    message="This action cannot be undone. This will permanently delete the
+            room and remove all members from our servers."
+                    isOpen={isAlertOpen}
+                    setOpen={setAlertOpen}
+                    onConfirm={handleDeleteRoom}
+                  />
                 </>
               )}
             </DropdownMenuContent>
