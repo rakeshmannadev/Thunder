@@ -1,3 +1,4 @@
+import Alertdialog from "@/components/Alertdialog/Alertdialog";
 import PlaylistSkeleton from "@/components/Skeleton/PlaylistSkeleton";
 import TooltipComponent from "@/components/Tooltip/TooltipComponent";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
@@ -29,10 +30,12 @@ import { AvatarFallback } from "@radix-ui/react-avatar";
 import { Camera, Home, Library, PlusCircle } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const LeftSidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAlertOpen, setAlertOpen] = useState(false);
+  const [nextRoomId, setNextRoomId] = useState<string | null>(null);
   const [roomName, setRoomName] = useState<{ roomName: string }>();
   const [visablity, setVisability] = useState<{ visability: string }>();
   const [imageFile, setImageFile] = useState<File | null>();
@@ -40,16 +43,28 @@ const LeftSidebar = () => {
   const imageRef = useRef<HTMLInputElement>(null);
 
   const { userId } = useAuth();
-  const { roomId, isPlayingSong } = useSocketStore();
+  const { roomId, isPlayingSong, isJoined, leaveRoom } = useSocketStore();
   const {
     playlistLoading,
     rooms,
     playlists,
     fetchJoinedRooms,
     fetchPlaylists,
+    currentUser,
   } = useUserStore();
 
   const { createRoom, isLoading } = useRoomStore();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const currentRoomId = location.pathname.slice(6);
+  const currentPlaylistId = location.pathname.slice(10);
+  console.log(currentPlaylistId);
+  const handleLeaveRoom = () => {
+    leaveRoom(roomId, currentUser?._id);
+    setAlertOpen(false);
+    if (nextRoomId) navigate(`/room/${nextRoomId}`);
+  };
 
   const closeModal = () => {
     setIsOpen(false);
@@ -94,24 +109,36 @@ const LeftSidebar = () => {
     }
   };
 
+  const handleOpenRoom = (room_id: string) => {
+    if (!room_id) return;
+    // check if user is joined current room
+    if (roomId !== room_id && isJoined) {
+      setNextRoomId(room_id);
+      setAlertOpen(true);
+    } else {
+      navigate(`/room/${room_id}`);
+    }
+  };
+
   return (
     <aside className="h-full flex flex-col gap-2">
       {/* Navigation menu */}
       <section className=" rounded-lg bg-zinc-900 p-4 flex flex-col items-center ">
-        <div className="space-y-2  w-fit ">
+        <div className="space-y-2  w-fit md:w-full flex flex-col items-center md:items-start  ">
           <TooltipComponent text="Home">
             <Link
               to={"/"}
               className={cn(
                 buttonVariants({
                   variant: "ghost",
-                  className:
-                    "w-full justify-center md:justify-start text-white hover:bg-zinc-800 ",
+                  className: `w-fit md:w-full p-4  justify-center md:justify-start text-white rounded-md hover:bg-zinc-800 ${
+                    location.pathname === "/" ? "bg-zinc-700" : ""
+                  }`,
                 })
               )}
             >
               <Home className="md:mr-2 size-5" />
-              <span className="hidden md:inline">Home</span>
+              <span className="hidden md:block">Home</span>
             </Link>
           </TooltipComponent>
           <TooltipComponent text="Create room">
@@ -121,7 +148,7 @@ const LeftSidebar = () => {
                 buttonVariants({
                   variant: "ghost",
                   className:
-                    "w-full cursor-pointer justify-center md:justify-start text-white hover:bg-zinc-800 ",
+                    " w-fit md:w-full p-4 cursor-pointer justify-center md:justify-start text-white hover:bg-zinc-800 ",
                 })
               )}
             >
@@ -204,30 +231,38 @@ const LeftSidebar = () => {
             </Dialog>
           </SignedIn>
 
-          <ScrollArea className="h-[calc(100vh-500px)] w-full pb-2">
+          <ScrollArea className="h-fit w-full pb-2">
             {rooms &&
               rooms.length > 0 &&
               rooms.map((room) => (
-                <div key={room._id} className="relative mt-3">
+                <div
+                  key={room._id}
+                  className={`relative mt-3 p-2 hover:bg-zinc-800 rounded-md ${
+                    currentRoomId === room.roomId ? "bg-zinc-700" : ""
+                  } `}
+                >
                   <TooltipComponent text={room.roomName}>
-                    <Link
-                      to={`/room/${room.roomId}`}
+                    <div
+                      onClick={() => handleOpenRoom(room.roomId)}
                       className={cn(
                         buttonVariants({
                           variant: "ghost",
                           className:
-                            "w-full justify-center md:justify-start text-white hover:bg-zinc-800 ",
+                            "w-fit md:w-full flex cursor-pointer items-center justify-center md:justify-start text-white   ",
                         })
                       )}
                     >
-                      <Avatar>
-                        <AvatarImage src={room.image} />
-                        <AvatarFallback>
-                          {room.roomName.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="hidden md:inline"> {room.roomName}</span>
-                    </Link>
+                      <div>
+                        <Avatar>
+                          <AvatarImage src={room.image} />
+                          <AvatarFallback>
+                            {room.roomName.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
+
+                      <span className="hidden md:block"> {room.roomName}</span>
+                    </div>
                   </TooltipComponent>
                   {isPlayingSong && roomId == room.roomId && (
                     <div className="absolute  bottom-4 right-4 ">
@@ -239,7 +274,12 @@ const LeftSidebar = () => {
           </ScrollArea>
         </div>
       </section>
-
+      <Alertdialog
+        isOpen={isAlertOpen}
+        setOpen={setAlertOpen}
+        onConfirm={handleLeaveRoom}
+        message="You are already in a Session ,leave the session to continue."
+      />
       {/* Library section */}
       <section className="flex-1 flex flex-col   items-center rounded-lg bg-zinc-900 p-4">
         <div className="flex items-center justify-between md:float-start md:mr-auto mb-4">
@@ -248,19 +288,21 @@ const LeftSidebar = () => {
             <span className="hidden md:inline">Playlists</span>
           </div>
         </div>
-        <ScrollArea className="h-[calc(100vh-300px)] w-fit md:w-full pb-10">
-          <div className="space-y-2 ">
+        <ScrollArea className="h-[calc(100vh-400px)] w-fit md:w-full pb-10">
+          <div className="space-y-2 w-full ">
             {playlistLoading ? (
               <PlaylistSkeleton />
             ) : (
               playlists &&
               playlists.length > 0 &&
               playlists.map((playlist) => (
-                <div key={playlist._id}>
+                <div key={playlist._id} className=" w-2/3 ">
                   <TooltipComponent text={playlist.playListName}>
                     <Link
                       to={`/playlist/${playlist._id}`}
-                      className="p-2 max-sm:w-16 hover:bg-zinc-800 rounded-full md:rounded-md flex items-center gap-3 group cursor-pointer"
+                      className={`p-2 max-sm:w-16 hover:bg-zinc-800 rounded-full md:rounded-md flex items-center gap-3 group cursor-pointer ${
+                        currentPlaylistId === playlist._id ? "bg-zinc-700" : ""
+                      } `}
                     >
                       <img
                         src={playlist.imageUrl}

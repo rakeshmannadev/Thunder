@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import express from "express";
-import http, { request } from "http";
+import http from "http";
 import Room from "../models/Room.js";
 import User from "../models/User.js";
 import { deleteRoom } from "../controllers/room.controller.js";

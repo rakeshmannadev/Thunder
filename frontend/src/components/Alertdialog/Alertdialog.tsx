@@ -37,9 +37,11 @@ const Alertdialog = ({
           <AlertDialogDescription>{message}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel onClick={() => setOpen(false)}>
+            Return
+          </AlertDialogCancel>
           <AlertDialogAction onClick={handleConfirm}>
-            {isLoading ? "Deleting..." : "Continue"}
+            Continue
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

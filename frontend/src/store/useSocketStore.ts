@@ -255,9 +255,11 @@ const useSocketStore = create<SocketState>((set, get) => ({
       socket.emit("leaveRoom", { userId, roomId });
     }
     set({ isPlayingSong: false, isBroadcasting: false, isJoined: false });
-    usePlayerStore.setState({ currentSong: null, isPlaying: false });
-    if (audio) {
-      audio.load();
+    if (get().isPlayingSong) {
+      usePlayerStore.setState({ currentSong: null, isPlaying: false });
+      if (audio) {
+        audio.load();
+      }
     }
   },
   endBroadcast: (userId, roomId) => {
