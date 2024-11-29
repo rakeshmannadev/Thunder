@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import {
   Check,
   ChevronsUpDown,
-  Dot,
   EllipsisVertical,
   LogOut,
   Music,
@@ -70,7 +69,7 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
     songRequests,
     playSong,
   } = useSocketStore();
-  const { currentRoom } = useRoomStore();
+  const { currentRoom, leaveJoinedRoom } = useRoomStore();
   const { currentUser } = useUserStore();
   const { fetchAllSongs, songs } = useMusicStore();
 
@@ -119,7 +118,7 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
     }
   }, []);
 
-  if (!currentUser) return null;
+  if (!currentUser || !currentRoom) return null;
 
   return (
     <div className=" flex justify-between p-4 border-b border-zinc-900">
@@ -174,7 +173,13 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
                   <DropdownMenuItem className="cursor-pointer">
                     <UserCog className="size-4" /> Be modaretor
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer text-red-400">
+                  <DropdownMenuItem
+                    className="cursor-pointer text-red-400"
+                    onClick={() => {
+                      leaveJoinedRoom(currentRoom._id);
+                      navigate("/");
+                    }}
+                  >
                     <LogOut className="size-4" /> Leave room
                   </DropdownMenuItem>
                 </>

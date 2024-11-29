@@ -68,7 +68,7 @@ export const getJoinRequests = async (req, res, next) => {
       requests: { $ne: [] },
       "requests.status": "pending",
     }).populate("requests.room");
-   
+
     if (!room)
       return res.status(404).json({ status: false, message: "No room found " });
 
@@ -80,7 +80,9 @@ export const getJoinRequests = async (req, res, next) => {
       });
     });
 
-    res.status(200).json({ status: true, requests:requests[0]?.requests || [] });
+    res
+      .status(200)
+      .json({ status: true, requests: requests[0]?.requests || [] });
   } catch (error) {
     console.log("Error in getjoinRequests user controller", error.message);
     next(error);
@@ -89,7 +91,7 @@ export const getJoinRequests = async (req, res, next) => {
 export const leaveRoom = async (req, res, next) => {
   try {
     const { roomId } = req.params;
-    const room = await Room.findOne({ roomId });
+    const room = await Room.findById(roomId);
     if (!room)
       return res.status(404).json({ status: false, message: "No room found " });
 
@@ -100,7 +102,7 @@ export const leaveRoom = async (req, res, next) => {
       $pull: { rooms: roomId },
     });
     await room.save();
-    res.status(200).json({ status: true, message: "You have leave the room" });
+    res.status(200).json({ status: true, message: "You have left the room" });
   } catch (error) {
     console.log("Error in leaveRoom user controller", error.message);
     next(error);

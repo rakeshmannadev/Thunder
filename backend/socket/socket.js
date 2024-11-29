@@ -73,8 +73,7 @@ io.on("connection", (socket) => {
       let currentSongRequest = null;
       let requestedUser = null;
       if (songRequsts[roomId]) {
-        currentSongRequest =
-          songRequsts[roomId][currentSong[roomId]];
+        currentSongRequest = songRequsts[roomId][currentSong[roomId]];
       }
 
       if (currentSongRequest) {
@@ -84,6 +83,7 @@ io.on("connection", (socket) => {
       io.to(socket.id).emit("songStarted", {
         songId: currentSong[roomId].songId,
         userName: requestedUser ? null : currentSong[roomId].user.name,
+        userId: requestedUser ? null : currentSong[roomId].user._id,
         requestedUser: requestedUser,
       });
 

@@ -185,6 +185,7 @@ export const PlaybackControls = () => {
   }
 
   const handleAddToFavorite = () => {
+    if(!currentSong) return toast.error("Play a song to add to favorite")
     if (currentSong) {
       const currUserName = user?.firstName || "You";
 

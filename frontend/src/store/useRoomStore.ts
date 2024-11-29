@@ -20,6 +20,7 @@ interface RoomStore {
   fetchRoomMembers: (roomId: string) => Promise<void>;
   getRoomById: (roomId: string) => Promise<void>;
   joinPublicRoom: (roomId: string) => Promise<void>;
+  leaveJoinedRoom: (roomId: string) => Promise<void>;
   fetchJoinRequests: (roomIds: string[]) => Promise<void>;
 }
 
@@ -107,6 +108,24 @@ const useRoomStore = create<RoomStore>((set) => ({
         useUserStore.setState({
           rooms: [...useUserStore.getState().rooms, response.data.room],
         });
+        toast.success(response.data.message);
+      }
+    } catch (error: any) {
+      console.log(error.response.data.message);
+      toast.error(error.response.data.message);
+    }
+  },
+  leaveJoinedRoom: async (roomId) => {
+    try {
+      
+      const response = await axiosInstance.put(`/user/leave-room/${roomId}`);
+      if (response.data.status) {
+        useUserStore.setState({
+          rooms: useUserStore
+            .getState()
+            .rooms.filter((room) => room._id !== roomId),
+        });
+        set({ currentRoom: null })
         toast.success(response.data.message);
       }
     } catch (error: any) {

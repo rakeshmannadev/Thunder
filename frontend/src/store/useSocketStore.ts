@@ -144,7 +144,7 @@ const useSocketStore = create<SocketState>((set, get) => ({
     });
 
     socket.on("songStarted", async (data) => {
-      const { songId, userName, requestedUser } = data;
+      const { songId, userName, requestedUser, userId } = data;
       set({ isLoading: true });
       try {
         const response = await axiosInstance.get(`/songs/${songId}`);
@@ -155,6 +155,7 @@ const useSocketStore = create<SocketState>((set, get) => ({
             isPlayingSong: true,
             isBroadcasting: true,
             userName,
+            userId,
             requestedUser,
           });
         }
@@ -290,6 +291,7 @@ const useSocketStore = create<SocketState>((set, get) => ({
     if (socket) {
       socket.emit("sendSongRequest", { userId, roomId, song });
     }
+    toast.success("Song request send to admin");
   },
   endBroadcast: (userId, roomId) => {
     const { socket } = get();
