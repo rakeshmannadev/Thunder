@@ -3,20 +3,23 @@ import { Button } from "@/components/ui/button";
 import {
   Check,
   ChevronsUpDown,
+  Dot,
   EllipsisVertical,
   LogOut,
   Music,
+  Play,
   RouteOffIcon,
   SatelliteDish,
   Trash,
   Unplug,
   UserCog,
+  X,
 } from "lucide-react";
 import Memberslist from "./Memberslist";
 import useSocketStore from "@/store/useSocketStore";
 import useRoomStore from "@/store/useRoomStore";
 import useUserStore from "@/store/useUserStore";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import {
   Dialog,
@@ -25,7 +28,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,6 +55,8 @@ import {
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import Alertdialog from "@/components/Alertdialog/Alertdialog";
+import useMusicStore from "@/store/useMusicStore";
+import { SongRequest } from "@/types";
 
 const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
   const {
@@ -61,13 +66,24 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
     isBroadcasting,
     activeUsers,
     deleteRoom,
+    sendSongRequest,
+    songRequests,
+    playSong,
   } = useSocketStore();
   const { currentRoom } = useRoomStore();
   const { currentUser } = useUserStore();
+  const { fetchAllSongs, songs } = useMusicStore();
 
   const [isOpen, setIsOpen] = useState(false);
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
+  const [requestedSong, setRequestSong] = useState<SongRequest>({
+    _id: "",
+    title: "",
+    imageUrl: "",
+    albumId: "",
+    userName: currentUser!.name,
+    userId: currentUser!._id,
+  });
   const [isAlertOpen, setAlertOpen] = useState(false);
 
   const closeModal = () => {
@@ -97,20 +113,12 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
     }
   };
 
-  const frameworks = [
-    {
-      value: "next.js",
-      label: "Next.js",
-    },
-    {
-      value: "sveltekit",
-      label: "SvelteKit",
-    },
-    {
-      value: "nuxt.js",
-      label: "Nuxt.js",
-    },
-  ];
+  useEffect(() => {
+    if (songs.length <= 0) {
+      fetchAllSongs();
+    }
+  }, []);
+
   if (!currentUser) return null;
 
   return (
@@ -139,7 +147,7 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
                 aria-haspopup="true"
                 size="icon"
                 variant="ghost"
-                className="hover:bg-gray-700/75 "
+                className="hover:bg-gray-700/75"
               >
                 <EllipsisVertical className="h-4 w-4" />
               </Button>
@@ -189,13 +197,68 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
                   )}
 
                   <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>
+                    <DropdownMenuSubTrigger
+                      className={`${
+                        songRequests.length > 0 && "text-green-400"
+                      }`}
+                    >
                       <Music className="size-4" />
                       <span>Song requests</span>
                     </DropdownMenuSubTrigger>
                     <DropdownMenuPortal>
                       <DropdownMenuSubContent>
-                        <DropdownMenuItem>list 1</DropdownMenuItem>
+                        {songRequests.length > 0 ? (
+                          songRequests.map((song, index) => (
+                            <DropdownMenuItem key={index}>
+                              <div className="flex gap-2 justify-between">
+                                <Avatar>
+                                  <AvatarImage src={song.imageUrl} />
+                                  <AvatarFallback></AvatarFallback>
+                                </Avatar>
+                                <div className="flex flex-col gap-1 justify-center">
+                                  <Link
+                                    to={`/album/${song.albumId}`}
+                                    className="hover:underline"
+                                  >
+                                    {song.title}
+                                  </Link>
+                                  <Link
+                                    to={`/profile/${song.userId}`}
+                                    className="hover:underline"
+                                  >
+                                    {song.userName}
+                                  </Link>
+                                </div>
+                                <div className="flex gap-2 items-center justify-center">
+                                  <div
+                                    title="Play"
+                                    className="h-full cursor-pointer   w-fit flex justify-center items-center hover:bg-slate-500 px-3 rounded-md"
+                                  >
+                                    <Play
+                                      className="size-4 text-green-500"
+                                      onClick={() =>
+                                        playSong(
+                                          currentUser._id,
+                                          roomId,
+                                          song._id,
+                                          song.userId
+                                        )
+                                      }
+                                    />
+                                  </div>
+                                  <div
+                                    title="Remove"
+                                    className="h-full  cursor-pointer  w-fit flex justify-center items-center hover:bg-slate-500 px-3 rounded-md"
+                                  >
+                                    <X className="size-4 text-red-500" />
+                                  </div>
+                                </div>
+                              </div>
+                            </DropdownMenuItem>
+                          ))
+                        ) : (
+                          <p>No song requests</p>
+                        )}
                       </DropdownMenuSubContent>
                     </DropdownMenuPortal>
                   </DropdownMenuSub>
@@ -244,10 +307,10 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
                       aria-expanded={open}
                       className="w-[200px] justify-between"
                     >
-                      {value
-                        ? frameworks.find(
-                            (framework) => framework.value === value
-                          )?.label
+                      {requestedSong.title
+                        ? songs.find(
+                            (song) => song.title === requestedSong.title
+                          )?.title
                         : "Select song..."}
                       <ChevronsUpDown className="opacity-50" />
                     </Button>
@@ -258,22 +321,35 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
                       <CommandList>
                         <CommandEmpty>No song found.</CommandEmpty>
                         <CommandGroup>
-                          {frameworks.map((framework) => (
+                          {songs.map((song) => (
                             <CommandItem
-                              key={framework.value}
-                              value={framework.value}
+                              key={song._id}
+                              value={song.title}
                               onSelect={(currentValue) => {
-                                setValue(
-                                  currentValue === value ? "" : currentValue
-                                );
+                                setRequestSong({
+                                  ...requestedSong,
+                                  _id: song._id,
+                                  albumId: song.albumId,
+                                  title:
+                                    currentValue === requestedSong.title
+                                      ? ""
+                                      : currentValue,
+                                  imageUrl: song.imageUrl,
+                                });
                                 setOpen(false);
                               }}
                             >
-                              {framework.label}
+                              <Avatar>
+                                <AvatarImage src={song.imageUrl} />
+                                <AvatarFallback>
+                                  {song.title.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
+                              {song.title}
                               <Check
                                 className={cn(
                                   "ml-auto",
-                                  value === framework.value
+                                  requestedSong.title === song.title
                                     ? "opacity-100"
                                     : "opacity-0"
                                 )}
@@ -289,7 +365,14 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
               <div className="grid grid-cols-4 items-center gap-4"></div>
             </div>
             <DialogFooter>
-              <Button>Send request</Button>
+              <Button
+                onClick={() => {
+                  sendSongRequest(currentUser?._id, roomId, requestedSong);
+                  closeModal();
+                }}
+              >
+                Send request
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

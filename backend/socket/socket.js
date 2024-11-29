@@ -30,6 +30,7 @@ const userSockets = {}; // tracks active users sockets by roomid
 const adminSockets = {}; // tracks admin socket ids by roomid
 const currentSong = {}; // tracks current song by roomid
 const currentSongTime = {}; // tracks current song time by songId
+const songRequsts = {}; // tracks song requests by roomId
 
 io.on("connection", (socket) => {
   const { userId } = socket.handshake.query;
@@ -67,8 +68,25 @@ io.on("connection", (socket) => {
     console.log(`${userId} joined room ${roomId}`);
 
     // Check if there is any current song playing
+
     if (currentSong[roomId]) {
-      io.to(socket.id).emit("songStarted", { songId: currentSong[roomId] });
+      let currentSongRequest = null;
+      let requestedUser = null;
+      if (songRequsts[roomId]) {
+        currentSongRequest =
+          songRequsts[roomId][currentSong[roomId]];
+      }
+
+      if (currentSongRequest) {
+        requestedUser = currentSongRequest.user;
+      }
+
+      io.to(socket.id).emit("songStarted", {
+        songId: currentSong[roomId].songId,
+        userName: requestedUser ? null : currentSong[roomId].user.name,
+        requestedUser: requestedUser,
+      });
+
       io.to(socket.id).emit("timeUpdated", {
         currentTime: currentSongTime[currentSong[roomId]],
       });
@@ -287,6 +305,24 @@ io.on("connection", (socket) => {
     }
   });
 
+  // send song request
+
+  socket.on("sendSongRequest", async ({ userId, roomId, song }) => {
+    const room = await Room.findOne({ roomId });
+    const user = await User.findById(userId);
+    if (!user) return console.log("User not found");
+    if (!room) return console.log("Room not found");
+    if (!room.participants.includes(userId))
+      return console.log("You are not a member");
+
+    const adminSocket = adminSockets[room.admin.toString()];
+    if (!songRequsts[roomId]) {
+      songRequsts[roomId] = {};
+    }
+    songRequsts[roomId][song._id] = { user };
+    io.to(adminSocket).emit("newSongRequest", { song });
+  });
+
   // delete room
 
   socket.on("deleteRoom", async ({ userId, roomId, room_id }) => {
@@ -326,20 +362,31 @@ io.on("connection", (socket) => {
     console.log(`Broadcast started by admin: ${user.name}`);
   });
 
-  socket.on("playSong", async ({ userId, roomId, songId }) => {
+  socket.on("playSong", async ({ userId, roomId, songId, requestedUserId }) => {
     const room = await Room.findOne({ roomId });
     if (!room) return;
+    const user = await User.findById(userId);
+    if (!user) return console.log("user not found");
+
+    let requestedUser = null;
+    if (requestedUserId) {
+      requestedUser = await User.findById(requestedUserId);
+    }
 
     if (room.admin.toString() !== userId.toString()) return;
 
-    io.to(roomId).emit("songStarted", { songId });
+    io.to(roomId).emit("songStarted", {
+      songId,
+      userName: user.name,
+      requestedUser,
+    });
 
     // push songId into currentSong map
     if (!currentSong[roomId]) {
-      currentSong[roomId] = "";
+      currentSong[roomId] = {};
     }
 
-    currentSong[roomId] = songId;
+    currentSong[roomId] = { songId, user };
     console.log(`current songId ${currentSong[roomId]}`);
     console.log(`Song played by admin: ${songId}`);
   });

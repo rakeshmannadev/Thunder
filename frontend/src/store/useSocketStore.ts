@@ -5,6 +5,7 @@ import { axiosInstance } from "@/lib/axios";
 import usePlayerStore from "./usePlayerStore";
 import useRoomStore from "./useRoomStore";
 import useUserStore from "./useUserStore";
+import { SongRequest, User } from "@/types";
 
 interface SocketState {
   socket: Socket | null;
@@ -13,18 +14,26 @@ interface SocketState {
   isBroadcasting: boolean;
   isPlayingSong: boolean;
   activeUsers: string[];
+  songRequests: SongRequest[];
+  requestedUser: User | null;
   userName: string;
   userId: string;
   roomId: string;
   connectSocket: (userId: string) => void;
   startBroadcast: (userId: string, roomId: string) => void;
-  playSong: (userId: string, roomId: string, songId: string) => void;
+  playSong: (
+    userId: string,
+    roomId: string,
+    songId: string,
+    requestedUserId: string | null
+  ) => void;
   pauseSong: (userId: string, roomId: string, songId: string) => void;
   endBroadcast: (userId: string, roomId: string) => void;
   updateTime: (roomId: string, songId: string, currentTime: number) => void;
   joinRoom: (roomId: string, userId: string) => void;
   leaveRoom: (roomId: string, userId: string) => void;
   sendJoinRequest: (userId: string, roomId: string) => void;
+  sendSongRequest: (userId: string, roomId: string, song: SongRequest) => void;
   acceptJoinRequest: (userId: string, roomId: string) => void;
   rejectJoinRequest: (userId: string, roomId: string) => void;
   deleteRoom: (userId: string, roomId: string, room_id: string) => void;
@@ -38,7 +47,9 @@ const useSocketStore = create<SocketState>((set, get) => ({
   isBroadcasting: false,
   isPlayingSong: false,
   activeUsers: [],
+  songRequests: [],
   userName: "",
+  requestedUser: null,
   userId: "",
   roomId: "",
   connectSocket: (userId) => {
@@ -87,6 +98,7 @@ const useSocketStore = create<SocketState>((set, get) => ({
       }));
       toast.error(data.message);
     });
+
     socket.on("joinRequestAccepted", (data) => {
       useUserStore.setState({
         rooms: [...useUserStore.getState().rooms, data.room],
@@ -132,20 +144,31 @@ const useSocketStore = create<SocketState>((set, get) => ({
     });
 
     socket.on("songStarted", async (data) => {
-      const { songId } = data;
+      const { songId, userName, requestedUser } = data;
       set({ isLoading: true });
       try {
         const response = await axiosInstance.get(`/songs/${songId}`);
         if (response.data.status) {
           const song = response.data.song;
           usePlayerStore.getState().setCurrentSong(song);
-          set({ isPlayingSong: true, isBroadcasting: true });
+          set({
+            isPlayingSong: true,
+            isBroadcasting: true,
+            userName,
+            requestedUser,
+          });
         }
       } catch (error: any) {
         console.log(error.response.data.message);
       } finally {
         set({ isLoading: false });
       }
+    });
+    socket.on("newSongRequest", (data) => {
+      set((state) => ({
+        songRequests: [...state.songRequests, data.song],
+      }));
+      toast.success("New song requst received from " + data.song.userName);
     });
 
     socket.on("songPaused", (data) => {
@@ -216,11 +239,11 @@ const useSocketStore = create<SocketState>((set, get) => ({
       socket.emit("updateTime", { roomId, songId, currentTime });
     }
   },
-  playSong: (userId, roomId, songId) => {
+  playSong: (userId, roomId, songId, requestedUserId = null) => {
     const { socket } = get();
 
     if (socket) {
-      socket.emit("playSong", { userId, roomId, songId });
+      socket.emit("playSong", { userId, roomId, songId, requestedUserId });
     }
   },
   pauseSong: (userId, roomId, songId) => {
@@ -260,6 +283,12 @@ const useSocketStore = create<SocketState>((set, get) => ({
       if (audio) {
         audio.load();
       }
+    }
+  },
+  sendSongRequest: (userId, roomId, song) => {
+    const { socket } = get();
+    if (socket) {
+      socket.emit("sendSongRequest", { userId, roomId, song });
     }
   },
   endBroadcast: (userId, roomId) => {

@@ -8,9 +8,17 @@ export interface Song {
   audioUrl: string;
   duration: number;
   createdAt: string;
-  updatedAt: Date;
+  updatedAt: string;
 }
 
+export interface SongRequest {
+  _id: string;
+  title: string;
+  albumId: string;
+  imageUrl: string;
+  userName: string;
+  userId: string;
+}
 export interface Album {
   _id: string;
   albumId: string;

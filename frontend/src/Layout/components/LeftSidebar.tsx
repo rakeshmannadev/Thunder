@@ -265,7 +265,7 @@ const LeftSidebar = () => {
                     </div>
                   </TooltipComponent>
                   {isPlayingSong && roomId == room.roomId && (
-                    <div className="absolute  bottom-4 right-4 ">
+                    <div className="absolute  bottom-6 right-6 ">
                       <div className="circle"></div>
                     </div>
                   )}

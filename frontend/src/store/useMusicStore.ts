@@ -3,25 +3,38 @@ import { Album, Song } from "@/types";
 import { create } from "zustand";
 
 interface MusicStore {
+  songs: Song[];
   featured: Song[];
   madeForYouAlbums: Album[];
   currentAlbum: Album | null;
-  trending:Song[];
+  trending: Song[];
   isLoading: boolean;
+  fetchAllSongs: () => Promise<void>;
   fetchFeaturedSongs: () => Promise<void>;
   fetchMadeForYouAlbums: () => Promise<void>;
   fetchTrendingSongs: () => Promise<void>;
-  fetchAlbumById: (albumId:string) => Promise<void>;
+  fetchAlbumById: (albumId: string) => Promise<void>;
 }
 
 const useMusicStore = create<MusicStore>((set) => ({
-  featured:[],
-  madeForYouAlbums:[],
-  trending:[],
+  songs: [],
+  featured: [],
+  madeForYouAlbums: [],
+  trending: [],
   currentAlbum: null,
   isLoading: false,
-  
 
+  fetchAllSongs: async () => {
+    set({ isLoading: true });
+    try {
+      const response = await axiosInstance.get("/songs");
+      set({ songs: response.data.songs });
+    } catch (error: any) {
+      console.log(error.response.data.message);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
   fetchFeaturedSongs: async () => {
     set({ isLoading: true });
     try {
@@ -45,7 +58,7 @@ const useMusicStore = create<MusicStore>((set) => ({
       set({ isLoading: false });
     }
   },
-  fetchTrendingSongs:async ()=>{
+  fetchTrendingSongs: async () => {
     try {
       const response = await axiosInstance.get("/songs/trending");
       set({ trending: response.data.songs });
@@ -54,16 +67,17 @@ const useMusicStore = create<MusicStore>((set) => ({
     } finally {
       set({ isLoading: false });
     }
-  },fetchAlbumById:async(albumId)=>{
-    set({isLoading:true})
+  },
+  fetchAlbumById: async (albumId) => {
+    set({ isLoading: true });
     try {
       const response = await axiosInstance.get(`/albums/${albumId}`);
       set({ currentAlbum: response.data.album });
-    } catch (error:any) {
-      console.log(error.response.data.message)
-    }finally{
-      set({isLoading:false})
+    } catch (error: any) {
+      console.log(error.response.data.message);
+    } finally {
+      set({ isLoading: false });
     }
-  }
+  },
 }));
 export default useMusicStore;
