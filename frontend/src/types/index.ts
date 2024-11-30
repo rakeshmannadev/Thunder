@@ -11,6 +11,18 @@ export interface Song {
   updatedAt: string;
 }
 
+export interface SearchedSong {
+  album: { id: string; name: string };
+  artists: { primary: { name: string }[] };
+  id: string;
+  duration: number;
+
+  image: { quality: string; url: string }[];
+
+  name: string;
+
+  year: string;
+}
 export interface SongRequest {
   _id: string;
   title: string;
@@ -19,6 +31,7 @@ export interface SongRequest {
   userName: string;
   userId: string;
 }
+
 export interface Album {
   _id: string;
   albumId: string;

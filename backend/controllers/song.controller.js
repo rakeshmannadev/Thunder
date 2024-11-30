@@ -1,4 +1,5 @@
 import Song from "../models/Song.js";
+import { fetchSong } from "../services/saavn.js";
 
 export const getAllSongs = async (req, res, next) => {
   try {
@@ -23,7 +24,7 @@ export const getFeaturedSongs = async (req, res, next) => {
           artist: 1,
           imageUrl: 1,
           audioUrl: 1,
-          albumId:1
+          albumId: 1,
         },
       },
     ]);
@@ -80,15 +81,28 @@ export const getTrending = async (req, res, next) => {
   }
 };
 export const getSongById = async (req, res, next) => {
-  const {songId} = req.params;
+  const { songId } = req.params;
   try {
     const song = await Song.findById(songId);
-    if(!song){
-      return res.status(404).json({status:false,message:"Song not found"});
+    if (!song) {
+      return res.status(404).json({ status: false, message: "Song not found" });
     }
-    res.status(200).json({status:true,song});
+    res.status(200).json({ status: true, song });
   } catch (error) {
-    console.log("first error in getSongById controller",error.message);
+    console.log("first error in getSongById controller", error.message);
     next(error);
   }
-}
+};
+
+export const searchSong = async (req, res, next) => {
+  try {
+    const { query } = req.params;
+    const response = await fetchSong(query, "/search/songs");
+    console.log(response);
+    res.status(200).json({ status: true, song: response });
+  } catch (error) {
+    res.status(500).json({ status: false, message: "Internal server errro" });
+    console.log("Error in search song controller", error.message);
+    next(error);
+  }
+};
