@@ -19,7 +19,7 @@ const albumSchema = mongoose.Schema(
       required: false,
     },
     releaseYear: {
-      type: Number,
+      type: String,
     },
     songs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Song" }],
   },

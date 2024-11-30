@@ -30,7 +30,7 @@ const Searchbar = () => {
       searchSong(debouncedValue);
     }
   }, [debouncedValue]);
-  console.log(searchLoading);
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -53,10 +53,10 @@ const Searchbar = () => {
           <CommandList>
             <CommandEmpty>No song found.</CommandEmpty>
             {!searchLoading &&
-              searchedSongs.length > 0 &&
-              searchedSongs.map((song) => (
+              searchedSongs?.length > 0 &&
+              searchedSongs.map((song,idx) => (
                 <CommandGroup>
-                  <CommandItem key={song.id}>
+                  <CommandItem key={idx}>
                     <Link
                       className="w-full flex gap-3 justify-start items-center"
                       to={`/album/${song.album.id}`}

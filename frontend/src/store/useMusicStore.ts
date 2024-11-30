@@ -77,7 +77,9 @@ const useMusicStore = create<MusicStore>((set) => ({
     set({ isLoading: true });
     try {
       const response = await axiosInstance.get(`/albums/${albumId}`);
-      set({ currentAlbum: response.data.album });
+      if (response.status) {
+        set({ currentAlbum: response.data.album });
+      }
     } catch (error: any) {
       console.log(error.response.data.message);
     } finally {
