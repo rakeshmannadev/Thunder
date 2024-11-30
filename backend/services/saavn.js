@@ -18,3 +18,18 @@ export const fetchSong = async (query, url) => {
     console.error(error);
   }
 };
+
+export const fetchAlbum = async (id, url) => {
+  const options = {
+    method: "GET",
+    url: process.env.SAAVN_URL + url,
+    params: { id },
+  };
+
+  try {
+    const data = await axios.request(options);
+    return data;
+  } catch (error) {
+    throw new Error(error);
+  }
+};

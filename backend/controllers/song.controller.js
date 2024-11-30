@@ -98,7 +98,6 @@ export const searchSong = async (req, res, next) => {
   try {
     const { query } = req.params;
     const response = await fetchSong(query, "/search/songs");
-    console.log(response);
     res.status(200).json({ status: true, song: response });
   } catch (error) {
     res.status(500).json({ status: false, message: "Internal server errro" });
