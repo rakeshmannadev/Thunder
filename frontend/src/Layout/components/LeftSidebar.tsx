@@ -59,7 +59,7 @@ const LeftSidebar = () => {
 
   const currentRoomId = location.pathname.slice(6);
   const currentPlaylistId = location.pathname.slice(10);
-  console.log(currentPlaylistId);
+
   const handleLeaveRoom = () => {
     leaveRoom(roomId, currentUser?._id);
     setAlertOpen(false);
