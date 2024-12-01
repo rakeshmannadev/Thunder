@@ -10,13 +10,12 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import useUserStore from "@/store/useUserStore";
 import useSocketStore from "@/store/useSocketStore";
 import useRoomStore from "@/store/useRoomStore";
 import usePlayerStore from "@/store/usePlayerStore";
 import { Bird, Loader } from "lucide-react";
-import Alertdialog from "@/components/Alertdialog/Alertdialog";
 
 const formatTime = (date: string) => {
   return new Date(date).toLocaleTimeString("en-US", {
@@ -28,18 +27,17 @@ const formatTime = (date: string) => {
 
 const RoomPage = () => {
   const [isMobile, setIsMobile] = useState(false);
-  const [isAlertOpen, setAlertOpen] = useState(true);
+
   const {
     joinRoom,
     isJoined,
     updateTime,
     isPlayingSong,
-    roomId: storeRoomId,
   } = useSocketStore();
   const { currentSong } = usePlayerStore();
   const { currentUser } = useUserStore();
 
-  const { roomId } = useParams<string>();
+  const { roomId } = useParams<string>() as Record<string, string>;
   const { getRoomById, currentRoom, fetchingRoom } = useRoomStore();
 
   const audio = document.querySelector("audio");

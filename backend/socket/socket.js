@@ -3,7 +3,7 @@ import express from "express";
 import http from "http";
 import Room from "../models/Room.js";
 import User from "../models/User.js";
-import { deleteRoom } from "../controllers/room.controller.js";
+import { deleteRoom, removeMember } from "../controllers/room.controller.js";
 const app = express();
 
 const server = http.createServer(app);
@@ -16,9 +16,6 @@ const io = new Server(server, {
   },
 });
 
-function getKeysByValue(obj, value) {
-  return Object.keys(obj).filter((key) => obj[key] === value);
-}
 
 // Function to get the key by value
 function getKeyByValue(obj, value) {
@@ -302,6 +299,32 @@ io.on("connection", (socket) => {
       }
     } catch (error) {
       console.log("Error in reject join request socket event", error.message);
+    }
+  });
+
+  // kick user from room
+  socket.on("kickMember", async ({ userId, roomId, memberId }) => {
+    try {
+      const response = await removeMember(userId, roomId, memberId);
+      if (response.status) {
+        // notify the member
+        const memberSocketId = adminSockets[memberId.toString()];
+        if (memberSocketId) {
+          io.to(memberSocketId).emit("kickedFromRoom", {
+            message: `You have been kicked from ${response.room.roomName} by admin`,
+            roomId,
+          });
+        }
+        // notify admin
+        io.to(socket.id).emit("userKicked", {
+          message: "User kicked",
+          roomId,
+          memberId,
+        });
+        socket.leave(roomId);
+      }
+    } catch (error) {
+      console.log("Error in kickUser socket event", error.message);
     }
   });
 

@@ -96,9 +96,10 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
   const navigate = useNavigate();
   const isAlreadyJoined =
     Array.isArray(activeUsers) &&
-    activeUsers.includes(currentUser?._id.toString());
+    activeUsers.includes(currentUser?._id?.toString());
 
-  const isAdmin = currentUser?._id.toString() === currentRoom?.admin.toString();
+  const isAdmin =
+    currentUser?._id?.toString() === currentRoom?.admin?.toString();
   const handleEndSession = () => {
     if (!isAlreadyJoined) return;
     leaveRoom(roomId, userId);

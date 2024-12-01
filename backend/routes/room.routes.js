@@ -6,14 +6,12 @@ import {
   getActiveUsers,
   getRoomById,
   getRoomMembers,
-  removeMember,
   removeModarator,
 } from "../controllers/room.controller.js";
 
 const router = express.Router();
 
 router.post("/create-room", protectRoute, createRoom);
-router.delete("/remove-member/", protectRoute, removeMember);
 router.put("/add-modarator", protectRoute, addModarator);
 router.delete("/remove-modarator", protectRoute, removeModarator);
 router.get("/getRoomMembers/:roomId", protectRoute, getRoomMembers);

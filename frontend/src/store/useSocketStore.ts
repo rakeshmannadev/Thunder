@@ -36,6 +36,7 @@ interface SocketState {
   sendSongRequest: (userId: string, roomId: string, song: SongRequest) => void;
   acceptJoinRequest: (userId: string, roomId: string) => void;
   rejectJoinRequest: (userId: string, roomId: string) => void;
+  kickMember: (userId: string, roomId: string, memberId: string) => void;
   deleteRoom: (userId: string, roomId: string, room_id: string) => void;
   disconnectSocket: () => void;
 }
@@ -62,7 +63,7 @@ const useSocketStore = create<SocketState>((set, get) => ({
 
     // Listen to socket events inside the store
     socket.on("connect", () => {
-      console.log("Connected to server");
+
     });
     socket.on("joinRequest", (data) => {
       useRoomStore.setState({
@@ -202,6 +203,25 @@ const useSocketStore = create<SocketState>((set, get) => ({
         useRoomStore.setState({ currentRoom: null });
       toast.success("Sorry this room is deleted by admin");
     });
+    socket.on("kickedFromRoom", (data) => {
+      useUserStore.setState({
+        rooms: useUserStore
+          .getState()
+          .rooms.filter((room) => room._id !== data.roomId),
+      });
+      useRoomStore.getState().currentRoom?._id === data.roomId &&
+        useRoomStore.setState({ currentRoom: null });
+
+      toast.success(data.message);
+    });
+    socket.on("userKicked", (data) => {
+      useRoomStore.setState({
+        members: useRoomStore
+          .getState()
+          .members.filter((member) => member._id !== data.memberId),
+      });
+      toast.success(data.message);
+    });
   },
   disconnectSocket: () => {
     const socket = get().socket;
@@ -270,6 +290,13 @@ const useSocketStore = create<SocketState>((set, get) => ({
     const { socket } = get();
     if (socket) {
       socket.emit("rejectJoinRequest", { userId, roomId });
+    }
+  },
+  kickMember(userId, roomId, memberId) {
+    const { socket } = get();
+    if (socket) {
+      console.log("Called");
+      socket.emit("kickMember", { userId, roomId, memberId });
     }
   },
   leaveRoom: (roomId: string, userId: string) => {

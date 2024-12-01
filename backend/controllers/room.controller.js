@@ -58,39 +58,31 @@ export const deleteRoom = async (userId, roomId) => {
   }
 };
 
-export const removeMember = async (req, res, next) => {
+export const removeMember = async (userId, roomId, memberId) => {
   try {
-    const { userId, roomId } = req.body;
-
     if (!userId || !roomId)
-      return res
-        .status(400)
-        .json({ status: false, message: "No userid or roomid provided" });
+      return { status: false, message: "No userid or roomid provided" };
 
-    const room = await Room.findOne({ roomId });
+    const room = await Room.findById(roomId);
     if (!room)
-      return res.status(404).json({
+      return {
         status: false,
         message: "No room is available with this roomid",
-      });
+      };
 
-    if (req.user.role !== "admin")
-      return res
-        .status(401)
-        .json({ status: false, message: "Only room admin can do that" });
+    if (room.admin.toString() !== userId.toString())
+      return { status: false, message: "Only room admin can do that" };
 
-    const otherUser = await User.findById(userId);
-    if (otherUser) {
-      otherUser.rooms.pull(roomId);
+    const member = await User.findById(memberId);
+    if (member) {
+      member.rooms.pull(roomId);
     }
-    room.participants.pull(userId);
+    room.participants.pull(memberId);
 
-    await otherUser.save();
-    await room.save();
-    res.status(200).json({ status: true, message: "Member removed from room" });
+    Promise.all([member.save(), room.save()]);
+    return { status: true, room };
   } catch (error) {
-    console.log("Error in remove member controller");
-    next(error);
+    console.log(error.message);
   }
 };
 
