@@ -315,16 +315,16 @@ const LoginPrompt = () => (
         aria-hidden="true"
       />
       <div className="relative bg-zinc-900 rounded-full p-4">
-        <HeadphonesIcon className="size-8 text-emerald-400" />
+        <HeadphonesIcon className="size-5 md:size-8 text-emerald-400" />
       </div>
     </div>
 
     <div className="space-y-2 max-w-[250px]">
-      <h3 className="text-lg font-semibold text-white">
+      <h3 className="text-sm md:text-lg font-semibold text-white">
         Join rooms and listen together
       </h3>
-      <p className="text-sm text-zinc-400">
-        Login to discover what music your friends are enjoying right now
+      <p className="text-xs md:text-sm text-zinc-400">
+        Login to discover what music others enjoing right now
       </p>
     </div>
   </div>

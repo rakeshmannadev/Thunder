@@ -40,8 +40,8 @@ interface UserStore {
 }
 
 const useUserStore = create<UserStore>((set, get) => ({
-  isLoading: true,
-  playlistLoading: true,
+  isLoading: false,
+  playlistLoading: false,
   rooms: [],
   publicRooms: [],
   playlists: [],

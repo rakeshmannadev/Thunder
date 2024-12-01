@@ -20,11 +20,14 @@ const Header = () => {
 
   return (
     <header className="flex  justify-between items-center gap-2 sticky top-0 w-full p-4 bg-zinc-900/75 backdrop-blur-md z-10 ">
-      <div className=":flex gap-2 items-center   ">
-        <span className="hidden md:inline font-bold text-zinc-300">Thunder</span>
-      </div>
+      <Link to={"/"} className="flex gap-2 items-center justify-center  ">
+        <img src="/Thunder_logo.png" alt="logo" className="w-12 " />
+        <span className="hidden md:inline font-bold text-zinc-300 mb-2">
+          Thunder
+        </span>
+      </Link>
       <div className="flex items-center gap-2">
-      <Searchbar />
+        <Searchbar />
         {userId && currentUser?.role === "admin" && (
           <Link
             to={"/admin"}

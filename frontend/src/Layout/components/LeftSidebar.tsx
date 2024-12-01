@@ -27,7 +27,7 @@ import useSocketStore from "@/store/useSocketStore";
 import useUserStore from "@/store/useUserStore";
 import { SignedIn, useAuth } from "@clerk/clerk-react";
 import { AvatarFallback } from "@radix-ui/react-avatar";
-import { Camera, Home, Library, PlusCircle } from "lucide-react";
+import { Bird, Camera, Home, Library, PlusCircle } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -141,21 +141,23 @@ const LeftSidebar = () => {
               <span className="hidden md:block">Home</span>
             </Link>
           </TooltipComponent>
-          <TooltipComponent text="Create room">
-            <div
-              onClick={openModal}
-              className={cn(
-                buttonVariants({
-                  variant: "ghost",
-                  className:
-                    " w-fit md:w-full p-4 cursor-pointer justify-center md:justify-start text-white hover:bg-zinc-800 ",
-                })
-              )}
-            >
-              <PlusCircle className="md:mr-2 size-5" />
-              <span className="hidden md:inline">Create Room</span>
-            </div>
-          </TooltipComponent>
+          {userId && (
+            <TooltipComponent text="Create room">
+              <div
+                onClick={openModal}
+                className={cn(
+                  buttonVariants({
+                    variant: "ghost",
+                    className:
+                      " w-fit md:w-full p-4 cursor-pointer justify-center md:justify-start text-white hover:bg-zinc-800 ",
+                  })
+                )}
+              >
+                <PlusCircle className="md:mr-2 size-5" />
+                <span className="hidden md:inline">Create Room</span>
+              </div>
+            </TooltipComponent>
+          )}
 
           <SignedIn>
             <Dialog open={isOpen} onOpenChange={closeModal}>
@@ -288,6 +290,7 @@ const LeftSidebar = () => {
             <span className="hidden md:inline">Playlists</span>
           </div>
         </div>
+        {!userId && <LoginPrompt />}
         <ScrollArea className="h-[calc(100vh-400px)] w-fit md:w-full pb-10">
           <div className="space-y-2 w-full ">
             {playlistLoading ? (
@@ -330,3 +333,29 @@ const LeftSidebar = () => {
 };
 
 export default LeftSidebar;
+
+const LoginPrompt = () => {
+  return (
+    <div className="h-full flex flex-col items-center justify-center p-6 text-center space-y-4 rounded-lg bg-zinc-900">
+      <div className="relative">
+        <div
+          className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-sky-500 rounded-full blur-lg
+       opacity-75 animate-pulse"
+          aria-hidden="true"
+        />
+        <div className="relative bg-zinc-900 rounded-full p-4">
+          <Bird className="size-5 md:size-8 text-emerald-400" />
+        </div>
+      </div>
+
+      <div className="space-y-2 max-w-[250px]">
+        <h3 className="text-sm md:text-lg font-semibold  text-white">
+          Create playlists and save your favorite songs
+        </h3>
+        <p className="text-xs md:text-sm text-zinc-400">
+          Login to save millions of songs and albums while listening them
+        </p>
+      </div>
+    </div>
+  );
+};

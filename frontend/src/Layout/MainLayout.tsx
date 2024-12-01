@@ -11,7 +11,7 @@ import AudioPlayer from "./components/AudioPlayer";
 import { useEffect, useState } from "react";
 
 const MainLayout = () => {
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(true);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -44,19 +44,16 @@ const MainLayout = () => {
           <Outlet />
         </ResizablePanel>
         {/* Right side */}
-       
-          
-            <ResizableHandle className="w-2 bg-black rounded-lg transition-colors" />
-            <ResizablePanel
-              defaultSize={isMobile ? 0 : 18}
-              minSize={0}
-              maxSize={isMobile ? 25 :18}
-              collapsedSize={0}
-            >
-              <RightSidebar />
-            </ResizablePanel>
-          
-        
+
+        <ResizableHandle withHandle className="w-2 bg-black rounded-lg transition-colors" />
+        <ResizablePanel
+          defaultSize={isMobile ? 0 : 18}
+          minSize={0}
+          maxSize={isMobile ? 25 : 18}
+          collapsedSize={0}
+        >
+          <RightSidebar />
+        </ResizablePanel>
       </ResizablePanelGroup>
       <PlaybackControls />
     </div>

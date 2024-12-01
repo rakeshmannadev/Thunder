@@ -15,7 +15,7 @@ const SignInWithGoogleBtn = () => {
   }
   return <Button  onClick={handleSignInWithGoogle} variant={'secondary'} className="w-full text-white border-zinc-200 h-10">
     <img src="/google.png" alt="google-img" className="w-5" />
-     Continue with Google </Button>
+    <span className="hidden md:inline">Continue with Google</span>  </Button>
 }
 
 export default SignInWithGoogleBtn
