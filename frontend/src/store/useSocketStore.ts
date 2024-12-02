@@ -39,6 +39,7 @@ interface SocketState {
   rejectJoinRequest: (userId: string, roomId: string) => void;
   kickMember: (userId: string, roomId: string, memberId: string) => void;
   deleteRoom: (userId: string, roomId: string, room_id: string) => void;
+  sendMessage: (content: string, senderId: string, roomId: string) => void;
   disconnectSocket: () => void;
 }
 
@@ -262,6 +263,14 @@ const useSocketStore = create<SocketState>((set, get) => ({
       });
       toast.success(data.message);
     });
+    socket.on("newMessage", (data) => {
+      useRoomStore.setState((state) => ({
+        currentRoom: {
+          ...state.currentRoom,
+          messages: [...state.currentRoom?.messages, data.message],
+        },
+      }));
+    });
   },
   disconnectSocket: () => {
     const socket = get().socket;
@@ -366,13 +375,19 @@ const useSocketStore = create<SocketState>((set, get) => ({
       socket.emit("endBroadcast", { userId, roomId });
     }
   },
-  deleteRoom: async (userId, roomId, room_id) => {
+  deleteRoom: (userId, roomId, room_id) => {
     const { socket } = get();
     set({ isLoading: true });
     if (socket) {
       socket.emit("deleteRoom", { userId, roomId, room_id });
     }
     set({ isLoading: false });
+  },
+  sendMessage: (content, senderId, roomId) => {
+    const { socket } = get();
+    if (socket) {
+      socket.emit("sendMessage", { content, senderId, roomId });
+    }
   },
 }));
 

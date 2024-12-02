@@ -4,6 +4,7 @@ import http from "http";
 import Room from "../models/Room.js";
 import User from "../models/User.js";
 import { deleteRoom, removeMember } from "../controllers/room.controller.js";
+import { sendMessage } from "../controllers/message.controller.js";
 const app = express();
 
 const server = http.createServer(app);
@@ -370,6 +371,15 @@ io.on("connection", (socket) => {
       }
     } catch (error) {
       console.log(error.message);
+    }
+  });
+
+  // Chat section
+
+  socket.on("sendMessage", async ({ content, senderId, roomId }) => {
+    const response = await sendMessage(content, senderId, roomId);
+    if (response.status) {
+      io.to(roomId).emit("newMessage", { message: response.message, roomId });
     }
   });
 

@@ -189,7 +189,12 @@ export const getRoomById = async (req, res, next) => {
         .status(400)
         .json({ status: false, message: "No roomId provided" });
 
-    const room = await Room.findOne({ roomId });
+    const room = await Room.findOne({ roomId }).populate({
+      path: "messages",
+      populate: {
+        path: "senderId",
+      },
+    });
     res.status(200).json({ status: true, room });
   } catch (error) {
     console.log("Error in getRoombyId controller", error.message);

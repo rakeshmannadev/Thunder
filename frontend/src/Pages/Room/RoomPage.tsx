@@ -28,12 +28,7 @@ const formatTime = (date: string) => {
 const RoomPage = () => {
   const [isMobile, setIsMobile] = useState(false);
 
-  const {
-    joinRoom,
-    isJoined,
-    updateTime,
-    isPlayingSong,
-  } = useSocketStore();
+  const { joinRoom, isJoined, updateTime, isPlayingSong } = useSocketStore();
   const { currentSong } = usePlayerStore();
   const { currentUser } = useUserStore();
 
@@ -41,7 +36,7 @@ const RoomPage = () => {
   const { getRoomById, currentRoom, fetchingRoom } = useRoomStore();
 
   const audio = document.querySelector("audio");
-
+  console.log(currentRoom);
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -129,7 +124,7 @@ const RoomPage = () => {
                       <div
                         key={index}
                         className={`flex items-start gap-3 z-20 ${
-                          message.senderId === currentUser?._id
+                          message.senderId._id === currentUser?._id
                             ? "flex-row-reverse"
                             : ""
                         }`}
@@ -137,19 +132,19 @@ const RoomPage = () => {
                         <Avatar className="size-8">
                           <AvatarImage
                             src={
-                              message.senderId === currentUser?._id
+                              message.senderId._id === currentUser?._id
                                 ? currentUser?.image
-                                : message.senderId?.imageUrl
+                                : message.senderId?.image
                             }
                           />
                         </Avatar>
 
                         <div
                           className={`rounded-lg p-3 max-w-[70%] 
-													${message.senderId === currentUser?._id ? "bg-green-500" : "bg-zinc-800"}
+													${message.senderId._id === currentUser?._id ? "bg-green-500" : "bg-zinc-800"}
 												`}
                         >
-                          <p className="text-sm">{message.content}</p>
+                          <p className="text-sm">{message.message}</p>
                           <span className="text-xs text-zinc-300 mt-1 block">
                             {formatTime(message.createdAt)}
                           </span>

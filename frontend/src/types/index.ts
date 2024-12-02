@@ -52,7 +52,12 @@ export interface Room {
   modarators: any[];
   requests: any[];
   participants: any[];
-  messages: any[];
+  messages: {
+    _id: string;
+    senderId: User;
+    content: string;
+    createdAt: string;
+  }[];
 }
 
 export interface Playlist {
