@@ -16,7 +16,6 @@ const io = new Server(server, {
   },
 });
 
-
 // Function to get the key by value
 function getKeyByValue(obj, value) {
   return Object.keys(obj).find((key) => obj[key].includes(value));
@@ -182,6 +181,7 @@ io.on("connection", (socket) => {
               user: {
                 userId,
                 userName: user.name,
+                userImage: user.image,
               },
               status: "pending",
               room: {
@@ -248,7 +248,10 @@ io.on("connection", (socket) => {
       Promise.all([room.save(), otherUser.save()]);
       const userSocketId = adminSockets[userId];
       if (userSocketId) {
-        io.to([userSocketId]).emit("joinRequestAccepted", { room });
+        io.to([userSocketId, socket.id]).emit("joinRequestAccepted", {
+          room,
+          userId: adminUserId,
+        });
       }
     } catch (error) {
       console.log("Error in accept request socket event", error.message);
@@ -295,6 +298,8 @@ io.on("connection", (socket) => {
         io.to([userSocketId, socket.id]).emit("joinRequestRejected", {
           room,
           message: "Join request rejected by admin 🙁",
+          userId: adminUserId,
+          memberId: userId,
         });
       }
     } catch (error) {
@@ -313,6 +318,8 @@ io.on("connection", (socket) => {
           io.to(memberSocketId).emit("kickedFromRoom", {
             message: `You have been kicked from ${response.room.roomName} by admin`,
             roomId,
+            image: response.room.image,
+            roomName: response.room.roomName,
           });
         }
         // notify admin
@@ -343,7 +350,7 @@ io.on("connection", (socket) => {
       songRequsts[roomId] = {};
     }
     songRequsts[roomId][song._id] = { user };
-    io.to(adminSocket).emit("newSongRequest", { song });
+    io.to(adminSocket).emit("newSongRequest", { song, user });
   });
 
   // delete room
@@ -356,6 +363,7 @@ io.on("connection", (socket) => {
         io.to(room_id).emit("roomDeleted", {
           message: response.message,
           roomId,
+          room: response.room,
         });
         delete activeUsers[room_id];
         socket.leave(room_id);

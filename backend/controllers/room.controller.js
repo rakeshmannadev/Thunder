@@ -40,7 +40,6 @@ export const createRoom = async (req, res, next) => {
 
 export const deleteRoom = async (userId, roomId) => {
   try {
-    console.log(roomId);
     const room = await Room.findById(roomId);
 
     if (!room) return { status: false, message: "Room not found" };
@@ -52,7 +51,7 @@ export const deleteRoom = async (userId, roomId) => {
       $pull: { rooms: roomId },
     });
     await Room.findByIdAndDelete(roomId);
-    return { status: true, message: "Room is deleted" };
+    return { status: true, message: "Room is deleted", room };
   } catch (error) {
     throw new Error(error);
   }

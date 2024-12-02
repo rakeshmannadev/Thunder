@@ -6,6 +6,7 @@ import usePlayerStore from "./usePlayerStore";
 import useRoomStore from "./useRoomStore";
 import useUserStore from "./useUserStore";
 import { SongRequest, User } from "@/types";
+import useShowCustomToast from "@/hooks/useShowCustomToast";
 
 interface SocketState {
   socket: Socket | null;
@@ -62,15 +63,17 @@ const useSocketStore = create<SocketState>((set, get) => ({
     set({ socket });
 
     // Listen to socket events inside the store
-    socket.on("connect", () => {
-
-    });
+    socket.on("connect", () => {});
     socket.on("joinRequest", (data) => {
+      const { showToast } = useShowCustomToast();
       useRoomStore.setState({
         joinRequests: [...useRoomStore.getState().joinRequests, data.request],
       });
-      toast.success(
-        "New join request received for " + data.request.room.roomName
+
+      showToast(
+        "New join request for " + data.request.room.roomName,
+        data.request.user.userImage,
+        data.request.user.userName
       );
     });
 
@@ -90,6 +93,22 @@ const useSocketStore = create<SocketState>((set, get) => ({
     });
 
     socket.on("joinRequestRejected", (data) => {
+      const { showToast } = useShowCustomToast();
+      if (data.userId !== useUserStore.getState().currentUser?._id) {
+        useUserStore.setState((state) => ({
+          publicRooms: state.publicRooms.map((room) =>
+            room._id === data.room._id
+              ? {
+                  ...room,
+                  requests: room.requests.filter(
+                    (request) => request.user.userId !== data.memberId
+                  ),
+                }
+              : room
+          ),
+        }));
+        showToast(data.message, data.room.image, data.room.roomName);
+      }
       useRoomStore.setState((state) => ({
         joinRequests: state.joinRequests.filter(
           (request) =>
@@ -97,25 +116,34 @@ const useSocketStore = create<SocketState>((set, get) => ({
             request.user.userId !== data.room.requests.user.userId
         ),
       }));
-      toast.error(data.message);
+      toast.success("Requst rejected");
     });
 
     socket.on("joinRequestAccepted", (data) => {
-      useUserStore.setState({
-        rooms: [...useUserStore.getState().rooms, data.room],
-      });
-      useUserStore.setState((state) => ({
-        publicRooms: state.publicRooms.filter(
-          (room) => room._id !== data.room._id
-        ),
-      }));
-      useRoomStore.setState((state) => ({
-        joinRequests: state.joinRequests.filter((request) => {
-          request.room._id !== data.room._id &&
-            request.user.userId !== data.room.requests.user.userId;
-        }),
-      }));
-      toast.success("Join request accepted for " + data.room.roomName);
+      const { showToast } = useShowCustomToast();
+      if (data.userId !== useUserStore.getState().currentUser?._id) {
+        useUserStore.setState({
+          rooms: [...useUserStore.getState().rooms, data.room],
+        });
+        useUserStore.setState((state) => ({
+          publicRooms: state.publicRooms.filter(
+            (room) => room._id !== data.room._id
+          ),
+        }));
+        showToast(
+          `Join request accepted by ${data.room.roomName} admin `,
+          data.room.image,
+          data.room.roomName
+        );
+      } else {
+        useRoomStore.setState((state) => ({
+          joinRequests: state.joinRequests.filter((request) => {
+            request.room._id !== data.room._id &&
+              request.user.userId !== data.room.requests.user.userId;
+          }),
+        }));
+        toast.success("Requst accepted");
+      }
     });
     socket.on("adminJoins", (data) => {
       toast.success(data.message);
@@ -167,10 +195,16 @@ const useSocketStore = create<SocketState>((set, get) => ({
       }
     });
     socket.on("newSongRequest", (data) => {
+      const { showToast } = useShowCustomToast();
+
       set((state) => ({
         songRequests: [...state.songRequests, data.song],
       }));
-      toast.success("New song requst received from " + data.song.userName);
+      showToast(
+        "New song requst received ",
+        data.user.image,
+        data.song.userName
+      );
     });
 
     socket.on("songPaused", (data) => {
@@ -195,15 +229,21 @@ const useSocketStore = create<SocketState>((set, get) => ({
       }
     });
     socket.on("roomDeleted", (data) => {
-      console.log("room deleted");
+      const { showToast } = useShowCustomToast();
+
       useUserStore.setState((state) => ({
         rooms: state.rooms.filter((room) => room._id !== data.roomId),
       }));
       useRoomStore.getState().currentRoom?._id === data.roomId &&
         useRoomStore.setState({ currentRoom: null });
-      toast.success("Sorry this room is deleted by admin");
+      showToast(
+        `${data.room.roomName} is deleted by admin`,
+        data.room.image,
+        data.room.roomName
+      );
     });
     socket.on("kickedFromRoom", (data) => {
+      const { showToast } = useShowCustomToast();
       useUserStore.setState({
         rooms: useUserStore
           .getState()
@@ -212,7 +252,7 @@ const useSocketStore = create<SocketState>((set, get) => ({
       useRoomStore.getState().currentRoom?._id === data.roomId &&
         useRoomStore.setState({ currentRoom: null });
 
-      toast.success(data.message);
+      showToast(data.message, data.image, data.roomName);
     });
     socket.on("userKicked", (data) => {
       useRoomStore.setState({

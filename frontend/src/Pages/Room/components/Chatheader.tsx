@@ -56,6 +56,7 @@ import { cn } from "@/lib/utils";
 import Alertdialog from "@/components/Alertdialog/Alertdialog";
 import useMusicStore from "@/store/useMusicStore";
 import { SongRequest } from "@/types";
+import toast from "react-hot-toast";
 
 const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
   const {
@@ -171,7 +172,10 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
                   >
                     <Music className="size-4" /> Request song
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => toast.success("Feature coming soon")}
+                  >
                     <UserCog className="size-4" /> Be modaretor
                   </DropdownMenuItem>
                   <DropdownMenuItem
@@ -302,16 +306,13 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <label htmlFor="name" className="text-right">
-                  Select song
-                </label>
                 <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
                       role="combobox"
                       aria-expanded={open}
-                      className="w-[200px] justify-between"
+                      className="w-fit justify-between"
                     >
                       {requestedSong.title
                         ? songs.find(
@@ -321,7 +322,7 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
                       <ChevronsUpDown className="opacity-50" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
+                  <PopoverContent className="w-[280px] p-0">
                     <Command>
                       <CommandInput placeholder="Search a song..." />
                       <CommandList>
