@@ -1,5 +1,4 @@
 import Header from "@/components/Header";
-import Chatheader from "./components/Chatheader";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import MessageInput from "./components/MessageInput";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
@@ -9,13 +8,21 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import useUserStore from "@/store/useUserStore";
 import useSocketStore from "@/store/useSocketStore";
 import useRoomStore from "@/store/useRoomStore";
 import usePlayerStore from "@/store/usePlayerStore";
-import { Bird, Loader } from "lucide-react";
+import { Bird, Crown, Loader } from "lucide-react";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import TooltipComponent from "@/components/Tooltip/TooltipComponent";
+import Chatheader from "./components/Chatheader";
 
 const formatTime = (date: string) => {
   return new Date(date).toLocaleTimeString("en-US", {
@@ -31,12 +38,13 @@ const RoomPage = () => {
   const { joinRoom, isJoined, updateTime, isPlayingSong } = useSocketStore();
   const { currentSong } = usePlayerStore();
   const { currentUser } = useUserStore();
+  const lastMessageRef = useRef(null);
 
   const { roomId } = useParams<string>() as Record<string, string>;
   const { getRoomById, currentRoom, fetchingRoom } = useRoomStore();
 
   const audio = document.querySelector("audio");
-  console.log(currentRoom);
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -46,6 +54,12 @@ const RoomPage = () => {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  }, [currentRoom]);
 
   // fetch current roomByID
   useEffect(() => {
@@ -65,7 +79,7 @@ const RoomPage = () => {
   // send socket event for updateTime
   useEffect(() => {
     let intervalId: any;
-    if (isPlayingSong && currentUser && currentUser.role === "admin") {
+    if (isPlayingSong && currentUser && currentUser.role === "admin" && audio) {
       intervalId = setInterval(() => {
         updateTime(roomId, currentSong._id, audio?.currentTime);
       }, 1000);
@@ -98,18 +112,17 @@ const RoomPage = () => {
 
   return (
     <main className="h-full rounded-lg bg-gradient-to-b from-zinc-800 to-zinc-900 overflow-hidden">
-      <Header />
-      <div className="grid  grid-cols-[1fr] h-[calc(100vh-130px)]">
+      <div className="grid  grid-cols-[1fr] h-[calc(100vh-100px)]">
         {/* chat message */}
         <div className=" flex flex-col h-full">
-          <Chatheader roomId={roomId} userId={currentUser?._id} />
+          <Chatheader roomId={currentRoom?.roomId} userId={currentUser?._id} />
           <ResizablePanelGroup
             direction="vertical"
             className=" flex flex-col h-full"
           >
             <ResizablePanel
-              defaultSize={isMobile ? 27 : 20}
-              maxSize={isMobile ? 27 : 20}
+              defaultSize={isMobile ? 13 : 13}
+              maxSize={isMobile ? 13 : 13}
               className="relative h-full"
             >
               <CurrentlyPlaying isMobile={isMobile} />
@@ -117,11 +130,12 @@ const RoomPage = () => {
             <ResizableHandle withHandle />
             {/* Messages */}
             <ResizablePanel>
-              <ScrollArea className="h-[calc(100vh-360px)] pb-16    ">
-                <div className="p-4  space-y-4  py-5   ">
+              <ScrollArea className="h-[calc(100vh-250px)] p-2    ">
+                <div className="p-4  space-y-4  py-5 h-full pb-16  ">
                   {currentRoom && currentRoom?.messages?.length > 0 ? (
                     currentRoom.messages.map((message: any, index) => (
                       <div
+                        ref={lastMessageRef}
                         key={index}
                         className={`flex items-start gap-3 z-20 ${
                           message.senderId._id === currentUser?._id
@@ -138,17 +152,42 @@ const RoomPage = () => {
                             }
                           />
                         </Avatar>
-
-                        <div
-                          className={`rounded-lg p-3 max-w-[70%] 
-													${message.senderId._id === currentUser?._id ? "bg-green-500" : "bg-zinc-800"}
-												`}
-                        >
-                          <p className="text-sm">{message.message}</p>
-                          <span className="text-xs text-zinc-300 mt-1 block">
-                            {formatTime(message.createdAt)}
-                          </span>
-                        </div>
+                        <ContextMenu>
+                          <ContextMenuContent>
+                            <ContextMenuItem>
+                              Delete for everyone
+                            </ContextMenuItem>
+                            <ContextMenuItem>Delete message</ContextMenuItem>
+                            <ContextMenuItem>Edit</ContextMenuItem>
+                          </ContextMenuContent>
+                          <div
+                            className={`rounded-lg px-3 pb-3 pt-1 max-w-[70%] 
+                            ${
+                              message.senderId._id === currentUser?._id
+                                ? "bg-green-800"
+                                : "bg-zinc-800"
+                            }
+                            `}
+                          >
+                            <ContextMenuTrigger>
+                              <Link
+                                to={`/profile/${message.senderId._id}`}
+                                className="text-xs font-semibold hover:underline"
+                              >
+                                {message.senderId.name}
+                                {message.senderId._id === currentRoom.admin && (
+                                  <TooltipComponent text="Admin">
+                                    <Crown className="inline size-3 ml-1 mb-1 text-yellow-400 cursor-pointer hover:cursor-pointer" />
+                                  </TooltipComponent>
+                                )}
+                              </Link>
+                              <p className="text-sm">{message.message}</p>
+                              <span className="text-xs text-zinc-300 mt-1 block">
+                                {formatTime(message.createdAt)}
+                              </span>
+                            </ContextMenuTrigger>
+                          </div>
+                        </ContextMenu>
                       </div>
                     ))
                   ) : (

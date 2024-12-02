@@ -123,7 +123,7 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
   if (!currentUser || !currentRoom) return null;
 
   return (
-    <div className=" flex justify-between p-4 border-b border-zinc-900">
+    <div className=" flex justify-between items-center p-4 border-b border-zinc-900">
       <div className="flex items-center gap-3 text-nowrap">
         <Avatar>
           <AvatarImage src={currentRoom?.image} />
@@ -146,11 +146,11 @@ const Chatheader = ({ roomId, userId }: { roomId: string; userId: string }) => {
               <Button
                 title="Open menu"
                 aria-haspopup="true"
-                size="icon"
+                size="sm"
                 variant="ghost"
                 className="hover:bg-gray-700/75"
               >
-                <EllipsisVertical className="h-4 w-4" />
+                <EllipsisVertical className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
 
