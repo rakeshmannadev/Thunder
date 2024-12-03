@@ -39,9 +39,11 @@ const Header = () => {
           </Link>
         )}
       </div>
-      <SignedOut>
-        <SignInWithGoogleBtn />
-      </SignedOut>
+      <div className="w-fit">
+        <SignedOut>
+          <SignInWithGoogleBtn />
+        </SignedOut>
+      </div>
 
       <UserButton />
     </header>

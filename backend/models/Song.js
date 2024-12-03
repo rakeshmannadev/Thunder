@@ -11,7 +11,6 @@ const songSchema = mongoose.Schema(
     },
     artist: {
       type: String,
-      required: true,
     },
     imageUrl: {
       type: String,
