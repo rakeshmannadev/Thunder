@@ -50,16 +50,15 @@ export interface Room {
   image: string;
   admin: string;
   modarators: any[];
-  requests: any[];
-  participants: any[];
-  messages: {
-    _id: string;
-    senderId: User;
-    content: string;
-    createdAt: string;
-  }[];
+  requests: Requests[];
+  participants: string[];
+  messages: Message[];
 }
-
+export interface Message {
+  _id: string;
+  senderId: User;
+  message: string;
+}
 export interface Playlist {
   _id: string | any;
   playListName: string;

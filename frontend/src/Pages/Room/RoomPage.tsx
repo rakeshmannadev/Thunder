@@ -21,9 +21,17 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import Picker from "emoji-picker-react";
 import TooltipComponent from "@/components/Tooltip/TooltipComponent";
 import Chatheader from "./components/Chatheader";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { AlertDialogHeader } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const formatTime = (date: string) => {
   return new Date(date).toLocaleTimeString("en-US", {
@@ -35,8 +43,18 @@ const formatTime = (date: string) => {
 
 const RoomPage = () => {
   const [isMobile, setIsMobile] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [editedMessage, setEditedMessage] = useState("");
 
-  const { joinRoom, isJoined, updateTime, isPlayingSong } = useSocketStore();
+  const {
+    joinRoom,
+    isJoined,
+    updateTime,
+    isPlayingSong,
+    adminDeleteMessage,
+    deleteForEveryone,
+    editMessage,
+  } = useSocketStore();
   const { currentSong } = usePlayerStore();
   const { currentUser } = useUserStore();
   const lastMessageRef = useRef(null);
@@ -45,6 +63,14 @@ const RoomPage = () => {
   const { getRoomById, currentRoom, fetchingRoom } = useRoomStore();
 
   const audio = document.querySelector("audio");
+
+  const handleEditMessage = (messageId: string, senderId: string) => {
+    if (!messageId || !senderId || !currentRoom) return;
+
+    editMessage(currentRoom?.roomId, messageId, senderId, editedMessage);
+    setEditedMessage("");
+    setOpen(false);
+  };
 
   useEffect(() => {
     const checkMobile = () => {
@@ -83,7 +109,7 @@ const RoomPage = () => {
     if (isPlayingSong && currentUser && currentUser.role === "admin" && audio) {
       intervalId = setInterval(() => {
         updateTime(roomId, currentSong._id, audio?.currentTime);
-      }, 1000);
+      }, 5000);
     }
     return () => clearInterval(intervalId);
   }, [isPlayingSong, currentUser, currentSong]);
@@ -153,13 +179,86 @@ const RoomPage = () => {
                             }
                           />
                         </Avatar>
+
                         <ContextMenu>
                           <ContextMenuContent>
-                            <ContextMenuItem>
-                              Delete for everyone
-                            </ContextMenuItem>
-                            <ContextMenuItem>Delete message</ContextMenuItem>
-                            <ContextMenuItem>Edit</ContextMenuItem>
+                            {message.senderId._id === currentUser?._id &&
+                              message.message.length >= 1 && (
+                                <>
+                                  <ContextMenuItem
+                                    onClick={() =>
+                                      deleteForEveryone(
+                                        currentRoom.roomId,
+                                        message._id,
+                                        message.senderId._id
+                                      )
+                                    }
+                                  >
+                                    Delete for everyone
+                                  </ContextMenuItem>
+                                  <ContextMenuItem
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      setOpen(true);
+                                    }}
+                                  >
+                                    Edit
+                                  </ContextMenuItem>
+                                </>
+                              )}
+                            <Dialog open={open} onOpenChange={setOpen}>
+                              <DialogContent className="sm:max-w-[425px]">
+                                <AlertDialogHeader>
+                                  <DialogTitle>Edit message</DialogTitle>
+                                </AlertDialogHeader>
+                                <div className="grid gap-4 py-4">
+                                  <div className="grid grid-cols-4 items-center gap-4">
+                                    <label
+                                      htmlFor="name"
+                                      className="text-right"
+                                    >
+                                      Message
+                                    </label>
+                                    <Input
+                                      id="name"
+                                      value={editedMessage}
+                                      placeholder="Type here.."
+                                      className="col-span-3"
+                                      onChange={(e) =>
+                                        setEditedMessage(e.target.value)
+                                      }
+                                    />
+                                  </div>
+                                </div>
+                                <DialogFooter>
+                                  <Button
+                                    onClick={() =>
+                                      handleEditMessage(
+                                        message._id,
+                                        message.senderId._id
+                                      )
+                                    }
+                                    type="submit"
+                                  >
+                                    Save changes
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                            {currentRoom.admin === currentUser?._id &&
+                              message.message.length >= 1 && (
+                                <ContextMenuItem
+                                  onClick={() =>
+                                    adminDeleteMessage(
+                                      currentRoom.roomId,
+                                      message._id,
+                                      currentRoom.admin
+                                    )
+                                  }
+                                >
+                                  Delete message
+                                </ContextMenuItem>
+                              )}
                           </ContextMenuContent>
                           <div
                             className={`rounded-lg px-3 pb-3 pt-1 max-w-[70%] 
@@ -173,7 +272,9 @@ const RoomPage = () => {
                             <ContextMenuTrigger>
                               <Link
                                 to={`/profile/${message.senderId._id}`}
-                                className="text-xs font-semibold hover:underline"
+                                className={`text-xs font-semibold hover:underline ${
+                                  message.message.length == 0 && "hidden"
+                                }`}
                               >
                                 {message.senderId.name}
                                 {message.senderId._id === currentRoom.admin && (
@@ -182,8 +283,19 @@ const RoomPage = () => {
                                   </TooltipComponent>
                                 )}
                               </Link>
-                              <p className="text-sm">{message.message}</p>
-                              <span className="text-xs text-zinc-300 mt-1 block">
+
+                              <p className="text-sm">
+                                {message.message.length >= 1 ? (
+                                  message.message
+                                ) : (
+                                  <span className="italic">
+                                    Message Deleted
+                                  </span>
+                                )}
+                              </p>
+                              <span
+                                className={`text-xs text-zinc-300 mt-1 block float-end`}
+                              >
                                 {formatTime(message.createdAt)}
                               </span>
                             </ContextMenuTrigger>

@@ -4,7 +4,12 @@ import http from "http";
 import Room from "../models/Room.js";
 import User from "../models/User.js";
 import { deleteRoom, removeMember } from "../controllers/room.controller.js";
-import { sendMessage } from "../controllers/message.controller.js";
+import {
+  adminDeleteMessage,
+  deleteForEveryone,
+  editMessage,
+  sendMessage,
+} from "../controllers/message.controller.js";
 const app = express();
 
 const server = http.createServer(app);
@@ -380,6 +385,42 @@ io.on("connection", (socket) => {
     const response = await sendMessage(content, senderId, roomId);
     if (response.status) {
       io.to(roomId).emit("newMessage", { message: response.message, roomId });
+    }
+  });
+
+  // admin deletes message
+
+  socket.on("adminDeleteMessage", async ({ roomId, messageId, adminId }) => {
+    const response = await adminDeleteMessage(roomId, messageId, adminId);
+    if (response.status) {
+      io.to(roomId).emit("adminDeletedMessage", { roomId, messageId });
+    } else {
+      console.log(response.message);
+    }
+  });
+
+  // delete for everyone
+  socket.on("deleteForEveryone", async ({ roomId, messageId, senderId }) => {
+    const response = await deleteForEveryone(roomId, messageId, senderId);
+    if (response.status) {
+      io.to(roomId).emit("deletedForEveryone", { roomId, messageId });
+    } else {
+      console.log(response.message);
+    }
+  });
+
+  // edit message
+  socket.on("editMessage", async ({ roomId, messageId, senderId, content }) => {
+    const response = await editMessage(roomId, messageId, senderId, content);
+    if (response.status) {
+      io.to(roomId).emit("messageEdited", {
+        roomId,
+        messageId,
+        senderId,
+        content,
+      });
+    } else {
+      console.log(response.message);
     }
   });
 

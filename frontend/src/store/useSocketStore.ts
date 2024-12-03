@@ -40,6 +40,22 @@ interface SocketState {
   kickMember: (userId: string, roomId: string, memberId: string) => void;
   deleteRoom: (userId: string, roomId: string, room_id: string) => void;
   sendMessage: (content: string, senderId: string, roomId: string) => void;
+  adminDeleteMessage: (
+    roomId: string,
+    messageId: string,
+    adminId: string
+  ) => void;
+  deleteForEveryone: (
+    roomId: string,
+    messageId: string,
+    senderId: string
+  ) => void;
+  editMessage: (
+    roomId: string,
+    messageId: string,
+    senderId: string,
+    content: string
+  ) => void;
   disconnectSocket: () => void;
 }
 
@@ -271,6 +287,42 @@ const useSocketStore = create<SocketState>((set, get) => ({
         },
       }));
     });
+    socket.on("adminDeletedMessage", (data) => {
+      useRoomStore.setState((state) => ({
+        currentRoom: {
+          ...state.currentRoom,
+          messages: state.currentRoom?.messages.map((message) =>
+            message._id === data.messageId
+              ? { ...message, message: "" }
+              : message
+          ),
+        },
+      }));
+    }),
+      socket.on("deletedForEveryone", (data) => {
+        useRoomStore.setState((state) => ({
+          currentRoom: {
+            ...state.currentRoom,
+            messages: state.currentRoom?.messages.map((message) =>
+              message._id === data.messageId
+                ? { ...message, message: "" }
+                : message
+            ),
+          },
+        }));
+      }),
+      socket.on("messageEdited", (data) => {
+        useRoomStore.setState((state) => ({
+          currentRoom: {
+            ...state.currentRoom,
+            messages: state.currentRoom?.messages.map((message) =>
+              message._id === data.messageId
+                ? { ...message, message: data.content }
+                : message
+            ),
+          },
+        }));
+      });
   },
   disconnectSocket: () => {
     const socket = get().socket;
@@ -341,7 +393,7 @@ const useSocketStore = create<SocketState>((set, get) => ({
       socket.emit("rejectJoinRequest", { userId, roomId });
     }
   },
-  kickMember(userId, roomId, memberId) {
+  kickMember: (userId, roomId, memberId) => {
     const { socket } = get();
     if (socket) {
       console.log("Called");
@@ -387,6 +439,24 @@ const useSocketStore = create<SocketState>((set, get) => ({
     const { socket } = get();
     if (socket) {
       socket.emit("sendMessage", { content, senderId, roomId });
+    }
+  },
+  adminDeleteMessage: (roomId, messageId, adminId) => {
+    const { socket } = get();
+    if (socket) {
+      socket.emit("adminDeleteMessage", { roomId, messageId, adminId });
+    }
+  },
+  deleteForEveryone: (roomId, messageId, senderId) => {
+    const { socket } = get();
+    if (socket) {
+      socket.emit("deleteForEveryone", { roomId, messageId, senderId });
+    }
+  },
+  editMessage: (roomId, messageId, senderId, content) => {
+    const { socket } = get();
+    if (socket) {
+      socket.emit("editMessage", { roomId, messageId, senderId, content });
     }
   },
 }));

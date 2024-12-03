@@ -48,7 +48,7 @@ const MessageInput = () => {
           {isComponentVisible && (
             <EmojiPicker
               theme={Theme.DARK}
-              emojiStyle={EmojiStyle.NATIVE}
+              emojiStyle={EmojiStyle.GOOGLE}
               style={{
                 position: "absolute",
                 bottom: "3rem",
