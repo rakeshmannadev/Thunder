@@ -185,7 +185,7 @@ export const PlaybackControls = () => {
   }
 
   const handleAddToFavorite = () => {
-    if(!currentSong) return toast.error("Play a song to add to favorite")
+    if (!currentSong) return toast.error("Play a song to add to favorite");
     if (currentSong) {
       const currUserName = user?.firstName || "You";
 
@@ -259,7 +259,93 @@ export const PlaybackControls = () => {
 
         {/* player controls*/}
         <div className="flex flex-col items-center gap-2 flex-1 max-w-full sm:max-w-[45%]">
-          <div className="flex items-center gap-4 sm:gap-6">
+          <div className="flex items-center gap-2 sm:gap-6">
+            <Dialog open={isOpen} onOpenChange={closeModal}>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  {user && (
+                    <Button
+                      title="Add to playlist"
+                      aria-haspopup="true"
+                      size="icon"
+                      variant="ghost"
+                      className="hover:text-white text-zinc-400 sm:hidden "
+                    >
+                      <ListPlus className="h-4 w-4" />
+                    </Button>
+                  )}
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={openModal}>
+                    <PlusCircle /> Create playlist
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                      <Plus />
+                      <span>Add to playlist</span>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent>
+                        {playlists &&
+                          playlists.map((playlist) => (
+                            <DropdownMenuItem
+                              className="cursor-pointer"
+                              key={playlist._id}
+                              onClick={() => handleAddToPlaylist(playlist._id)}
+                            >
+                              {playlist.playListName}
+                            </DropdownMenuItem>
+                          ))}
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <DialogContent
+                className="sm:max-w-[425px]"
+                onEscapeKeyDown={closeModal}
+              >
+                <DialogHeader>
+                  <DialogTitle>Create Playlist</DialogTitle>
+                  <DialogDescription>
+                    Playlist will appeare on leftside
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <label htmlFor="name" className="text-right">
+                      Name
+                    </label>
+                    <Input
+                      onChange={(e) => setPlaylistName(e.target.value)}
+                      id="name"
+                      placeholder="Party songs"
+                      className="col-span-3"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <label htmlFor="username" className="text-right">
+                      Artist name
+                    </label>
+                    <Input
+                      onChange={(e) => setArtist(e.target.value)}
+                      id="username"
+                      placeholder="Arijit"
+                      className="col-span-3"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button onClick={() => handleAddToPlaylist(null)}>
+                    Create playlist
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
             <TooltipComponent text={isShuffle ? "Suffle on" : "Shuffle off"}>
               <Button
                 onClick={handleShuffle}
@@ -336,6 +422,27 @@ export const PlaybackControls = () => {
                 )}
               </Button>
             </TooltipComponent>
+
+            {user && (
+              <TooltipComponent
+                text={
+                  isAlreadyFavorite ? "Added to favorites" : "Add to favorite"
+                }
+              >
+                <Button
+                  onClick={handleAddToFavorite}
+                  size="icon"
+                  variant="ghost"
+                  className="hover:text-white text-zinc-400 sm:hidden"
+                >
+                  <Heart
+                    className="h-4 w-4"
+                    fill={isAlreadyFavorite ? "green" : "#18181b"}
+                    color={isAlreadyFavorite ? "green" : "#a1a1aa"}
+                  />
+                </Button>
+              </TooltipComponent>
+            )}
           </div>
 
           <div className="flex items-center gap-2 w-full">
@@ -353,7 +460,7 @@ export const PlaybackControls = () => {
           </div>
         </div>
         {/* volume controls */}
-        <div className="hidden sm:flex items-center gap-4 min-w-[180px] w-[30%] justify-end">
+        <div className=" hidden md:flex items-center gap-4 sm:min-w-[180px]  w-[30%] justify-end">
           {user && (
             <TooltipComponent
               text={
@@ -377,7 +484,7 @@ export const PlaybackControls = () => {
           <Button
             size="icon"
             variant="ghost"
-            className="hover:text-white text-zinc-400"
+            className="hover:text-white text-zinc-400 hidden sm:block"
           >
             <Mic2 className="h-4 w-4" />
           </Button>
@@ -385,7 +492,7 @@ export const PlaybackControls = () => {
             <Button
               size="icon"
               variant="ghost"
-              className="hover:text-white text-zinc-400"
+              className="hover:text-white text-zinc-400 hidden sm:block "
             >
               <ListMusic className="h-4 w-4" />
             </Button>
@@ -400,7 +507,7 @@ export const PlaybackControls = () => {
                     aria-haspopup="true"
                     size="icon"
                     variant="ghost"
-                    className="hover:text-white text-zinc-400"
+                    className="hover:text-white text-zinc-400 "
                   >
                     <ListPlus className="h-4 w-4" />
                   </Button>
@@ -478,7 +585,7 @@ export const PlaybackControls = () => {
             </DialogContent>
           </Dialog>
 
-          <div className="flex items-center gap-2">
+          <div className="items-center gap-2 hidden sm:flex">
             <TooltipComponent text={`Volume:${volume}`}>
               <Button
                 onClick={() => {

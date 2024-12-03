@@ -20,13 +20,14 @@ const Header = () => {
 
   return (
     <header className="flex  justify-between items-center gap-2 sticky top-0 w-full p-4 bg-zinc-900/75 backdrop-blur-md z-10 ">
-      <Link to={"/"} className="flex gap-2 items-center justify-center  ">
+      <Link
+        to={"/"}
+        className="hidden md:flex  gap-2 items-center justify-center  "
+      >
         <img src="/Thunder_logo.png" alt="logo" className="w-12 " />
-        <span className="hidden md:inline font-bold text-zinc-300 mb-2">
-          Thunder
-        </span>
+        <span className="font-bold text-zinc-300 mb-2">Thunder</span>
       </Link>
-      <div className="flex items-center gap-2">
+      <div className="flex justify-between md:justify-end items-center gap-3 w-full">
         <Searchbar />
         {userId && currentUser?.role === "admin" && (
           <Link
@@ -37,13 +38,12 @@ const Header = () => {
             <span className="hidden md:block">Admin Dashboard</span>
           </Link>
         )}
-
-        <SignedOut>
-          <SignInWithGoogleBtn />
-        </SignedOut>
-
-        <UserButton />
       </div>
+      <SignedOut>
+        <SignInWithGoogleBtn />
+      </SignedOut>
+
+      <UserButton />
     </header>
   );
 };

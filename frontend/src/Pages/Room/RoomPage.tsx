@@ -21,6 +21,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import Picker from "emoji-picker-react";
 import TooltipComponent from "@/components/Tooltip/TooltipComponent";
 import Chatheader from "./components/Chatheader";
 

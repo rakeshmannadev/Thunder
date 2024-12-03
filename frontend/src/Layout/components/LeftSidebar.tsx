@@ -125,6 +125,10 @@ const LeftSidebar = () => {
       {/* Navigation menu */}
       <section className=" rounded-lg bg-zinc-900 p-4 flex flex-col items-center ">
         <div className="space-y-2  w-fit md:w-full flex flex-col items-center md:items-start  ">
+          <Link to={"/"} className="block md:hidden w-fit p-2  text-white ">
+            <img src="/Thunder_logo.png" alt="logo" className="size-8 " />
+          </Link>
+
           <TooltipComponent text="Home">
             <Link
               to={"/"}
