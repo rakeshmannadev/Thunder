@@ -15,6 +15,7 @@ dist-ssr
 song.json
 seed
 temp
+frontend
 
 # Editor directories and files
 .vscode/*
