@@ -37,6 +37,7 @@
     "socket.io-client": "^4.8.1",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
+    "tunder": "file:..",
     "zustand": "^5.0.1"
   },
   "devDependencies": {

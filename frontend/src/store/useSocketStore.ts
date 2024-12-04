@@ -59,6 +59,9 @@ interface SocketState {
   disconnectSocket: () => void;
 }
 
+const baseURL =
+  import.meta.env.MODE === "development" ? "http://localhost:3000" : "/";
+
 const useSocketStore = create<SocketState>((set, get) => ({
   socket: null,
   isLoading: false,
@@ -72,10 +75,12 @@ const useSocketStore = create<SocketState>((set, get) => ({
   userId: "",
   roomId: "",
   connectSocket: (userId) => {
-    const socket = io("http://localhost:3000", {
+    const socket = io(baseURL, {
       query: {
         userId,
       },
+      autoConnect: false,
+      withCredentials: true,
     });
     set({ socket });
 

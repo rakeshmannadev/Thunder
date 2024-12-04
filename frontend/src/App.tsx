@@ -40,7 +40,7 @@ function App() {
           element={
             <AuthenticateWithRedirectCallback
               signUpForceRedirectUrl={
-                "https://thunder-ohm2.onrender.com/#/auth-callback"
+                "/auth-callback"
               }
             />
           }

@@ -9,8 +9,8 @@ const SignInWithGoogleBtn = () => {
   const handleSignInWithGoogle = () => {
     signIn.authenticateWithRedirect({
       strategy: "oauth_google",
-      redirectUrl: "https://thunder-ohm2.onrender.com/#/sso-callback",
-      redirectUrlComplete: "https://thunder-ohm2.onrender.com/#/auth-callback",
+      redirectUrl: "/sso-callback",
+      redirectUrlComplete: "/auth-callback",
     });
   };
   return (
