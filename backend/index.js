@@ -15,17 +15,15 @@ import songRoutes from "./routes/song.routes.js";
 import roomRoutes from "./routes/room.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import connectDb from "./db/connectDb.js";
-import { app,server } from "./socket/socket.js";
+import { app, server } from "./socket/socket.js";
 
 dotenv.config();
 const __dirname = path.resolve();
 
-
-
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL,
     credentials: true,
   })
 );
@@ -41,7 +39,6 @@ app.use(
     },
   })
 );
-
 
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/auth", authRoutes);
