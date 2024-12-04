@@ -36,10 +36,10 @@ function App() {
     <>
       <Routes>
         <Route
-          path="/sso-callback"
+          path="https://thunder-h183.onrender.com/#/sso-callback"
           element={
             <AuthenticateWithRedirectCallback
-              signUpForceRedirectUrl={"/auth-callback"}
+              signUpForceRedirectUrl={"https://thunder-h183.onrender.com/#/auth-callback"}
             />
           }
         />
