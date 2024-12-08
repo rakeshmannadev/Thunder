@@ -1,8 +1,6 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import AuthCallbackPage from "./Pages/Auth/AuthCallbackPage";
 import HomePage from "./Pages/Home/HomePage";
-import { AuthenticateWithRedirectCallback, useAuth } from "@clerk/clerk-react";
 import MainLayout from "./Layout/MainLayout";
 import RoomPage from "./Pages/Room/RoomPage";
 import AlbumPage from "./Pages/Album/AlbumPage";
@@ -10,14 +8,21 @@ import PlaylistPage from "./Pages/Playlist/PlaylistPage";
 import { useEffect } from "react";
 import useUserStore from "./store/useUserStore";
 import useSocketStore from "./store/useSocketStore";
+import AuthPage from "./Pages/Auth/AuthPage";
+import { Loader } from "lucide-react";
 
 function App() {
-  const { userId } = useAuth();
-  const { currentUser } = useUserStore();
+  const { currentUser, getCurrentUser, isLoading } = useUserStore();
   const { connectSocket, disconnectSocket } = useSocketStore();
 
   useEffect(() => {
-    if (userId && currentUser) {
+    if (!currentUser) {
+      getCurrentUser();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (currentUser) {
       connectSocket(currentUser._id);
     }
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -31,21 +36,24 @@ function App() {
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [userId, currentUser, disconnectSocket, connectSocket]);
+  }, [currentUser, disconnectSocket, connectSocket]);
+
+  if (isLoading)
+    return (
+      <div className="min-h-screen w-full flex justify-center items-center">
+        <Loader className="animate-spin text-emerald-500 size-8" />
+      </div>
+    );
   return (
     <>
       <Routes>
         <Route
-          path="https://thunder-h183.onrender.com/#/sso-callback"
-          element={
-            <AuthenticateWithRedirectCallback
-              signUpForceRedirectUrl={"https://thunder-h183.onrender.com/#/auth-callback"}
-            />
-          }
+          path="/auth"
+          element={!currentUser ? <AuthPage /> : <Navigate to={"/"} />}
         />
-        <Route path="/auth-callback" element={<AuthCallbackPage />} />
-
-        <Route element={<MainLayout />}>
+        <Route
+          element={currentUser ? <MainLayout /> : <Navigate to={"/auth"} />}
+        >
           <Route path="/" element={<HomePage />} />
           <Route path="/room/:roomId" element={<RoomPage />} />
           <Route path="/album/:id" element={<AlbumPage />} />

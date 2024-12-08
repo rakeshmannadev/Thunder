@@ -1,16 +1,27 @@
 import User from "../models/User.js";
+import jwt from "jsonwebtoken";
 
 export async function protectRoute(req, res, next) {
   try {
-    if (!req.auth.userId) {
+    const token = req.cookies.thunder;
+    if (!token) {
       return res
         .status(401)
-        .json({ message: "Unauthorized - you must be logged in" });
+        .json({ error: "Unauthorized access- no token provied" });
     }
 
-    const user = await User.findOne({ clerkId: req.auth.userId });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded) {
+      return res
+        .status(401)
+        .json({ error: "Unauthorized access- invalid token" });
+    }
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const user = await User.findById(decoded.id).select("-password");
+    if (!user) {
+      return res.status(401).json({ error: "User not found" });
+    }
+
     req.user = user;
 
     next();

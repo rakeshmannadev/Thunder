@@ -112,10 +112,7 @@ export const deleteAlbum = async (req, res, next) => {
 
 export const checkAdmin = async (req, res, next) => {
   try {
-    const currentUser = req.auth.userId;
-    const user = await User.findOne({
-      clerkId: currentUser,
-    });
+    const user = await User.findById(req.user._id);
 
     if (user.role !== "admin") {
       return res

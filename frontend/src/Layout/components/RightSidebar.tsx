@@ -18,7 +18,6 @@ import {
 import useRoomStore from "@/store/useRoomStore";
 import useSocketStore from "@/store/useSocketStore";
 import useUserStore from "@/store/useUserStore";
-import { useAuth } from "@clerk/clerk-react";
 import {
   Bell,
   BellDot,
@@ -38,12 +37,11 @@ const RightSidebar = () => {
   const { joinPublicRoom, fetchJoinRequests, joinRequests } = useRoomStore();
   const { sendJoinRequest, acceptJoinRequest, rejectJoinRequest } =
     useSocketStore();
-  const { userId } = useAuth();
   const { currentUser } = useUserStore();
 
   const userCreatedRooms: string[] = [];
 
-  if (userId && currentUser) {
+  if ( currentUser) {
     rooms.forEach((room) => {
       if (room.admin === currentUser._id) {
         userCreatedRooms.push(room._id);
@@ -70,20 +68,20 @@ const RightSidebar = () => {
   }, []);
 
   const handleJoinPublicRoom = (roomId: string) => {
-    if (!userId) return toast.error("Please login to join rooms");
+    if (!currentUser) return toast.error("Please login to join rooms");
     joinPublicRoom(roomId);
   };
   const handleSendRequest = (roomId: string) => {
-    if (!userId || !currentUser)
+    if (!currentUser)
       return toast.error("Please login to send request");
     sendJoinRequest(currentUser?._id, roomId);
   };
 
-  return userId ? (
+  return currentUser ? (
     <aside className="h-full flex flex-col gap-2">
       <section className="rounded-lg bg-zinc-900 p-4">
         <div className="flex  flex-col lg:flex-row  gap-2">
-          {userId && (
+          {currentUser&& (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -128,7 +126,7 @@ const RightSidebar = () => {
             </DropdownMenu>
           )}
 
-          {userId && (
+          {currentUser && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button

@@ -25,7 +25,6 @@ import { cn } from "@/lib/utils";
 import useRoomStore from "@/store/useRoomStore";
 import useSocketStore from "@/store/useSocketStore";
 import useUserStore from "@/store/useUserStore";
-import { SignedIn, useAuth } from "@clerk/clerk-react";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { Bird, Camera, Home, Library, PlusCircle } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
@@ -42,7 +41,6 @@ const LeftSidebar = () => {
   const [imageUrl, setImageUrl] = useState<string | ArrayBuffer | null | any>();
   const imageRef = useRef<HTMLInputElement>(null);
 
-  const { userId } = useAuth();
   const { roomId, isPlayingSong, isJoined, leaveRoom } = useSocketStore();
   const {
     playlistLoading,
@@ -74,11 +72,11 @@ const LeftSidebar = () => {
   };
 
   useEffect(() => {
-    if (userId && rooms.length <= 0 && playlists.length <= 0) {
+    if (currentUser && rooms.length <= 0 && playlists.length <= 0) {
       fetchJoinedRooms();
       fetchPlaylists();
     }
-  }, [userId, rooms.length, playlists.length]);
+  }, [rooms.length, playlists.length]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const image = e.target.files?.[0];
@@ -145,7 +143,7 @@ const LeftSidebar = () => {
               <span className="hidden md:block">Home</span>
             </Link>
           </TooltipComponent>
-          {userId && (
+          {currentUser && (
             <TooltipComponent text="Create room">
               <div
                 onClick={openModal}
@@ -163,7 +161,7 @@ const LeftSidebar = () => {
             </TooltipComponent>
           )}
 
-          <SignedIn>
+          {currentUser && (
             <Dialog open={isOpen} onOpenChange={closeModal}>
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
@@ -235,7 +233,7 @@ const LeftSidebar = () => {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-          </SignedIn>
+          )}
 
           <ScrollArea className="h-fit w-full pb-2">
             {rooms &&
@@ -294,7 +292,7 @@ const LeftSidebar = () => {
             <span className="hidden md:inline">Playlists</span>
           </div>
         </div>
-        {!userId && <LoginPrompt />}
+        {!currentUser && <LoginPrompt />}
         <ScrollArea className="h-[calc(100vh-400px)] w-fit md:w-full pb-10">
           <div className="space-y-2 w-full ">
             {playlistLoading ? (

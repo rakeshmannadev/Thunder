@@ -5,7 +5,6 @@ import useRoomStore from "@/store/useRoomStore";
 import useSocketStore from "@/store/useSocketStore";
 import useUserStore from "@/store/useUserStore";
 
-import { useUser } from "@clerk/clerk-react";
 import { Send, Smile } from "lucide-react";
 import { useState } from "react";
 import useComponentVisible from "@/hooks/useComponentVisible";
@@ -13,7 +12,6 @@ import useComponentVisible from "@/hooks/useComponentVisible";
 const MessageInput = () => {
   const [newMessage, setNewMessage] = useState("");
 
-  const { user } = useUser();
   const { currentUser } = useUserStore();
   const { currentRoom } = useRoomStore();
   const { sendMessage } = useSocketStore();
@@ -21,7 +19,7 @@ const MessageInput = () => {
     useComponentVisible(false);
 
   const handleSend = () => {
-    if (!currentRoom || !user || !currentUser || !newMessage) return;
+    if (!currentRoom || !currentUser || !currentUser || !newMessage) return;
     sendMessage(newMessage.trim(), currentUser?._id, currentRoom.roomId);
     setNewMessage("");
   };

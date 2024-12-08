@@ -6,7 +6,6 @@ import cors from "cors";
 import cron from "node-cron";
 import fs from "fs";
 
-import { clerkMiddleware } from "@clerk/express";
 import fileUpload from "express-fileupload";
 
 import userRoutes from "./routes/user.routes.js";
@@ -30,7 +29,6 @@ app.use(
   })
 );
 app.use(cookieParser());
-app.use(clerkMiddleware()); // it attach the user in req-> req.auth
 app.use(
   fileUpload({
     useTempFiles: true,

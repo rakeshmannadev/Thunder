@@ -111,8 +111,7 @@ export const leaveRoom = async (req, res, next) => {
 
 export const getCurrentUser = async (req, res) => {
   try {
-    const user = await User.findOne({ clerkId: req.auth.userId });
-    res.status(200).json({ user });
+    res.status(200).json({ status: true, user: req.user });
   } catch (error) {
     console.log("Error in get current user controller", error.message);
   }

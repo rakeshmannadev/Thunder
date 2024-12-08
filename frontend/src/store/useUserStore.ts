@@ -124,7 +124,7 @@ const useUserStore = create<UserStore>((set, get) => ({
     }
   },
   getPlaylistSongs: async (id) => {
-    set({ isLoading: true });
+    set({ playlistLoading: true });
     try {
       const response = await axiosInstance.get(`/user/getPlaylistSongs/${id}`);
 
@@ -134,7 +134,7 @@ const useUserStore = create<UserStore>((set, get) => ({
     } catch (error: any) {
       console.log(error.response.data.message);
     } finally {
-      set({ isLoading: false });
+      set({ playlistLoading: false });
     }
   },
   addSongToPlaylist: async (

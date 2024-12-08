@@ -16,17 +16,18 @@ import { protectRoute } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/getCurrentUser", protectRoute, getCurrentUser);
-router.get("/getJoinedRooms", protectRoute, getJoinedRooms);
-router.get("/getPlaylists", protectRoute, getPlaylists);
-router.post("/addToFavorite", protectRoute, addToFavorite);
-router.post("/addToPlaylist", protectRoute, addToPlaylist);
-router.post("/addAlbumToPlaylist", protectRoute, addAlbumToPlaylist);
-router.get("/getPlaylistSongs/:id", protectRoute, getPlaylistSongs);
+router.use(protectRoute);
+router.get("/getCurrentUser", getCurrentUser);
+router.get("/getJoinedRooms", getJoinedRooms);
+router.get("/getPlaylists", getPlaylists);
+router.post("/addToFavorite", addToFavorite);
+router.post("/addToPlaylist", addToPlaylist);
+router.post("/addAlbumToPlaylist", addAlbumToPlaylist);
+router.get("/getPlaylistSongs/:id", getPlaylistSongs);
 
-router.post("/getJoinRequests", protectRoute, getJoinRequests);
-router.get("/getRooms", protectRoute, getRooms);
-router.put("/join-public-room/:roomId", protectRoute, joinPublicRoom);
-router.put("/leave-room/:roomId", protectRoute, leaveRoom);
+router.post("/getJoinRequests", getJoinRequests);
+router.get("/getRooms", getRooms);
+router.put("/join-public-room/:roomId", joinPublicRoom);
+router.put("/leave-room/:roomId", leaveRoom);
 
 export default router;

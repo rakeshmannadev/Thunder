@@ -1,15 +1,14 @@
-import { SignedOut, useAuth, UserButton } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
 import { LayoutDashboard } from "lucide-react";
-import SignInWithGoogleBtn from "./SignInWithGoogleBtn";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "./ui/button";
 import useUserStore from "@/store/useUserStore";
 import Searchbar from "./Searchbar";
+import TooltipComponent from "./Tooltip/TooltipComponent";
 
 const Header = () => {
   const { currentUser } = useUserStore();
-  const { userId } = useAuth();
+
 
   return (
     <header className="flex  justify-between items-center gap-1 sticky top-0 w-full p-4 bg-zinc-900/75 backdrop-blur-md z-10 ">
@@ -22,7 +21,7 @@ const Header = () => {
       </Link>
       <div className="flex justify-between md:justify-end items-center gap-3 w-full">
         <Searchbar />
-        {userId && currentUser?.role === "admin" && (
+        {currentUser?.role === "admin" && (
           <Link
             to={"/admin"}
             className={cn(buttonVariants({ variant: "outline" }))}
@@ -33,12 +32,24 @@ const Header = () => {
         )}
       </div>
       <div className="w-fit">
-        <SignedOut>
-          <SignInWithGoogleBtn />
-        </SignedOut>
+        {!currentUser && (
+          <TooltipComponent text="Login">
+            <Link
+              to={"/auth"}
+              className={cn(
+                buttonVariants({
+                  variant: "outline",
+                  className: `w-fit md:w-full p-4  justify-center md:justify-start text-white rounded-md hover:bg-zinc-800 
+                  }`,
+                })
+              )}
+            >
+              <span>Login</span>
+            </Link>
+          </TooltipComponent>
+        )}
       </div>
 
-      <UserButton />
     </header>
   );
 };

@@ -2,12 +2,22 @@ import mongoose from "mongoose";
 
 const userSchema = mongoose.Schema(
   {
-    clerkId: {
+    email: {
       type: String,
-      required: false,
+      required: true,
+      unique: true,
     },
     name: {
       type: String,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    gender: {
+      type: String,
+      required: true,
+      enum: ["male", "female"],
     },
 
     image: {
@@ -17,26 +27,26 @@ const userSchema = mongoose.Schema(
       type: String,
       default: "user",
     },
-    rooms:[{type:mongoose.Schema.Types.ObjectId,ref:"Room"}],
+    rooms: [{ type: mongoose.Schema.Types.ObjectId, ref: "Room" }],
 
     playlists: [
-     {
-      playListName:{
-        type:String,
-        required:true,
+      {
+        playListName: {
+          type: String,
+          required: true,
+        },
+        albumId: {
+          type: String,
+          default: null,
+        },
+        artist: {
+          type: String,
+        },
+        imageUrl: {
+          type: String,
+        },
+        songs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Song" }],
       },
-      albumId:{
-        type:String,
-        default:null
-      },
-      artist:{
-        type:String,
-      },
-      imageUrl:{
-        type:String,
-      },
-      songs:[{type:mongoose.Schema.Types.ObjectId,ref:"Song"}]
-     }
     ],
     followers: {
       type: Array,

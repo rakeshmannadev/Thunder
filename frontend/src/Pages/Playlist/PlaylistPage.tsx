@@ -12,11 +12,15 @@ const PlaylistPage = () => {
   const { id } = useParams();
   const { isPlaying, currentSong, togglePlay, playAlbum, isShuffle } =
     usePlayerStore();
-  const { currentPlaylist, getPlaylistSongs, isLoading, playlists } =
-    useUserStore();
+  const {
+    currentUser,
+    currentPlaylist,
+    getPlaylistSongs,
+    playlistLoading,
+    playlists,
+  } = useUserStore();
   const { isPlayingSong, isBroadcasting, pauseSong, playSong, roomId } =
     useSocketStore();
-  const { currentUser } = useUserStore();
 
   const handlePlayAlbum = () => {
     if (!currentPlaylist) return;
@@ -74,30 +78,30 @@ const PlaylistPage = () => {
           {/* content */}
           <div className="relative z-10">
             <div className="flex flex-col md:flex-row p-6 gap-6 pb-8">
-              {!isLoading && (
+              {!playlistLoading && (
                 <img
                   src={currentPlaylist?.imageUrl}
                   alt="playlist_img"
                   className="w-[240px] h-[240px] shadow-xl rounded"
                 />
               )}
-              {isLoading && (
+              {playlistLoading && (
                 <Skeleton className="h-[240px] w-[240px] rounded" />
               )}
               <div className="flex flex-col justify-end">
-                {!isLoading && (
+                {!playlistLoading && (
                   <h1 className=" text-2xl md:text-7xl font-bold my-4">
                     {currentPlaylist?.playListName}
                   </h1>
                 )}
-                {isLoading && <Skeleton className="h-10 w-[250px]" />}
-                {!isLoading && (
+                {playlistLoading && <Skeleton className="h-10 w-[250px]" />}
+                {!playlistLoading && (
                   <div className="flex items-center gap-2 text-sm text-zinc-100">
                     <span>{currentPlaylist?.artist}</span>
                     <span>● {currentPlaylist?.songs.length} Songs</span>
                   </div>
                 )}
-                {isLoading && <Skeleton className="h-4 w-[250px] mt-5" />}
+                {playlistLoading && <Skeleton className="h-4 w-[250px] mt-5" />}
               </div>
             </div>
             {/* Play button */}
@@ -144,7 +148,7 @@ const PlaylistPage = () => {
               {/* Song lists */}
               <div className="px-6">
                 <div className="space-y-2 py-4">
-                  {!isLoading &&
+                  {!playlistLoading &&
                     currentPlaylist?.songs.map((song, index) => {
                       const isCurrentSong = currentSong?._id === song._id;
                       return (
@@ -191,7 +195,7 @@ const PlaylistPage = () => {
                         </div>
                       );
                     })}
-                  {isLoading &&
+                  {playlistLoading &&
                     Array.from({ length: 10 }).map((_, index) => {
                       return (
                         <div

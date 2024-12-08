@@ -22,7 +22,6 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import usePlayerStore from "@/store/usePlayerStore";
 import useUserStore from "@/store/useUserStore";
-import { useUser } from "@clerk/clerk-react";
 import {
   Heart,
   ListMusic,
@@ -82,7 +81,7 @@ export const PlaybackControls = () => {
     isLoading,
   } = useSocketStore();
   const { currentRoom } = useRoomStore();
-  const { user } = useUser();
+
 
   const [volume, setVolume] = useState(20);
   const [isMute, setMute] = useState(false);
@@ -187,7 +186,7 @@ export const PlaybackControls = () => {
   const handleAddToFavorite = () => {
     if (!currentSong) return toast.error("Play a song to add to favorite");
     if (currentSong) {
-      const currUserName = user?.firstName || "You";
+      const currUserName = currentUser?.name || "You";
 
       addToFavorite(
         currUserName,
@@ -265,7 +264,7 @@ export const PlaybackControls = () => {
             <Dialog open={isOpen} onOpenChange={closeModal}>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  {user && (
+                  {currentUser && (
                     <Button
                       title="Add to playlist"
                       aria-haspopup="true"
@@ -425,7 +424,7 @@ export const PlaybackControls = () => {
               </Button>
             </TooltipComponent>
 
-            {user && (
+            {currentUser && (
               <TooltipComponent
                 text={
                   isAlreadyFavorite ? "Added to favorites" : "Add to favorite"
@@ -463,7 +462,7 @@ export const PlaybackControls = () => {
         </div>
         {/* volume controls */}
         <div className=" hidden md:flex items-center gap-4 sm:min-w-[180px]  w-[30%] justify-end">
-          {user && (
+          {currentUser && (
             <TooltipComponent
               text={
                 isAlreadyFavorite ? "Added to favorites" : "Add to favorite"
@@ -503,7 +502,7 @@ export const PlaybackControls = () => {
           <Dialog open={isOpen} onOpenChange={closeModal}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                {user && (
+                {currentUser && (
                   <Button
                     title="Add to playlist"
                     aria-haspopup="true"

@@ -69,7 +69,8 @@ export interface Playlist {
 }
 export interface User {
   _id: string;
-  clerkId: string;
+  email:string;
+  gender:string;
   name: string;
   image: string;
   rooms: Array<Room>;
