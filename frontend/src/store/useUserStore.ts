@@ -48,7 +48,6 @@ const useUserStore = create<UserStore>((set, get) => ({
   currentPlaylist: null,
   currentUser: null,
   fetchJoinedRooms: async () => {
-    set({ isLoading: true });
     try {
       const response = await axiosInstance.get("/user/getJoinedRooms");
       set({ rooms: response.data.rooms });
@@ -56,18 +55,15 @@ const useUserStore = create<UserStore>((set, get) => ({
       console.log(error.response.data.messages);
       console.log(error);
     } finally {
-      set({ isLoading: false });
     }
   },
   fetchPublicRooms: async () => {
-    set({ isLoading: true });
     try {
       const response = await axiosInstance.get("/user/getRooms");
       set({ publicRooms: response.data.rooms });
     } catch (error: any) {
       console.log(error.response.data.message);
     } finally {
-      set({ isLoading: false });
     }
   },
   fetchPlaylists: async () => {

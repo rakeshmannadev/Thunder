@@ -5,6 +5,10 @@ import bcrypt from "bcryptjs";
 export const signup = async (req, res) => {
   try {
     const { email, name, password, gender } = req.body;
+    if (!email || !name || !password || !gender)
+      return res
+        .status(400)
+        .json({ status: false, message: "All fields are required" });
     const user = await User.findOne({ email });
 
     if (user) {
@@ -68,6 +72,7 @@ export const login = async (req, res) => {
     res.status(200).json({
       status: true,
       user,
+      message: "Login successfull",
     });
   } catch (error) {
     console.log("Error in login controller", error);
@@ -76,7 +81,7 @@ export const login = async (req, res) => {
 };
 export const logout = async (req, res) => {
   try {
-    res.cookie("token", "", { maxAge: 0 });
+    res.clearCookie("thunder");
     res.status(200).json({ status: true, message: "Logout successfull" });
   } catch (error) {
     console.log("Error in logout controller", error);

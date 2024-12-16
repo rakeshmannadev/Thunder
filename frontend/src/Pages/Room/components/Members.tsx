@@ -22,7 +22,7 @@ const Members = ({
 
   const isActive =
     Array.isArray(activeUsers) && activeUsers.includes(member._id.toString());
-
+console.log(member)
   return (
     <div className="flex flex-col items-center gap-3 mt-2 hover:bg-zinc-600 rounded-md p-2 text-nowrap">
       {isLoading ? (
@@ -35,7 +35,7 @@ const Members = ({
           >
             <Avatar>
               <AvatarImage src={member.image} />
-              <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+              <AvatarFallback>{member.name?.charAt(0)}</AvatarFallback>
             </Avatar>
             <div
               className={`absolute bottom-0 left-0 h-3 w-3 rounded-full ring-2  ${

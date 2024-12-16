@@ -236,7 +236,8 @@ const LeftSidebar = () => {
           )}
 
           <ScrollArea className="h-fit w-full pb-2">
-            {rooms &&
+            {currentUser &&
+              rooms &&
               rooms.length > 0 &&
               rooms.map((room) => (
                 <div

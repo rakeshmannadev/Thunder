@@ -16,10 +16,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import useAuthStore from "@/store/useAuthStore";
+import {Loader2 } from "lucide-react";
 import { useState } from "react";
 
 const AuthPage = () => {
-  const { signup, login } = useAuthStore();
+  const { signup, login,isLoading } = useAuthStore();
   const [isSignup, setSignup] = useState(false);
   const [authData, setAuthData] = useState({
     email: "",
@@ -82,7 +83,7 @@ const AuthPage = () => {
                     }
                   />
                 </div>
-                <div className="flex flex-col space-y-1.5">
+                {isSignup && <div className="flex flex-col space-y-1.5">
                   <label htmlFor="Gender">Gender</label>
                   <Select
                     onValueChange={(value) =>
@@ -97,14 +98,16 @@ const AuthPage = () => {
                       <SelectItem value="female">Female</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
+                </div>}
               </div>
             </form>
           </CardContent>
 
           <CardFooter className="min-w-full flex flex-col gap-2">
             <Button className="w-full" onClick={handleSubmit}>
-              {isSignup ? "Create account" : "Login"}
+              {isSignup  ? "Create account" : "Login"
+              
+              } {isLoading && <Loader2 className="size-4 animate-spin"/>}
             </Button>
 
             {isSignup ? (

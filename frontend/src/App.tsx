@@ -51,9 +51,7 @@ function App() {
           path="/auth"
           element={!currentUser ? <AuthPage /> : <Navigate to={"/"} />}
         />
-        <Route
-          element={currentUser ? <MainLayout /> : <Navigate to={"/auth"} />}
-        >
+        <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/room/:roomId" element={<RoomPage />} />
           <Route path="/album/:id" element={<AlbumPage />} />

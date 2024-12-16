@@ -1,17 +1,28 @@
 import { Link } from "react-router-dom";
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, LogOut, Settings, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "./ui/button";
 import useUserStore from "@/store/useUserStore";
 import Searchbar from "./Searchbar";
 import TooltipComponent from "./Tooltip/TooltipComponent";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import useAuthStore from "@/store/useAuthStore";
 
 const Header = () => {
   const { currentUser } = useUserStore();
-
+  const { logout } = useAuthStore();
 
   return (
-    <header className="flex  justify-between items-center gap-1 sticky top-0 w-full p-4 bg-zinc-900/75 backdrop-blur-md z-10 ">
+    <header className="flex  justify-between items-center gap-4 sticky top-0 w-full p-4 bg-zinc-900/75 backdrop-blur-md z-10 ">
       <Link
         to={"/"}
         className="hidden md:flex  gap-2 items-center justify-center  "
@@ -48,8 +59,44 @@ const Header = () => {
             </Link>
           </TooltipComponent>
         )}
+        {currentUser && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Avatar className="cursor-pointer size-8">
+                <AvatarImage src={currentUser.image} />
+                <AvatarFallback>{currentUser.name[0]}</AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-fit">
+              <DropdownMenuLabel>
+                <h4 className="font-medium leading-none">{currentUser.name}</h4>
+                <p className="text-sm text-muted-foreground">
+                  {currentUser.email}
+                </p>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem>
+                  <User />
+                  <Link to="/profile">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Settings className="size-2" />
+                  <Link to="/settings">Settings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => logout()}
+                >
+                  <LogOut />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
-
     </header>
   );
 };
