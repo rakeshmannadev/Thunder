@@ -12,6 +12,9 @@ const songSchema = mongoose.Schema(
     artist: {
       type: String,
     },
+      artistId:{
+        type: String,
+      },
     imageUrl: {
       type: String,
     },
