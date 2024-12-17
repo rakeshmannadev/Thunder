@@ -30,17 +30,18 @@ export const getAlbumById = async (req, res, next) => {
     if (!album) {
       const response = await fetchAlbum(albumId, "/albums");
       const fetchedAlbum = response.data;
-      console.log("Fetched album: ", fetchedAlbum);
+
       let songs = [];
 
       for (let i = 0; i < fetchedAlbum.songs?.length; i++) {
         const song = await fetchSongById(`/songs/${fetchedAlbum.songs[i].id}`);
-        console.log("Fetched song: ", song);
+
         if (song) {
           const newSong = await Song.create({
             songId: song.id,
             title: song.name,
             artist: song.artists?.primary[0]?.name,
+            artistId: song.artists?.primary[0]?.id,
             imageUrl: song.image[2].url,
             audioUrl: song.downloadUrl[3].url,
             releaseYear: song.releaseDate,
@@ -55,6 +56,7 @@ export const getAlbumById = async (req, res, next) => {
         albumId: fetchedAlbum.id,
         title: fetchedAlbum.name,
         artist: fetchedAlbum.artists?.primary[0]?.name,
+        artistId:fetchedAlbum.artists?.primary[0]?.id,
         imageUrl: fetchedAlbum.image[2].url,
         releaseYear: fetchedAlbum.year,
         songs,

@@ -13,6 +13,7 @@ import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import albumRoutes from "./routes/album.routes.js";
 import songRoutes from "./routes/song.routes.js";
+import artistRoutes from "./routes/artist.routes.js";
 import roomRoutes from "./routes/room.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import connectDb from "./db/connectDb.js";
@@ -61,6 +62,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/albums", albumRoutes);
 app.use("/api/v1/songs", songRoutes);
+app.use("/api/v1/artist",artistRoutes);
 app.use("/api/v1/rooms", roomRoutes);
 app.use("/api/v1/messages", messageRoutes);
 
