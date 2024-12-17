@@ -89,8 +89,10 @@ export const PlaybackControls = () => {
   const [duration, setDuration] = useState(0);
   const [playlistName, setPlaylistName] = useState("");
   const [artist, setArtist] = useState("");
+  const  [isOverflowing, setIsOverflowing] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -138,6 +140,20 @@ export const PlaybackControls = () => {
       audio.removeEventListener("ended", handleEnded);
     };
   }, [currentSong, isRepeat]);
+
+  useEffect(() => {
+    const checkOverflow = ()=>{
+      if(containerRef.current){
+        setIsOverflowing(
+            containerRef.current.scrollWidth > containerRef.current.clientWidth
+        );
+
+      }
+    }
+    checkOverflow();
+    window.addEventListener("resize", checkOverflow);
+    return () => window.removeEventListener("resize", checkOverflow);
+  }, [currentSong]);
 
   const handleSeek = (value: number[]) => {
     if (audioRef.current) {
@@ -243,16 +259,16 @@ export const PlaybackControls = () => {
                   className="w-14 h-14 object-cover rounded-md"
                 />
               </Link>
-              <div className="hidden sm:block flex-1 min-w-0">
+              <div className="hidden sm:block flex-1 min-w-0 truncate " ref={containerRef}>
                 <Link
                   to={`/album/${currentSong.albumId}`}
-                  className="font-medium truncate hover:underline cursor-pointer"
+                  className={`font-medium inline-block ${isOverflowing ? 'animate-marquee':''} hover:underline cursor-pointer`}
                 >
                   {currentSong.title}
                 </Link>
-                <div className="hidden sm:block text-sm text-zinc-400 truncate hover:underline cursor-pointer">
+                <Link to={`/artist/${currentSong.artistId}`} className="hidden sm:block text-sm text-zinc-400 truncate hover:underline cursor-pointer">
                   {currentSong.artist}
-                </div>
+                </Link>
               </div>
             </>
           )}

@@ -10,6 +10,7 @@ import useUserStore from "./store/useUserStore";
 import useSocketStore from "./store/useSocketStore";
 import AuthPage from "./Pages/Auth/AuthPage";
 import { Loader } from "lucide-react";
+import ArtistPage from "@/Pages/Artist/ArtistPage.tsx";
 
 function App() {
   const { currentUser, getCurrentUser, isLoading } = useUserStore();
@@ -56,6 +57,7 @@ function App() {
           <Route path="/room/:roomId" element={<RoomPage />} />
           <Route path="/album/:id" element={<AlbumPage />} />
           <Route path="/playlist/:id" element={<PlaylistPage />} />
+          <Route path="/artist/:id" element={<ArtistPage/>} />
         </Route>
       </Routes>
       <Toaster position="bottom-right" />

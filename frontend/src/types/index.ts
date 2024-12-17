@@ -2,6 +2,7 @@ export interface Song {
   _id: string;
   title: string;
   artist: string;
+  artistId: string;
   album: string;
   albumId: string;
   imageUrl: string;

@@ -53,7 +53,16 @@ export default {
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
   			}
-  		}
+  		},
+		animation: {
+			marquee: "marquee 10s linear infinite", // Define the animation name
+		},
+		keyframes: {
+			marquee: {
+				"0%": { transform: "translateX(100%)" }, // Start off-screen to the right
+				"100%": { transform: "translateX(-100%)" }, // Move to off-screen to the left
+			},
+		},
   	}
   },
   plugins: [require("tailwindcss-animate")],
