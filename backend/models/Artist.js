@@ -15,8 +15,19 @@ const artistSchema = new mongoose.Schema({
     wiki:{type:String},
     image:{type:String},
     topSongs:[{type:mongoose.Schema.Types.ObjectId,ref:"Song"}], // stores songId
-    albums:[{type:mongoose.Schema.Types.ObjectId,ref:"Album"}], // stores albumId
-    singles:[{type:mongoose.Schema.Types.ObjectId,ref:"Album"}], // stores albumId
+    albums:[{
+        id:String,
+        name:String,
+        artist:String,
+        image:String,
+    }],
+    singles:[{
+        id:String,
+        name:String,
+        artist:String,
+        image:String,
+
+    }],
 
 
 });

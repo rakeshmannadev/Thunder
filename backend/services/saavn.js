@@ -44,3 +44,16 @@ export const fetchSongById = async (url) => {
     console.error(error);
   }
 };
+
+export const fetchArtistById = async (url) => {
+  const options = {
+    method: "GET",
+    url: process.env.SAAVN_API + url,
+  };
+  try{
+    const data = await axios.request(options);
+    return data.data;
+  }catch (error) {
+    throw new Error(error);
+  }
+}
