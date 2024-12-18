@@ -1,15 +1,12 @@
 import PlayButton from "@/Pages/Home/components/PlayButton.tsx";
+import useMusicStore from "@/store/useMusicStore.ts";
 
 const TopSongsSection = ()=>{
-const topSongs = [{
-    _id:45234,
-    imageUrl:"",
-    title:"Kesariya",
-    artist:"Arijit Singh"
-}]
+const {currentArtist} = useMusicStore()
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-            {topSongs.map((song) => (
+
+            {currentArtist?.topSongs.map((song) => (
                 <div
                     key={song._id}
                     className="flex items-center bg-zinc-800/50 rounded-md overflow-hidden

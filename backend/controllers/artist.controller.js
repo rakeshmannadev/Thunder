@@ -5,7 +5,9 @@ import Song from "../models/Song.js";
 
 export const getArtistById = async (req, res) => {
     try {
+
         const {id} = req.params;
+
         const artist = await Artist.findOne({artistId: id}).populate('topSongs');
         if(!artist){
             const url  = `/artists/${id}`;
@@ -26,7 +28,7 @@ export const getArtistById = async (req, res) => {
                         artist:fetchedArtist.topSongs[i].artists.primary[0]?.name,
                         artistId:fetchedArtist.topSongs[i].artists.primary[0]?.id,
                         imageUrl:fetchedArtist.topSongs[i].image[2]?.url,
-                        audioUrl:fetchedArtist.topSongs[i].downloadeUrl[3]?.url,
+                        audioUrl:fetchedArtist.topSongs[i].downloadUrl[3]?.url,
                         releaseYear:fetchedArtist.topSongs[i].year,
                         duration:fetchedArtist.topSongs[i].duration,
                         albumId: fetchedArtist.topSongs[i].album.id,
@@ -45,10 +47,10 @@ export const getArtistById = async (req, res) => {
             // store albums
             for(let i=0;i<fetchedArtist.topAlbums.length;i++){
                 albums.push({
-                    id:fetchedArtist.topAlbums[i].id,
-                    name:fetchedArtist.topAlbums[i].name,
+                    albumId:fetchedArtist.topAlbums[i].id,
+                    title:fetchedArtist.topAlbums[i].name,
                     artist:fetchedArtist.topAlbums[i].artists.primary[0]?.name,
-                    image:fetchedArtist.topAlbums[i].image[2]?.url,
+                    imageUrl:fetchedArtist.topAlbums[i].image[2]?.url,
                 })
 
             }
@@ -56,10 +58,10 @@ export const getArtistById = async (req, res) => {
             // store singles
             for(let i=0;i<fetchedArtist.singles.length;i++){
                 singles.push({
-                    id:fetchedArtist.singles[i].id,
-                    name:fetchedArtist.singles[i].name,
+                    albumId:fetchedArtist.singles[i].id,
+                    title:fetchedArtist.singles[i].name,
                     artist:fetchedArtist.singles[i].artists.primary[0]?.name,
-                    image:fetchedArtist.singles[i].image[2]?.url,
+                    imageUrl:fetchedArtist.singles[i].image[2]?.url,
                 })
             }
 
@@ -67,7 +69,7 @@ export const getArtistById = async (req, res) => {
                 name:fetchedArtist.name,
                 artistId: fetchedArtist.id,
                 followers: fetchedArtist.followerCount,
-                fanCount: Integer.parseInt(fetchedArtist.fanCount),
+                fanCount: parseInt(fetchedArtist.fanCount),
                 isVerified: fetchedArtist.isVerified,
                 type: fetchedArtist.dominantType,
                 bio: fetchedArtist.bio,
@@ -81,8 +83,9 @@ export const getArtistById = async (req, res) => {
                 singles,
 
             })
+            const updatedArtist = await Artist.findById(newArtist._id).populate('topSongs');
 
-            return  res.status(200).json({status:true,artist:newArtist});
+            return  res.status(200).json({status:true,artist:updatedArtist});
         }
        res.status(200).json({status:true,artist});
 

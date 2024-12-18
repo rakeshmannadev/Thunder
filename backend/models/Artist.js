@@ -16,16 +16,16 @@ const artistSchema = new mongoose.Schema({
     image:{type:String},
     topSongs:[{type:mongoose.Schema.Types.ObjectId,ref:"Song"}], // stores songId
     albums:[{
-        id:String,
-        name:String,
+        albumId:String,
+        title:String,
         artist:String,
-        image:String,
+        imageUrl:String,
     }],
     singles:[{
-        id:String,
-        name:String,
+        albumId:String,
+        title:String,
         artist:String,
-        image:String,
+        imageUrl:String,
 
     }],
 

@@ -42,7 +42,26 @@ export interface Album {
   releaseYear: string;
   songs: Song[];
 }
+export interface Artist{
+  _id: string;
+  name: string;
+  artistId: string;
+  followers: number;
+  fanCount: number;
+  isVerified: boolean;
+  type:string;
+  bio:[];
+  dob: string;
+  fb:string,
+  twitter:string,
+  instagram:string,
+  wiki:string,
+  image: string;
+  topSongs:Song[];
+  albums:Album[];
+  singles:Album[];
 
+}
 export interface Room {
   _id: string;
   roomId: string;
