@@ -22,7 +22,7 @@ export const getFeaturedSongs = async (req, res, next) => {
           _id: 1,
           title: 1,
           artist: 1,
-          artistId:1,
+          artistId: 1,
           imageUrl: 1,
           audioUrl: 1,
           albumId: 1,
@@ -46,7 +46,7 @@ export const getMadeForYou = async (req, res, next) => {
           _id: 1,
           title: 1,
           artist: 1,
-          artistId:1,
+          artistId: 1,
           imageUrl: 1,
           audioUrl: 1,
           albumId: 1,
@@ -70,7 +70,7 @@ export const getTrending = async (req, res, next) => {
           _id: 1,
           title: 1,
           artist: 1,
-          artistId:1,
+          artistId: 1,
           imageUrl: 1,
           audioUrl: 1,
           albumId: 1,
@@ -100,8 +100,13 @@ export const getSongById = async (req, res, next) => {
 export const searchSong = async (req, res, next) => {
   try {
     const { query } = req.params;
-    const response = await fetchSong(query, "/search/songs");
-    res.status(200).json({ status: true, song: response });
+    const fetchedResult = await fetch(
+      `https://saavn.dev/api/search?query=${query}`
+    );
+    const result = await fetchedResult.json();
+
+    console.log(result);
+    res.status(200).json({ status: true, song: result.data });
   } catch (error) {
     res.status(500).json({ status: false, message: "Internal server errro" });
     console.log("Error in search song controller", error.message);

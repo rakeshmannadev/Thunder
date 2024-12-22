@@ -81,18 +81,18 @@ const ArtistPage = () => {
                   <div className="flex items-center gap-4 text-sm text-zinc-100">
                     <span>
                       {" "}
-                      <a href={currentArtist?.fb}>
+                      <a href={currentArtist?.fb} target="_blank">
                         {" "}
                         <Facebook />{" "}
                       </a>{" "}
                     </span>
                     <span>
-                      <a href={currentArtist?.twitter}>
+                      <a href={currentArtist?.twitter} target="_blank">
                         <Twitter />
                       </a>{" "}
                     </span>
                     <span>
-                      <a href={currentArtist?.wiki}>
+                      <a href={currentArtist?.wiki} target="_blank">
                         <Instagram />
                       </a>{" "}
                     </span>

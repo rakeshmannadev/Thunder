@@ -8,6 +8,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from "@/components/ui/command";
 import {
   Popover,
@@ -52,30 +53,128 @@ const Searchbar = () => {
           />
           <CommandList>
             <CommandEmpty>No song found.</CommandEmpty>
+            {searchedSongs && (
+              <p className="text-sm font-bold p-3">Top Result:</p>
+            )}
             {!searchLoading &&
-              searchedSongs?.length > 0 &&
-              searchedSongs.map((song,idx) => (
+              searchedSongs &&
+              searchedSongs.topQuery.results.map((result, idx) => (
                 <CommandGroup>
+                  {/*  TopQuery result section */}
                   <CommandItem key={idx}>
                     <Link
                       className="w-full flex gap-3 justify-start items-center"
-                      to={`/album/${song.album.id}`}
+                      to={`/${result.type}/${result.id}`}
                     >
                       <div>
                         <img
-                          src={song.image[1].url}
-                          alt={song.name}
+                          src={result.image[0].url}
+                          alt={result.title}
                           className="size-10 rounded-sm"
                         />
                       </div>
                       <div className="flex flex-col gap-1 items-start justify-center">
-                        <p>{song.name}</p>
-                        <p>{song.artists.primary[0]?.name}</p>
+                        <p>{result.title}</p>
+                        <p>
+                          {result?.type.charAt(0).toUpperCase() +
+                            result.type.slice(1)}
+                        </p>
                       </div>
                     </Link>
                   </CommandItem>
                 </CommandGroup>
               ))}
+            {searchedSongs && (
+              <>
+                <CommandSeparator />
+                <p className="text-sm font-bold p-3">Songs:</p>
+              </>
+            )}
+            {!searchLoading &&
+              searchedSongs &&
+              searchedSongs.songs.results.map((result, idx) => (
+                <CommandGroup>
+                  <CommandItem key={idx}>
+                    <Link
+                      className="w-full flex gap-3 justify-start items-center"
+                      to={`/song/${result.id}`}
+                    >
+                      <div>
+                        <img
+                          src={result.image[0].url}
+                          alt={result.title}
+                          className="size-10 rounded-sm"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1 items-start justify-center">
+                        <p>{result.title}</p>
+                        <p>{result.singers}</p>
+                      </div>
+                    </Link>
+                  </CommandItem>
+                </CommandGroup>
+              ))}
+            {searchedSongs && (
+              <>
+                <CommandSeparator />
+                <p className="text-sm font-bold p-3">Albums:</p>
+              </>
+            )}
+            {!searchLoading &&
+              searchedSongs &&
+              searchedSongs.albums.results.map((result, idx) => (
+                <CommandGroup>
+                  <CommandItem key={idx}>
+                    <Link
+                      className="w-full flex gap-3 justify-start items-center"
+                      to={`/album/${result.id}`}
+                    >
+                      <div>
+                        <img
+                          src={result.image[0].url}
+                          alt={result.title}
+                          className="size-10 rounded-sm"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1 items-start justify-center">
+                        <p>{result.title}</p>
+                        <p>{result.artist}</p>
+                      </div>
+                    </Link>
+                  </CommandItem>
+                </CommandGroup>
+              ))}
+            {searchedSongs && (
+              <>
+                <CommandSeparator />
+                <p className="text-sm font-bold p-3">Playlists:</p>
+              </>
+            )}
+            {!searchLoading &&
+              searchedSongs &&
+              searchedSongs.playlists.results.map((result, idx) => (
+                <CommandGroup>
+                  <CommandItem key={idx}>
+                    <Link
+                      className="w-full flex gap-3 justify-start items-center"
+                      to={`/playlist/${result.id}`}
+                    >
+                      <div>
+                        <img
+                          src={result.image[0].url}
+                          alt={result.title}
+                          className="size-10 rounded-sm"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1 items-start justify-center">
+                        <p>{result.title}</p>
+                        <p>{result.type}</p>
+                      </div>
+                    </Link>
+                  </CommandItem>
+                </CommandGroup>
+              ))}
+
             {searchLoading &&
               Array.from({ length: 10 }).map((_, idx) => (
                 <CommandGroup>

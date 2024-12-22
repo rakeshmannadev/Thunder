@@ -1,5 +1,5 @@
 import { axiosInstance } from "@/lib/axios";
-import {Album, Artist, SearchedSong, Song} from "@/types";
+import { Album, Artist, SearchedSong, Song } from "@/types";
 import { create } from "zustand";
 
 interface MusicStore {
@@ -7,9 +7,9 @@ interface MusicStore {
   featured: Song[];
   madeForYouAlbums: Album[];
   currentAlbum: Album | null;
-  currentArtist:Artist | null;
+  currentArtist: Artist | null;
   trending: Song[];
-  searchedSongs: SearchedSong[];
+  searchedSongs: SearchedSong | null;
   isLoading: boolean;
   searchLoading: boolean;
   fetchAllSongs: () => Promise<void>;
@@ -28,7 +28,7 @@ const useMusicStore = create<MusicStore>((set) => ({
   trending: [],
   currentAlbum: null,
   currentArtist: null,
-  searchedSongs: [],
+  searchedSongs: null,
   isLoading: false,
   searchLoading: false,
 
@@ -54,16 +54,15 @@ const useMusicStore = create<MusicStore>((set) => ({
       set({ isLoading: false });
     }
   },
-  fetchArtistById:async (id:string)=>{
-    set({isLoading: true});
-    try{
+  fetchArtistById: async (id: string) => {
+    set({ isLoading: true });
+    try {
       const response = await axiosInstance.get(`/artists/${id}`);
       set({ currentArtist: response.data.artist });
-      
-    }catch(error:any){
+    } catch (error: any) {
       console.log(error.response.data.message);
-      set({currentArtist:null})
-    }finally {
+      set({ currentArtist: null });
+    } finally {
       set({ isLoading: false });
     }
   },

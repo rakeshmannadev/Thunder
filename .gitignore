@@ -15,6 +15,7 @@ dist-ssr
 song.json
 seed
 temp
+file.json
 .env.local
 
 # Editor directories and files

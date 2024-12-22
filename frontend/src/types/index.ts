@@ -13,16 +13,57 @@ export interface Song {
 }
 
 export interface SearchedSong {
-  album: { id: string; name: string };
-  artists: { primary: { name: string }[] };
-  id: string;
-  duration: number;
-
-  image: { quality: string; url: string }[];
-
-  name: string;
-
-  year: string;
+  albums: {
+    results: [
+      {
+        id: string;
+        title: string;
+        image: [{ quality: string; url: string }];
+        artist: string;
+      }
+    ];
+  };
+  artists: {
+    results: [
+      {
+        id: string;
+        title: string;
+        image: [{ quality: string; url: string }];
+        type: string;
+        description: string;
+      }
+    ];
+  };
+  playlists: {
+    results: [
+      {
+        id: string;
+        title: string;
+        type: string;
+        image: [{ quality: string; url: string }];
+      }
+    ];
+  };
+  songs: {
+    results: [
+      {
+        id: string;
+        title: string;
+        singers: string;
+        image: [{ quality: string; url: string }];
+      }
+    ];
+  };
+  topQuery: {
+    results: [
+      {
+        id: string;
+        title: string;
+        image: [{ quality: string; url: string }];
+        type: string;
+      }
+    ];
+  };
 }
 export interface SongRequest {
   _id: string;
@@ -42,25 +83,24 @@ export interface Album {
   releaseYear: string;
   songs: Song[];
 }
-export interface Artist{
+export interface Artist {
   _id: string;
   name: string;
   artistId: string;
   followers: number;
   fanCount: number;
   isVerified: boolean;
-  type:string;
-  bio:[];
+  type: string;
+  bio: [];
   dob: string;
-  fb:string,
-  twitter:string,
-  instagram:string,
-  wiki:string,
+  fb: string;
+  twitter: string;
+  instagram: string;
+  wiki: string;
   image: string;
-  topSongs:Song[];
-  albums:Album[];
-  singles:Album[];
-
+  topSongs: Song[];
+  albums: Album[];
+  singles: Album[];
 }
 export interface Room {
   _id: string;
@@ -89,8 +129,8 @@ export interface Playlist {
 }
 export interface User {
   _id: string;
-  email:string;
-  gender:string;
+  email: string;
+  gender: string;
   name: string;
   image: string;
   rooms: Array<Room>;

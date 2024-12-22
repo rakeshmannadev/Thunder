@@ -15,6 +15,7 @@ import albumRoutes from "./routes/album.routes.js";
 import songRoutes from "./routes/song.routes.js";
 import artistRoutes from "./routes/artist.routes.js";
 import roomRoutes from "./routes/room.routes.js";
+import playlistRoutes from "./routes/playlist.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import connectDb from "./db/connectDb.js";
 import { app, server } from "./socket/socket.js";
@@ -61,8 +62,9 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/albums", albumRoutes);
+app.use("/api/v1/playlists", playlistRoutes);
 app.use("/api/v1/songs", songRoutes);
-app.use("/api/v1/artists",artistRoutes);
+app.use("/api/v1/artists", artistRoutes);
 app.use("/api/v1/rooms", roomRoutes);
 app.use("/api/v1/messages", messageRoutes);
 

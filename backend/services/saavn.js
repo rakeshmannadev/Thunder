@@ -45,15 +45,29 @@ export const fetchSongById = async (url) => {
   }
 };
 
-export const fetchArtistById = async (url) => {
+export const fetchArtistById = async (url,id) => {
   const options = {
     method: "GET",
     url: process.env.SAAVN_API + url,
+    params:{id}
   };
-  try{
+  try {
     const data = await axios.request(options);
     return data.data;
-  }catch (error) {
+  } catch (error) {
     throw new Error(error);
   }
-}
+};
+
+export const fetchPlaylistById = async (url) => {
+  try {
+    const options = {
+      method: "GET",
+      url: process.env.SAAVN_API + url,
+    };
+    const data = await axios.request(options);
+    return data.data;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
