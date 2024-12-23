@@ -30,23 +30,7 @@ const userSchema = mongoose.Schema(
     rooms: [{ type: mongoose.Schema.Types.ObjectId, ref: "Room" }],
 
     playlists: [
-      {
-        playListName: {
-          type: String,
-          required: true,
-        },
-        albumId: {
-          type: String,
-          default: null,
-        },
-        artist: {
-          type: String,
-        },
-        imageUrl: {
-          type: String,
-        },
-        songs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Song" }],
-      },
+      {type:mongoose.Schema.Types.ObjectId,ref:"Playlist"}
     ],
     followers: {
       type: Array,

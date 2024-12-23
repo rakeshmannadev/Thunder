@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import usePlayerStore from "@/store/usePlayerStore";
 import useSocketStore from "@/store/useSocketStore";
 import useUserStore from "@/store/useUserStore";
-import { Clock, Pause, Play, Shuffle } from "lucide-react";
+import { CircleCheckBig, Clock, Pause, Play, PlusCircle, Shuffle } from "lucide-react";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
@@ -18,6 +18,7 @@ const PlaylistPage = () => {
     getPlaylistSongs,
     playlistLoading,
     playlists,
+    addAlbumToPlaylist
   } = useUserStore();
   const { isPlayingSong, isBroadcasting, pauseSong, playSong, roomId } =
     useSocketStore();
@@ -66,6 +67,27 @@ const PlaylistPage = () => {
     }
   }, [id, getPlaylistSongs, playlists]);
 
+  const handleAddAlbumToPlaylist = () => {
+    if (currentPlaylist) {
+      const songs: string[] = [];
+      currentPlaylist.songs.map((song) => {
+        songs.push(song._id);
+      });
+      addAlbumToPlaylist(
+        currentPlaylist.playlistId,
+        currentPlaylist.playlistName,
+        currentPlaylist.artist[0].name,
+        currentPlaylist.albumId,
+        currentPlaylist.imageUrl,
+        songs
+      );
+    }
+  };
+
+  const isAddedToPlaylist = playlists.find(
+    (playlist) => playlist.playlistId === currentPlaylist?.playlistId
+  );
+
   return (
     <div className="h-full">
       <ScrollArea className="h-full rounded-md">
@@ -91,13 +113,16 @@ const PlaylistPage = () => {
               <div className="flex flex-col justify-end">
                 {!playlistLoading && (
                   <h1 className=" text-2xl md:text-7xl font-bold my-4">
-                    {currentPlaylist?.playListName}
+                    {currentPlaylist?.playlistName}
                   </h1>
                 )}
                 {playlistLoading && <Skeleton className="h-10 w-[250px]" />}
                 {!playlistLoading && (
                   <div className="flex items-center gap-2 text-sm text-zinc-100">
-                    <span>{currentPlaylist?.artist}</span>
+                    {currentPlaylist?.artist.map((artist)=>(
+                      <span>{artist.name}</span>
+
+                    ))}
                     <span>● {currentPlaylist?.songs.length} Songs</span>
                   </div>
                 )}
@@ -121,6 +146,19 @@ const PlaylistPage = () => {
                   <Play className="h-7 w-7 text-black" />
                 )}
               </Button>
+
+                {/* Add to playlist button */}
+              {isAddedToPlaylist ? (
+                <CircleCheckBig
+                  className="size-7 cursor-pointer"
+                  color="green"
+                />
+              ) : (
+                <PlusCircle 
+                  onClick={handleAddAlbumToPlaylist}
+                  className="size-7 cursor-pointer"
+                />
+              )}
 
               <Shuffle
                 onClick={handleShufflePlaylist}

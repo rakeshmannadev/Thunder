@@ -79,6 +79,7 @@ const AlbumPage = () => {
         songs.push(song._id);
       });
       addAlbumToPlaylist(
+        null,
         currentAlbum.title,
         currentAlbum.artist,
         currentAlbum.albumId,

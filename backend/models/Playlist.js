@@ -1,8 +1,14 @@
 import mongoose from "mongoose";
 const playlistSchema = mongoose.Schema({
+
   playlistId: {
     type: String,
-    required: true,
+    required: false,
+    default:null,
+  },
+  albumId:{
+    type:String,
+    default:null,
   },
   playlistName: {
     type: String,
@@ -17,7 +23,7 @@ const playlistSchema = mongoose.Schema({
   songCount: {
     type: Number,
   },
-  artists: [
+  artist: [
     {
       artistId: { type: String },
       name: { type: String },
@@ -26,7 +32,7 @@ const playlistSchema = mongoose.Schema({
       type: { type: String },
     },
   ],
-  image: { type: String },
+  imageUrl: { type: String },
   songs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Song" }],
 });
 

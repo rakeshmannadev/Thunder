@@ -1,6 +1,9 @@
+import Playlist from "../models/Playlist.js";
 import Room from "../models/Room.js";
 import User from "../models/User.js";
-import mongoose from "mongoose";
+import mongoose, { isObjectIdOrHexString } from "mongoose";
+import { fetchPlaylistById } from "../services/saavn.js";
+import Song from "../models/Song.js";
 export const getJoinedRooms = async (req, res, next) => {
   try {
     const rooms = await Room.find({ _id: { $in: req.user.rooms } });
@@ -13,7 +16,9 @@ export const getJoinedRooms = async (req, res, next) => {
 
 export const getPlaylists = async (req, res, next) => {
   try {
-    res.status(200).json({ playlists: req.user.playlists });
+    const playlists = await Playlist.find({ _id: { $in: req.user.playlists } });
+
+    res.status(200).json({ playlists });
   } catch (error) {
     console.log("Error in getPlaylists user controller", error.message);
     next(error);
@@ -121,19 +126,37 @@ export const addToFavorite = async (req, res, next) => {
   try {
     const { songId, playListName, imageUrl, artist } = req.body;
     const user = req.user;
+    const playlists = await Playlist.find({
+      _id: { $in: req.user.playlists },
+    });
 
-    let favoritesPlayList = user.playlists.find(
-      (playlist) => playlist.playListName === "Favorites"
+    let favoritesPlayList = playlists.find(
+      (playlist) => playlist.playlistName === "Favorites"
     );
 
     if (!favoritesPlayList) {
-      favoritesPlayList = {
-        playListName,
-        artist,
+      const favoritesPlayList = await Playlist.create({
+        playlistName: playListName,
+        artist: [
+          {
+            artistId: user._id,
+            name: artist,
+            role: user.role,
+            image: user.image,
+            type: "User",
+          },
+        ],
         imageUrl,
-        songs: [],
-      };
-      user.playlists.push(favoritesPlayList);
+        songs: [songId],
+      });
+
+      user.playlists.push(favoritesPlayList._id);
+      await user.save();
+      return res.status(201).json({
+        status: true,
+        message: "Favorite playlist created",
+        playlist: favoritesPlayList,
+      });
     }
 
     if (favoritesPlayList.songs.includes(songId)) {
@@ -141,9 +164,10 @@ export const addToFavorite = async (req, res, next) => {
         .status(400)
         .json({ status: false, message: "Song is already in favorites!" });
     }
-    favoritesPlayList.songs.push(songId);
 
-    await user.save();
+    favoritesPlayList.songs.push(songId);
+    await favoritesPlayList.save();
+
     res.status(200).json({ status: true, message: "Song added to favorites" });
   } catch (error) {
     console.log("Error in addtoFavorite controller", error.message);
@@ -154,24 +178,80 @@ export const addToFavorite = async (req, res, next) => {
 export const getPlaylistSongs = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const user = req.user;
+    let songs=null;
+    if(isObjectIdOrHexString(id)){
+       songs = await Playlist.findById(id).populate("songs");
 
-    const songs = await User.aggregate([
-      { $match: { _id: new mongoose.Types.ObjectId(user._id) } }, // Match user by userId
-      { $unwind: "$playlists" }, // Decompose playlists array
-      { $match: { "playlists._id": new mongoose.Types.ObjectId(id) } }, // Match specific playlist by _id
-      {
-        $lookup: {
-          from: "songs", // Collection name for songs
-          localField: "playlists.songs",
-          foreignField: "_id",
-          as: "playlists.songs",
-        },
-      },
-      { $project: { playlists: 1 } }, // Keep only the matched playlist
-    ]);
+    }else{
+      songs = await Playlist.findOne({playlistId:id}).populate("songs");
+    }
 
-    res.status(200).json({ status: true, songs });
+    if (songs) return res.status(200).json({ status: true, songs });
+
+    const response = await fetch(` https://saavn.dev/api/playlists?id=${id}`);
+    const result = await response.json();
+    const fetchedPlaylist = result.data;
+
+    if (!result.success) {
+      return res
+        .status(404)
+        .json({ status: false, message: "No playlist found" });
+    }
+    // console.log(fetchedPlaylist.songs);
+    // Store songs in Song model
+    const songIds = [];
+    for (let i = 0; i < fetchedPlaylist.songs.length; i++) {
+      const song = await Song.findOne({ songId: fetchedPlaylist.songs[i].id });
+      console.log("Fetched song " + i, song);
+      if (!song) {
+        const newSong = new Song({
+          songId: fetchedPlaylist.songs[i].id,
+          title: fetchedPlaylist.songs[i].name,
+          artist: fetchedPlaylist.songs[i].artists.primary[0].name,
+          artistId: fetchedPlaylist.songs[i].artists.primary[0].id,
+          imageUrl: fetchedPlaylist.songs[i].image[2]?.url,
+          audioUrl: fetchedPlaylist.songs[i].downloadUrl[3]?.url,
+          releaseYear: fetchedPlaylist.songs[i].year,
+          duration: fetchedPlaylist.songs[i].duration,
+          albumId: fetchedPlaylist.songs[i].album.id,
+        });
+        await newSong.save();
+        console.log("song saved");
+        songIds.push(newSong._id);
+      } else {
+        songIds.push(song._id);
+      }
+    }
+
+    // store artists in temp artist array
+
+    const artists = [];
+    for (let i = 0; i < fetchedPlaylist.artists.length; i++) {
+      const newArtist = {
+        artistId: fetchedPlaylist.artists[i].id,
+        name: fetchedPlaylist.artists[i].name,
+        role: fetchedPlaylist.artists[i].role,
+        image: fetchedPlaylist.artists[i].image[2]?.url,
+        type: fetchedPlaylist.artists[i].type,
+      };
+      artists.push(newArtist);
+    }
+
+    // Store playlist in Playlist model
+    const newPlaylist = new Playlist({
+      playlistId: fetchedPlaylist.id,
+      playlistName: fetchedPlaylist.name,
+      description: fetchedPlaylist.description,
+      year: fetchedPlaylist.year,
+      songCount: fetchedPlaylist.songCount,
+      artist: artists,
+      imageUrl: fetchedPlaylist.image[2]?.url,
+      songs: songIds,
+    });
+    await newPlaylist.save();
+
+    const newSongs = await Playlist.findById(newPlaylist._id).populate("songs");
+    res.status(200).json({ status: true, songs: newSongs });
   } catch (error) {
     console.log("Error in getPlaylistSongs", error.message);
     next(error);
@@ -182,41 +262,47 @@ export const addToPlaylist = async (req, res, next) => {
     const { playlistId, artist, songId, playListName, imageUrl } = req.body;
 
     const user = req.user;
+    const playlist = await Playlist.findById(playlistId);
 
-    if (!playlistId) {
+    if (!playlist) {
       if (!playListName || !artist || !songId)
         return res
           .status(400)
           .json({ status: false, message: "Please provide all details" });
-      const playlist = await User.findOneAndUpdate(
-        {
-          _id: req.user._id,
-        },
-        {
-          $push: {
-            playlists: { playListName, imageUrl, artist, songs: [songId] },
+      const playlist = new Playlist({
+        playlistName: playListName,
+        artist: [
+          {
+            artistId: user._id,
+            name: artist,
+            role: user.role,
+            image: user.image,
+            type: "User",
           },
-        },
-        { new: true }
-      );
-      return res
-        .status(200)
-        .json({ status: true, message: "Album added to playlist", playlist });
+        ],
+        imageUrl,
+        songs: [songId],
+      });
+      await playlist.save();
+      user.playlists.push(playlist._id);
+      await user.save();
+
+      return res.status(200).json({
+        status: true,
+        message: "Playlist created",
+        playlist,
+      });
     }
 
-    user.playlists.map((playlist) => {
-      if (playlist._id.toString() === playlistId.toString()) {
-        if (playlist.songs.includes(songId)) {
-          return res.status(400).json({
-            status: false,
-            message: "Song is already in this playlist",
-          });
-        }
-        playlist.songs.push(songId);
-      }
-    });
+    if (playlist.songs.includes(songId)) {
+      return res.status(400).json({
+        status: false,
+        message: "Song is already in this playlist",
+      });
+    }
+    playlist.songs.push(songId);
 
-    await user.save();
+    await playlist.save();
     return res
       .status(200)
       .json({ status: true, message: "Song added to playlist" });
@@ -228,19 +314,19 @@ export const addToPlaylist = async (req, res, next) => {
 
 export const addAlbumToPlaylist = async (req, res, next) => {
   try {
-    const { playListName, imageUrl, artist, albumId, songs } = req.body;
+    const { playListName, imageUrl, artist,albumId,playlistId, songs } = req.body;
+    const user = req.user;
+    const playlist = new Playlist({
+      playlistName: playListName,
+      imageUrl,
+      playlistId,
+      albumId,
+      artist: { name: artist },
+      songs,
+    });
 
-    const playlist = await User.findOneAndUpdate(
-      {
-        _id: req.user._id,
-      },
-      {
-        $push: {
-          playlists: { playListName, imageUrl, artist, albumId, songs },
-        },
-      },
-      { new: true }
-    );
+    user.playlists.push(playlist._id);
+    Promise.all[(playlist.save(), user.save())];
     res
       .status(200)
       .json({ status: true, message: "Album added to playlist", playlist });

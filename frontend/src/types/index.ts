@@ -121,9 +121,12 @@ export interface Message {
 }
 export interface Playlist {
   _id: string | any;
-  playListName: string;
+  playlistId:string|null
+  playlistName: string;
+  year:string | null;
+  description:string|null;
   imageUrl: string;
-  artist: string;
+  artist: {artistId:string,name:string,role:string,image:string,type:string}[];
   albumId: string | any;
   songs: Song[] | any[];
 }

@@ -192,7 +192,7 @@ export const PlaybackControls = () => {
 
   let isAlreadyFavorite;
   const favoriteSongs = playlists.find(
-    (playlist) => playlist.playListName === "Favorites"
+    (playlist) => playlist.playlistName === "Favorites"
   );
 
   if (favoriteSongs && currentSong) {
@@ -313,7 +313,7 @@ export const PlaybackControls = () => {
                               key={playlist._id}
                               onClick={() => handleAddToPlaylist(playlist._id)}
                             >
-                              {playlist.playListName}
+                              {playlist.playlistName}
                             </DropdownMenuItem>
                           ))}
                       </DropdownMenuSubContent>
@@ -551,7 +551,7 @@ export const PlaybackControls = () => {
                             key={playlist._id}
                             onClick={() => handleAddToPlaylist(playlist._id)}
                           >
-                            {playlist.playListName}
+                            {playlist.playlistName}
                           </DropdownMenuItem>
                         ))}
                     </DropdownMenuSubContent>

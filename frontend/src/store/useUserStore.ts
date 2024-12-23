@@ -24,6 +24,7 @@ interface UserStore {
     imageUrl: string
   ) => Promise<void>;
   addAlbumToPlaylist: (
+    playlistId:string|null,
     playListName: string,
     artist: string,
     albumId: string | any,
@@ -105,13 +106,27 @@ const useUserStore = create<UserStore>((set, get) => ({
       });
 
       if (response.data.status) {
-        set((state) => ({
-          playlists: state.playlists.map((playlist) =>
-            playlist.playListName === playListName
-              ? { ...playlist, songs: [...playlist.songs, songId] }
-              : playlist
-          ),
-        }));
+        set((state) => {
+          const existingFavorites = state.playlists.find(
+            (playlist) => playlist.playlistName === "Favorites"
+          );
+
+          if (existingFavorites) {
+            // Update the existing 'Favorites' playlist
+            return {
+              playlists: state.playlists.map((playlist) =>
+                playlist.playlistName === "Favorites"
+                  ? { ...playlist, songs: [...playlist.songs, songId] }
+                  : playlist
+              ),
+            };
+          } else {
+            return {
+              playlists: [...state.playlists, response.data.playlist],
+            };
+          }
+        });
+
         toast.success(response.data.message);
       }
     } catch (error: any) {
@@ -125,7 +140,7 @@ const useUserStore = create<UserStore>((set, get) => ({
       const response = await axiosInstance.get(`/user/getPlaylistSongs/${id}`);
 
       if (response.data.status) {
-        set({ currentPlaylist: response.data.songs[0].playlists });
+        set({ currentPlaylist: response.data.songs });
       }
     } catch (error: any) {
       console.log(error.response.data.message);
@@ -160,19 +175,7 @@ const useUserStore = create<UserStore>((set, get) => ({
           }));
         } else {
           set((state) => ({
-            playlists: [
-              ...state.playlists,
-              {
-                _id: response.data.playlist.playlists[
-                  response.data.playlist.playlists.length - 1
-                ]._id,
-                playListName,
-                artist,
-                albumId: null,
-                imageUrl,
-                songs: [songId],
-              },
-            ],
+            playlists: [...state.playlists, response.data.playlist],
           }));
         }
         toast.success(response.data.message);
@@ -183,6 +186,7 @@ const useUserStore = create<UserStore>((set, get) => ({
     }
   },
   addAlbumToPlaylist: async (
+    playlistId,
     playListName,
     artist,
     albumId,
@@ -194,25 +198,14 @@ const useUserStore = create<UserStore>((set, get) => ({
         playListName,
         artist,
         albumId,
+        playlistId,
         imageUrl,
         songs,
       });
 
       if (response.data.status) {
         set((state) => ({
-          playlists: [
-            ...state.playlists,
-            {
-              _id: response.data.playlist.playlists[
-                response.data.playlist.playlists.length - 1
-              ]._id,
-              playListName,
-              artist,
-              albumId,
-              imageUrl,
-              songs,
-            },
-          ],
+          playlists: [...state.playlists, response.data.playlist],
         }));
         toast.success(response.data.message);
       }

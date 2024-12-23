@@ -303,7 +303,7 @@ const LeftSidebar = () => {
               playlists.length > 0 &&
               playlists.map((playlist) => (
                 <div key={playlist._id} className=" w-2/3 ">
-                  <TooltipComponent text={playlist.playListName}>
+                  <TooltipComponent text={playlist.playlistName}>
                     <Link
                       to={`/playlist/${playlist._id}`}
                       className={`p-2 max-sm:w-16 hover:bg-zinc-800 rounded-full md:rounded-md flex items-center gap-3 group cursor-pointer ${
@@ -317,10 +317,10 @@ const LeftSidebar = () => {
                       />
                       <div className="flex-1 min-w-0 hidden md:block">
                         <p className="font-medium truncate">
-                          {playlist.playListName}
+                          {playlist.playlistName}
                         </p>
                         <p className="text-sm text-zinc-400 truncate">
-                          playlist ● {playlist.artist}
+                          playlist ● {playlist.artist[0].name}
                         </p>
                       </div>
                     </Link>

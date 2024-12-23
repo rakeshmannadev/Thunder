@@ -28,6 +28,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.8.1",
     "node-cron": "^3.0.3",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "tunder": "file:"
   }
 }
