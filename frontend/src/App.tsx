@@ -11,6 +11,7 @@ import useSocketStore from "./store/useSocketStore";
 import AuthPage from "./Pages/Auth/AuthPage";
 import { Loader } from "lucide-react";
 import ArtistPage from "@/Pages/Artist/ArtistPage.tsx";
+import SinglePage from "./Pages/Single/SinglePage";
 
 function App() {
   const { currentUser, getCurrentUser, isLoading } = useUserStore();
@@ -58,6 +59,7 @@ function App() {
           <Route path="/album/:id" element={<AlbumPage />} />
           <Route path="/playlist/:id" element={<PlaylistPage />} />
           <Route path="/artist/:id" element={<ArtistPage/>} />
+          <Route path="/song/:id" element={<SinglePage/>} />
         </Route>
       </Routes>
       <Toaster position="bottom-right" />
