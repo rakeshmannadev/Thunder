@@ -13,11 +13,13 @@ const PlayButton = ({ song }: { song: Song }) => {
   const { currentUser } = useUserStore();
   const isCurrentSong = currentSong?._id === song._id;
 
-  const handlePlay = () => {
+  const handlePlay = (e:any) => {
+    e.preventDefault();
     if (currentUser && isBroadcasting) {
       if (isPlayingSong && isCurrentSong) {
         pauseSong(currentUser._id, roomId, song._id);
       } else {
+        
         playSong(currentUser._id, roomId, song._id, null);
       }
     } else if (isCurrentSong) {

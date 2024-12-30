@@ -12,11 +12,12 @@ import AuthPage from "./Pages/Auth/AuthPage";
 import { Loader } from "lucide-react";
 import ArtistPage from "@/Pages/Artist/ArtistPage.tsx";
 import SinglePage from "./Pages/Single/SinglePage";
+import usePlayerStore from "./store/usePlayerStore";
 
 function App() {
   const { currentUser, getCurrentUser, isLoading } = useUserStore();
   const { connectSocket, disconnectSocket } = useSocketStore();
-
+const {currentSong} = usePlayerStore();
   useEffect(() => {
     if (!currentUser) {
       getCurrentUser();
@@ -39,6 +40,13 @@ function App() {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [currentUser, disconnectSocket, connectSocket]);
+
+console.log(currentSong)
+  useEffect(()=>{
+    if(currentSong){
+      document.title=`${currentSong.title} | Thunder`
+    }
+  },[currentSong])
 
   if (isLoading)
     return (

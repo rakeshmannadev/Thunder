@@ -261,7 +261,7 @@ export const PlaybackControls = () => {
               </Link>
               <div className="hidden sm:block flex-1 min-w-0 truncate " ref={containerRef}>
                 <Link
-                  to={`/album/${currentSong.albumId}`}
+                  to={`/song/${currentSong.songId}`}
                   className={`font-medium inline-block ${isOverflowing ? 'animate-marquee':''} hover:underline cursor-pointer`}
                 >
                   {currentSong.title}

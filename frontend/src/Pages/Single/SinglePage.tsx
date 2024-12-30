@@ -245,12 +245,13 @@ const SinglePage = () => {
             <SelectSeparator />
 
             <div className="space-y-8 p-5">
-              <SectionGrid
-                title="More from album"
-                songs={currentAlbum?.songs || []}
-                isLoading={isLoading}
-              />
-
+              {currentAlbum && (
+                <SectionGrid
+                  title={`More from ${currentAlbum?.title}`}
+                  songs={currentAlbum?.songs || []}
+                  isLoading={isLoading}
+                />
+              )}
               <AlbumGrid
                 title="Albums by artist"
                 songs={currentArtist?.albums || []}
@@ -261,10 +262,6 @@ const SinglePage = () => {
               <div className="flex">
                 <ScrollArea type="always" className="w-1 flex-1">
                   <div className="flex gap-2 pb-4">
-                    <Artists />
-                    <Artists />
-                    <Artists />
-                    <Artists />
                     <Artists />
                     <Artists />
                     <Artists />
