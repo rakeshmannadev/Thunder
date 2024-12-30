@@ -10,7 +10,7 @@ type SectionGridProps = {
 };
 const AlbumGrid = ({ songs, title, isLoading }: SectionGridProps) => {
   if (isLoading) return <SectionGridSkeleton />;
-
+console.log(songs)
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between mb-4">
@@ -41,7 +41,7 @@ const AlbumGrid = ({ songs, title, isLoading }: SectionGridProps) => {
               </div>
             </div>
             <h3 className="font-medium mb-2 truncate">{song.title}</h3>
-            <p className="text-sm text-zinc-400 truncate">{song.artist}</p>
+            <p className="text-sm text-zinc-400 truncate">{song.artists.primary.map((artist)=>artist.name).join(", ")}</p>
           </Link>
         ))}
       </div>

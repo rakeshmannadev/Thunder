@@ -5,7 +5,7 @@ import usePlayerStore from "@/store/usePlayerStore";
 import useSocketStore from "@/store/useSocketStore";
 import useUserStore from "@/store/useUserStore";
 import { CircleCheckBig, Clock, Pause, Play, PlusCircle, Shuffle } from "lucide-react";
-import { useEffect } from "react";
+import { JSXElementConstructor, Key, ReactElement, ReactNode, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 const PlaylistPage = () => {
@@ -27,13 +27,13 @@ const PlaylistPage = () => {
     if (!currentPlaylist) return;
 
     const iscurrentPlaylistPlaying = currentPlaylist?.songs.some(
-      (song) => song._id === currentSong?._id
+      (song: { _id: string | undefined; }) => song._id === currentSong?._id
     );
     if (currentUser && isBroadcasting) {
-      if (isPlayingSong && iscurrentPlaylistPlaying) {
+      if (isPlayingSong && iscurrentPlaylistPlaying && currentSong) {
         pauseSong(currentUser._id, roomId, currentSong._id);
       } else {
-        playSong(currentUser._id, roomId, currentSong._id, null);
+        playSong(currentUser._id, roomId, currentSong!._id, null);
       }
     } else if (iscurrentPlaylistPlaying) {
       togglePlay();
@@ -70,7 +70,7 @@ const PlaylistPage = () => {
   const handleAddAlbumToPlaylist = () => {
     if (currentPlaylist) {
       const songs: string[] = [];
-      currentPlaylist.songs.map((song) => {
+      currentPlaylist.songs.map((song: { _id: string; }) => {
         songs.push(song._id);
       });
       addAlbumToPlaylist(
@@ -87,7 +87,7 @@ const PlaylistPage = () => {
   const isAddedToPlaylist = playlists.find(
     (playlist) => playlist.playlistId === currentPlaylist?.playlistId
   );
-
+console.log(currentPlaylist);
   return (
     <div className="h-full">
       <ScrollArea className="h-full rounded-md">
@@ -139,7 +139,7 @@ const PlaylistPage = () => {
               >
                 {isPlaying &&
                 currentPlaylist?.songs.some(
-                  (song) => song._id === currentSong?._id
+                  (song: { _id: string | undefined; }) => song._id === currentSong?._id
                 ) ? (
                   <Pause className="h-7 w-7 text-black" />
                 ) : (
@@ -187,7 +187,7 @@ const PlaylistPage = () => {
               <div className="px-6">
                 <div className="space-y-2 py-4">
                   {!playlistLoading &&
-                    currentPlaylist?.songs.map((song, index) => {
+                    currentPlaylist?.songs.map((song: { _id: Key | null | undefined; imageUrl: string | undefined; title: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined; artists: { primary: { name: any; }[]; }; createdAt: string; duration: number; }, index: number) => {
                       const isCurrentSong = currentSong?._id === song._id;
                       return (
                         <div
@@ -213,7 +213,7 @@ const PlaylistPage = () => {
                           <div className="flex items-center gap-3">
                             <img
                               src={song.imageUrl}
-                              alt={song.title}
+                              alt="song_img"
                               className="size-10"
                             />
 
@@ -221,7 +221,7 @@ const PlaylistPage = () => {
                               <div className={`font-medium text-white`}>
                                 {song.title}
                               </div>
-                              <div>{song.artist}</div>
+                              <div>{song.artists?.primary.map((artist)=>artist.name).join(", ")}</div>
                             </div>
                           </div>
                           <div className="flex items-center">

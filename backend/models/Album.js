@@ -10,9 +10,10 @@ const albumSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    artist: {
-      type: String,
+    artists: {
+      type: Object,
       required: true,
+      default: {},
     },
       artistId:{type:String},
     imageUrl: {

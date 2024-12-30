@@ -11,7 +11,7 @@ export const getAllAlbums = async (req, res, next) => {
           _id: 1,
           albumId: 1,
           title: 1,
-          artist: 1,
+          artists: 1,
           imageUrl: 1,
         },
       },
@@ -40,12 +40,16 @@ export const getAlbumById = async (req, res, next) => {
           const newSong = await Song.create({
             songId: song.id,
             title: song.name,
-            artist: song.artists?.primary[0]?.name,
+            artists: song.artists,
             artistId: song.artists?.primary[0]?.id,
             imageUrl: song.image[2].url,
             audioUrl: song.downloadUrl[3].url,
-            releaseYear: song.releaseDate,
+            releaseYear: song.year,
+            releaseDate: song.releaseDate,
             duration: song.duration,
+            playCount:song.playCount,
+            language:song.language,
+            label:song.label,
             albumId: song.album.id,
           });
           songs.push(newSong._id);
@@ -55,7 +59,7 @@ export const getAlbumById = async (req, res, next) => {
       const newAlbum = new Album({
         albumId: fetchedAlbum.id,
         title: fetchedAlbum.name,
-        artist: fetchedAlbum.artists?.primary[0]?.name,
+        artists: fetchedAlbum.artists,
         artistId:fetchedAlbum.artists?.primary[0]?.id,
         imageUrl: fetchedAlbum.image[2].url,
         releaseYear: fetchedAlbum.year,

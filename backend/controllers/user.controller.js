@@ -1,8 +1,8 @@
 import Playlist from "../models/Playlist.js";
 import Room from "../models/Room.js";
 import User from "../models/User.js";
-import mongoose, { isObjectIdOrHexString } from "mongoose";
-import { fetchPlaylistById } from "../services/saavn.js";
+import{ isObjectIdOrHexString } from "mongoose";
+
 import Song from "../models/Song.js";
 export const getJoinedRooms = async (req, res, next) => {
   try {
@@ -207,7 +207,7 @@ export const getPlaylistSongs = async (req, res, next) => {
         const newSong = new Song({
           songId: fetchedPlaylist.songs[i].id,
           title: fetchedPlaylist.songs[i].name,
-          artist: fetchedPlaylist.songs[i].artists.primary[0].name,
+          artists: fetchedPlaylist.songs[i].artists,
           artistId: fetchedPlaylist.songs[i].artists.primary[0].id,
           imageUrl: fetchedPlaylist.songs[i].image[2]?.url,
           audioUrl: fetchedPlaylist.songs[i].downloadUrl[3]?.url,

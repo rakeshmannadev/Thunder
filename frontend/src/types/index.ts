@@ -1,7 +1,16 @@
 export interface Song {
   _id: string;
+  songId: string;
   title: string;
-  artist: string;
+  artists: {
+    primary: [
+      {
+        id: string;
+        name: string;
+      }
+    ];
+    all: [];
+  };
   artistId: string;
   album: string;
   albumId: string;
@@ -10,6 +19,7 @@ export interface Song {
   duration: number;
   createdAt: string;
   updatedAt: string;
+  releaseDate:string;
 }
 
 export interface SearchedSong {
@@ -79,7 +89,16 @@ export interface Album {
   albumId: string;
   title: string;
   imageUrl: string;
-  artist: string;
+  artists: {
+    primary: [
+      {
+        id: string;
+        name: string;
+      }
+    ];
+    all: any[];
+    featured:any[];
+  };
   releaseYear: string;
   songs: Song[];
 }
@@ -121,14 +140,20 @@ export interface Message {
 }
 export interface Playlist {
   _id: string | any;
-  playlistId:string|null
+  playlistId: string | null;
   playlistName: string;
-  year:string | null;
-  description:string|null;
+  year: string | null;
+  description: string | null;
   imageUrl: string;
-  artist: {artistId:string,name:string,role:string,image:string,type:string}[];
+  artist: {
+    artistId: string;
+    name: string;
+    role: string;
+    image: string;
+    type: string;
+  }[];
   albumId: string | any;
-  songs: Song[] | any[];
+  songs: Song[] | any;
 }
 export interface User {
   _id: string;

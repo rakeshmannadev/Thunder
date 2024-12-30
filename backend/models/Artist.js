@@ -18,13 +18,13 @@ const artistSchema = new mongoose.Schema({
     albums:[{
         albumId:String,
         title:String,
-        artist:String,
+        artists:{type:Object,default:{}},
         imageUrl:String,
     }],
     singles:[{
         albumId:String,
         title:String,
-        artist:String,
+        artists:{type:Object,default:{}},
         imageUrl:String,
 
     }],

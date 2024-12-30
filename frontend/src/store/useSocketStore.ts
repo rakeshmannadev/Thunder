@@ -231,7 +231,7 @@ const useSocketStore = create<SocketState>((set, get) => ({
       const { songId } = data;
       const { isPlayingSong } = get();
       if (
-        usePlayerStore.getState().currentSong._id === songId &&
+        usePlayerStore.getState().currentSong!._id === songId &&
         isPlayingSong
       ) {
         set({ isPlayingSong: false });

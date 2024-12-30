@@ -1,5 +1,5 @@
 import Song from "../models/Song.js";
-import { fetchSong } from "../services/saavn.js";
+import { fetchSongById } from "../services/saavn.js";
 
 export const getAllSongs = async (req, res, next) => {
   try {
@@ -21,7 +21,7 @@ export const getFeaturedSongs = async (req, res, next) => {
         $project: {
           _id: 1,
           title: 1,
-          artist: 1,
+          artists: 1,
           artistId: 1,
           imageUrl: 1,
           audioUrl: 1,
@@ -45,7 +45,7 @@ export const getMadeForYou = async (req, res, next) => {
         $project: {
           _id: 1,
           title: 1,
-          artist: 1,
+          artists: 1,
           artistId: 1,
           imageUrl: 1,
           audioUrl: 1,
@@ -63,13 +63,13 @@ export const getTrending = async (req, res, next) => {
   try {
     const songs = await Song.aggregate([
       {
-        $sample: { size: 4 },
+        $sample: { size: 5 },
       },
       {
         $project: {
           _id: 1,
           title: 1,
-          artist: 1,
+          artists: 1,
           artistId: 1,
           imageUrl: 1,
           audioUrl: 1,
@@ -85,12 +85,31 @@ export const getTrending = async (req, res, next) => {
 };
 export const getSongById = async (req, res, next) => {
   const { songId } = req.params;
+
   try {
-    const song = await Song.findById(songId);
-    if (!song) {
-      return res.status(404).json({ status: false, message: "Song not found" });
+    const song = await Song.findOne({ songId });
+    if (song) {
+      return res.status(200).json({ status: true, song });
     }
-    res.status(200).json({ status: true, song });
+    const fetchedSong = await fetchSongById(`/songs?ids=${songId}`);
+   
+    const newSong = new Song({
+      songId: fetchedSong.id,
+      albumId: fetchedSong.album.id,
+      title: fetchedSong.name,
+      artists: fetchedSong.artists,
+      artistId: fetchedSong.artists.primary[0]?.id,
+      imageUrl: fetchedSong.artists.primary[0].image[2].url,
+      audioUrl: fetchedSong.downloadUrl[3].url,
+      releaseYear: fetchedSong.year,
+      releaseDate: fetchedSong.releaseDate,
+      duration: fetchedSong.duration,
+      playCount: fetchedSong.playCount,
+      language: fetchedSong.language,
+      label: fetchedSong.label,
+    });
+    await newSong.save();
+    res.status(200).json({status:true,song:newSong});
   } catch (error) {
     console.log("first error in getSongById controller", error.message);
     next(error);
@@ -105,7 +124,6 @@ export const searchSong = async (req, res, next) => {
     );
     const result = await fetchedResult.json();
 
-    console.log(result);
     res.status(200).json({ status: true, song: result.data });
   } catch (error) {
     res.status(500).json({ status: false, message: "Internal server errro" });

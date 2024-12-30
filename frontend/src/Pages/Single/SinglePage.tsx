@@ -55,10 +55,10 @@ const SinglePage = () => {
       (song) => song._id === currentSong?._id
     );
     if (currentUser && isBroadcasting) {
-      if (isPlayingSong && isCurrentAlbumPlaying) {
+      if (isPlayingSong && isCurrentAlbumPlaying && currentSong) {
         pauseSong(currentUser._id, roomId, currentSong._id);
       } else {
-        playSong(currentUser._id, roomId, currentSong._id, null);
+        playSong(currentUser._id, roomId, currentSong!._id, null);
       }
     } else if (isCurrentAlbumPlaying) {
       togglePlay();

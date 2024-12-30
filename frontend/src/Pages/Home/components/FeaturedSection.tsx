@@ -13,7 +13,7 @@ const FeaturedSection = () => {
   }, [fetchFeaturedSongs]);
 
   if (isLoading) return <FeaturedGridSkeleton />;
-  
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
       {featured.map((song) => (
@@ -29,7 +29,9 @@ const FeaturedSection = () => {
           />
           <div className="flex-1 p-4">
             <p className="font-medium truncate">{song.title}</p>
-            <p className="text-sm text-zinc-400 truncate">{song.artist}</p>
+            <p className="text-sm text-zinc-400 truncate">
+              {song.artists.primary.map((artist) => artist.name).join(", ")}
+            </p>
           </div>
           <PlayButton song={song} />
         </div>

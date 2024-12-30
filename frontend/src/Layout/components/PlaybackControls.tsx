@@ -42,7 +42,7 @@ import {
   Volume2,
   VolumeX,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
@@ -82,14 +82,13 @@ export const PlaybackControls = () => {
   } = useSocketStore();
   const { currentRoom } = useRoomStore();
 
-
   const [volume, setVolume] = useState(20);
   const [isMute, setMute] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [playlistName, setPlaylistName] = useState("");
   const [artist, setArtist] = useState("");
-  const  [isOverflowing, setIsOverflowing] = useState(false);
+  const [isOverflowing, setIsOverflowing] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -142,14 +141,13 @@ export const PlaybackControls = () => {
   }, [currentSong, isRepeat]);
 
   useEffect(() => {
-    const checkOverflow = ()=>{
-      if(containerRef.current){
+    const checkOverflow = () => {
+      if (containerRef.current) {
         setIsOverflowing(
-            containerRef.current.scrollWidth > containerRef.current.clientWidth
+          containerRef.current.scrollWidth > containerRef.current.clientWidth
         );
-
       }
-    }
+    };
     checkOverflow();
     window.addEventListener("resize", checkOverflow);
     return () => window.removeEventListener("resize", checkOverflow);
@@ -165,17 +163,20 @@ export const PlaybackControls = () => {
     if (isShuffle) return usePlayerStore.setState({ isShuffle: false });
 
     const songs = [...featured, ...trending];
-    const album = {
-      _id: "34234",
-      albumId: "42342",
-      title: "Shuffle album",
-      imageUrl: "shuffle",
-      artist: "various",
-      releaseYear: "null",
-      songs: songs,
-    };
     const randomIndex = Math.floor(Math.random() * songs.length);
-    useMusicStore.setState({ currentAlbum: album });
+    useMusicStore.setState({ currentAlbum: {
+      songs: [...songs],
+      _id: "",
+      albumId: "",
+      title: "",
+      imageUrl: "",
+      artists: {
+        primary: [{id:"shuffle",name:"shuffle"}],
+        all: [],
+        featured: []
+      },
+      releaseYear: ""
+    }});
     const updatedAlbum = useMusicStore.getState().currentAlbum;
 
     if (!updatedAlbum) return;
@@ -194,6 +195,7 @@ export const PlaybackControls = () => {
   const favoriteSongs = playlists.find(
     (playlist) => playlist.playlistName === "Favorites"
   );
+  console.log(favoriteSongs);
 
   if (favoriteSongs && currentSong) {
     isAlreadyFavorite = favoriteSongs.songs.includes(currentSong._id);
@@ -236,9 +238,9 @@ export const PlaybackControls = () => {
   const handleTogglePlay = () => {
     if (currentUser && isBroadcasting) {
       if (isPlayingSong) {
-        pauseSong(currentUser._id, roomId, currentSong._id);
+        pauseSong(currentUser._id, roomId, currentSong!._id);
       } else {
-        playSong(currentUser._id, roomId, currentSong._id, null);
+        playSong(currentUser._id, roomId, currentSong!._id, null);
       }
     } else {
       togglePlay();
@@ -259,16 +261,31 @@ export const PlaybackControls = () => {
                   className="w-14 h-14 object-cover rounded-md"
                 />
               </Link>
-              <div className="hidden sm:block flex-1 min-w-0 truncate " ref={containerRef}>
+              <div
+                className="hidden sm:block flex-1 min-w-0 truncate "
+                ref={containerRef}
+              >
                 <Link
                   to={`/song/${currentSong.songId}`}
-                  className={`font-medium inline-block ${isOverflowing ? 'animate-marquee':''} hover:underline cursor-pointer`}
+                  className={`font-medium inline-block ${
+                    isOverflowing ? "animate-marquee" : ""
+                  } hover:underline cursor-pointer`}
                 >
                   {currentSong.title}
                 </Link>
-                <Link to={`/artist/${currentSong.artistId}`} className="hidden sm:block text-sm text-zinc-400 truncate hover:underline cursor-pointer">
-                  {currentSong.artist}
-                </Link>
+                <div className="flex items-center gap-1">
+                  {currentSong.artists.primary.map((artist, index) => (
+                    <React.Fragment key={artist.id}>
+                      <Link
+                        to={`/artist/${artist.id}`}
+                        className="hidden sm:block text-sm text-zinc-400 truncate hover:underline cursor-pointer"
+                      >
+                        {artist.name}
+                      </Link>
+                      {index < currentSong.artists.primary.length - 1 && ", "}
+                    </React.Fragment>
+                  ))}
+                </div>
               </div>
             </>
           )}

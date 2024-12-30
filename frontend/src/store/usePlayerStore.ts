@@ -3,7 +3,7 @@ import { create } from "zustand";
 import useSocketStore from "./useSocketStore";
 
 interface PlayerStore {
-  currentSong: Song | any;
+  currentSong: Song |null;
   isPlaying: boolean;
   isShuffle: boolean;
   isRepeat: boolean;

@@ -25,12 +25,16 @@ export const getArtistById = async (req, res) => {
                  const newSong =    await Song.create({
                         songId:fetchedArtist.topSongs[i].id,
                         title:fetchedArtist.topSongs[i].name,
-                        artist:fetchedArtist.topSongs[i].artists.primary[0]?.name,
+                        artists:fetchedArtist.topSongs[i].artists,
                         artistId:fetchedArtist.topSongs[i].artists.primary[0]?.id,
                         imageUrl:fetchedArtist.topSongs[i].image[2]?.url,
                         audioUrl:fetchedArtist.topSongs[i].downloadUrl[3]?.url,
                         releaseYear:fetchedArtist.topSongs[i].year,
+                        releaseDate:fetchedArtist.topSongs[i].releaseDate,
                         duration:fetchedArtist.topSongs[i].duration,
+                        playCount:fetchedArtist.topSongs[i].playCount,
+                        language:fetchedArtist.topSongs[i].language,
+                        label:fetchedArtist.topSongs[i].label,
                         albumId: fetchedArtist.topSongs[i].album.id,
                     })
                 songIds.push(newSong._id);
@@ -49,7 +53,7 @@ export const getArtistById = async (req, res) => {
                 albums.push({
                     albumId:fetchedArtist.topAlbums[i].id,
                     title:fetchedArtist.topAlbums[i].name,
-                    artist:fetchedArtist.topAlbums[i].artists.primary[0]?.name,
+                    artists:fetchedArtist.topAlbums[i].artists,
                     imageUrl:fetchedArtist.topAlbums[i].image[2]?.url,
                 })
 
@@ -60,7 +64,7 @@ export const getArtistById = async (req, res) => {
                 singles.push({
                     albumId:fetchedArtist.singles[i].id,
                     title:fetchedArtist.singles[i].name,
-                    artist:fetchedArtist.singles[i].artists.primary[0]?.name,
+                    artists:fetchedArtist.singles[i].artists,
                     imageUrl:fetchedArtist.singles[i].image[2]?.url,
                 })
             }

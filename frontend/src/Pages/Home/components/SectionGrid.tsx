@@ -30,7 +30,7 @@ const SectionGrid = ({ songs, title, isLoading }: SectionGridProps) => {
           <div className="flex gap-2 pb-4">
             {songs.map((song) => (
               <Link
-              to={`/song/${song._id}`}
+                to={`/song/${song._id}`}
                 key={song._id}
                 className="bg-zinc-800/40 p-4 w-32 lg:w-60 rounded-md hover:bg-zinc-700/40 transition-all group cursor-pointer"
               >
@@ -46,7 +46,10 @@ const SectionGrid = ({ songs, title, isLoading }: SectionGridProps) => {
                   <PlayButton song={song} />
                 </div>
                 <h3 className="font-medium mb-2 truncate">{song.title}</h3>
-                <p className="text-sm text-zinc-400 truncate">{song.artist}</p>
+
+                <p className="text-sm text-zinc-400 truncate">
+                  {song.artists.primary.map((artist) => artist.name).join(", ")}
+                </p>
               </Link>
             ))}
           </div>

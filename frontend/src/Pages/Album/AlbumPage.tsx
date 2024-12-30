@@ -34,9 +34,9 @@ const AlbumPage = () => {
     );
     if (currentUser && isBroadcasting) {
       if (isPlayingSong && isCurrentAlbumPlaying) {
-        pauseSong(currentUser._id, roomId, currentSong._id);
+        pauseSong(currentUser._id, roomId, currentSong!._id);
       } else {
-        playSong(currentUser._id, roomId, currentSong._id, null);
+        playSong(currentUser._id, roomId, currentSong!._id, null);
       }
     } else if (isCurrentAlbumPlaying) {
       togglePlay();
@@ -81,7 +81,7 @@ const AlbumPage = () => {
       addAlbumToPlaylist(
         null,
         currentAlbum.title,
-        currentAlbum.artist,
+        currentAlbum.artists.primary[0].name,
         currentAlbum.albumId,
         currentAlbum.imageUrl,
         songs
@@ -121,7 +121,7 @@ const AlbumPage = () => {
                 {isLoading && <Skeleton className="h-10 w-[250px]" />}
                 {!isLoading && (
                   <div className="flex items-center gap-2 text-sm text-zinc-100">
-                    <span>{currentAlbum?.artist}</span>
+                    <span>{currentAlbum?.artists.primary.map((artist)=>artist.name).join(", ")}</span>
                     <span>● {currentAlbum?.songs.length} Songs</span>
                     <span>● {currentAlbum?.releaseYear}</span>
                   </div>
@@ -218,11 +218,11 @@ const AlbumPage = () => {
                               <div className={`font-medium text-white`}>
                                 {song.title}
                               </div>
-                              <div>{song.artist}</div>
+                              <div>{song.artists.primary.map((artist)=>artist.name).join(", ")}</div>
                             </div>
                           </div>
                           <div className="flex items-center">
-                            {song.createdAt?.split("T")[0]}
+                            {song.releaseDate}
                           </div>
                           <div className="flex items-center">
                             {formatDuration(song.duration)}

@@ -9,8 +9,9 @@ const songSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    artist: {
-      type: String,
+    artists: {
+      type: Object,
+      default:{},
     },
       artistId:{
         type: String,
@@ -25,9 +26,21 @@ const songSchema = mongoose.Schema(
     releaseYear: {
       type: String,
     },
+    releaseDate:{
+      type:String,
+    },
     duration: {
       type: Number,
       required: true,
+    },
+    playCount:{
+      type:String,
+    },
+    language:{
+      type:String,
+    },
+    label:{
+      type:String,
     },
     albumId: {
       type: String,
