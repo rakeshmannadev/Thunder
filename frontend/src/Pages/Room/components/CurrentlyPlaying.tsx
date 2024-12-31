@@ -14,7 +14,7 @@ const CurrentlyPlaying = ({ isMobile }: { isMobile: boolean }) => {
       <div className="flex gap-3 items-center  w-full">
         {isBroadcasting && isPlayingSong && (
           <img
-            src={currentSong.imageUrl}
+            src={currentSong!.imageUrl}
             alt="album"
             className="rounded-full size-8 animate-spin "
           />
@@ -26,9 +26,9 @@ const CurrentlyPlaying = ({ isMobile }: { isMobile: boolean }) => {
                 isPlayingSong ? (
                   <Link
                     className="hover:underline"
-                    to={`/album/${currentSong.albumId}`}
+                    to={`/album/${currentSong!.albumId}`}
                   >
-                    {currentSong.title}{" "}
+                    {currentSong!.title}{" "}
                   </Link>
                 ) : (
                   "Admin is about to broadcast"
@@ -43,9 +43,9 @@ const CurrentlyPlaying = ({ isMobile }: { isMobile: boolean }) => {
                 isPlayingSong ? (
                   <Link
                     className="hover:underline"
-                    to={`/album/${currentSong.albumId}`}
+                    to={`/album/${currentSong!.albumId}`}
                   >
-                    {currentSong.title}{" "}
+                    {currentSong!.title}{" "}
                   </Link>
                 ) : (
                   "Admin is about to broadcast"
@@ -57,7 +57,7 @@ const CurrentlyPlaying = ({ isMobile }: { isMobile: boolean }) => {
           )}
           {isBroadcasting && isPlayingSong && (
             <p className="text-emerald-50 text-sm font-semibold">
-              {currentSong.artist}
+              {currentSong!.artists.primary.map((artist)=>artist.name).join(", ")}
             </p>
           )}
         </div>

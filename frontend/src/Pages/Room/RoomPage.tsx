@@ -114,7 +114,7 @@ const RoomPage = () => {
       audio
     ) {
       intervalId = setInterval(() => {
-        updateTime(roomId, currentSong._id, audio?.currentTime);
+        updateTime(roomId, currentSong!._id, audio?.currentTime);
       }, 5000);
     }
     return () => clearInterval(intervalId);
