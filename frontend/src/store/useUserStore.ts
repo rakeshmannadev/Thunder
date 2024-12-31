@@ -26,7 +26,7 @@ interface UserStore {
   addAlbumToPlaylist: (
     playlistId:string|null,
     playListName: string,
-    artist: string,
+    artist: Array<any>,
     albumId: string | any,
     imageUrl: string,
     songs: Array<string>
@@ -38,11 +38,13 @@ interface UserStore {
   currentPlaylist: Playlist | null;
   isLoading: boolean;
   playlistLoading: boolean;
+  fetchingPlaylist: boolean;
 }
 
 const useUserStore = create<UserStore>((set, get) => ({
   isLoading: false,
   playlistLoading: false,
+  fetchingPlaylist:false,
   rooms: [],
   publicRooms: [],
   playlists: [],
@@ -68,7 +70,7 @@ const useUserStore = create<UserStore>((set, get) => ({
     }
   },
   fetchPlaylists: async () => {
-    set({ playlistLoading: true });
+    set({ fetchingPlaylist: true });
 
     try {
       const response = await axiosInstance.get("/user/getPlaylists");
@@ -76,7 +78,7 @@ const useUserStore = create<UserStore>((set, get) => ({
     } catch (error: any) {
       console.log(error.response.data.messages);
     } finally {
-      set({ playlistLoading: false });
+      set({ fetchingPlaylist: false });
     }
   },
   getCurrentUser: async () => {
@@ -91,7 +93,7 @@ const useUserStore = create<UserStore>((set, get) => ({
     }
   },
   addToFavorite: async (
-    artist: string,
+    artist:string,
     imageUrl: string,
     songId: string,
     playListName: string

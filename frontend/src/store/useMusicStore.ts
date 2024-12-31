@@ -10,6 +10,7 @@ interface MusicStore {
   currentArtist: Artist | null;
   trending: Song[];
   searchedSongs: SearchedSong | null;
+  single: Song | null;
   isLoading: boolean;
   searchLoading: boolean;
   fetchAllSongs: () => Promise<void>;
@@ -19,10 +20,12 @@ interface MusicStore {
   fetchTrendingSongs: () => Promise<void>;
   fetchAlbumById: (albumId: string) => Promise<void>;
   searchSong: (query: string) => Promise<void>;
+  fetchSingle: (id: string) => Promise<void>;
 }
 
 const useMusicStore = create<MusicStore>((set) => ({
   songs: [],
+  single: null,
   featured: [],
   madeForYouAlbums: [],
   trending: [],
@@ -62,6 +65,35 @@ const useMusicStore = create<MusicStore>((set) => ({
     } catch (error: any) {
       console.log(error.response.data.message);
       set({ currentArtist: null });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+  fetchSingle: async (id) => {
+    set({ isLoading: true });
+    try {
+      const response = await axiosInstance.get(`/songs/${id}`);
+      if (response.data) {
+        const albumResponse = await axiosInstance.get(
+          `/albums/${response.data.song.albumId}`
+        );
+        if (albumResponse.status) {
+          set({ currentAlbum: albumResponse.data.album });
+        }
+        const artistResponse = await axiosInstance.get(
+          `/artists/${response.data.song.artistId}`
+        );
+        if (artistResponse) {
+          set({ currentArtist: artistResponse.data.artist });
+        }
+        set({ single: response.data.song });
+      } else {
+        throw new Error(response.data.message);
+      }
+    } catch (error: any) {
+      console.log(error.response.data.message);
+      set({ single: null });
+      set({ currentAlbum: null });
     } finally {
       set({ isLoading: false });
     }

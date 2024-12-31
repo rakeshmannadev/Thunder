@@ -5,7 +5,7 @@ import { fetchAlbum, fetchSongById } from "../services/saavn.js";
 export const getAllAlbums = async (req, res, next) => {
   try {
     const albums = await Album.aggregate([
-      { $sample: { size: 4 } },
+      { $sample: { size: 5 } },
       {
         $project: {
           _id: 1,

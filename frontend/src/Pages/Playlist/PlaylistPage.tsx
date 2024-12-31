@@ -1,12 +1,26 @@
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import usePlayerStore from "@/store/usePlayerStore";
 import useSocketStore from "@/store/useSocketStore";
 import useUserStore from "@/store/useUserStore";
-import { CircleCheckBig, Clock, Pause, Play, PlusCircle, Shuffle } from "lucide-react";
-import { JSXElementConstructor, Key, ReactElement, ReactNode, useEffect } from "react";
+import {
+  CircleCheckBig,
+  Clock,
+  Pause,
+  Play,
+  PlusCircle,
+  Shuffle,
+} from "lucide-react";
+import {
+  JSXElementConstructor,
+  Key,
+  ReactElement,
+  ReactNode,
+  useEffect,
+} from "react";
 import { useParams } from "react-router-dom";
+import Artists from "../Single/Artists";
 
 const PlaylistPage = () => {
   const { id } = useParams();
@@ -18,7 +32,7 @@ const PlaylistPage = () => {
     getPlaylistSongs,
     playlistLoading,
     playlists,
-    addAlbumToPlaylist
+    addAlbumToPlaylist,
   } = useUserStore();
   const { isPlayingSong, isBroadcasting, pauseSong, playSong, roomId } =
     useSocketStore();
@@ -27,7 +41,7 @@ const PlaylistPage = () => {
     if (!currentPlaylist) return;
 
     const iscurrentPlaylistPlaying = currentPlaylist?.songs.some(
-      (song: { _id: string | undefined; }) => song._id === currentSong?._id
+      (song: { _id: string | undefined }) => song._id === currentSong?._id
     );
     if (currentUser && isBroadcasting) {
       if (isPlayingSong && iscurrentPlaylistPlaying && currentSong) {
@@ -70,13 +84,13 @@ const PlaylistPage = () => {
   const handleAddAlbumToPlaylist = () => {
     if (currentPlaylist) {
       const songs: string[] = [];
-      currentPlaylist.songs.map((song: { _id: string; }) => {
+      currentPlaylist.songs.map((song: { _id: string }) => {
         songs.push(song._id);
       });
       addAlbumToPlaylist(
         currentPlaylist.playlistId,
         currentPlaylist.playlistName,
-        currentPlaylist.artist[0].name,
+        currentPlaylist.artist,
         currentPlaylist.albumId,
         currentPlaylist.imageUrl,
         songs
@@ -87,7 +101,7 @@ const PlaylistPage = () => {
   const isAddedToPlaylist = playlists.find(
     (playlist) => playlist.playlistId === currentPlaylist?.playlistId
   );
-console.log(currentPlaylist);
+
   return (
     <div className="h-full">
       <ScrollArea className="h-full rounded-md">
@@ -119,10 +133,13 @@ console.log(currentPlaylist);
                 {playlistLoading && <Skeleton className="h-10 w-[250px]" />}
                 {!playlistLoading && (
                   <div className="flex items-center gap-2 text-sm text-zinc-100">
-                    {currentPlaylist?.artist.map((artist)=>(
-                      <span>{artist.name}</span>
-
-                    ))}
+                    <span>
+                      {currentPlaylist && currentPlaylist.artist.length > 3
+                        ? "Various artists"
+                        : currentPlaylist?.artist.map(
+                            (artist, idx) => idx < 3 && artist.name
+                          )}
+                    </span>
                     <span>● {currentPlaylist?.songs.length} Songs</span>
                   </div>
                 )}
@@ -139,7 +156,8 @@ console.log(currentPlaylist);
               >
                 {isPlaying &&
                 currentPlaylist?.songs.some(
-                  (song: { _id: string | undefined; }) => song._id === currentSong?._id
+                  (song: { _id: string | undefined }) =>
+                    song._id === currentSong?._id
                 ) ? (
                   <Pause className="h-7 w-7 text-black" />
                 ) : (
@@ -147,14 +165,14 @@ console.log(currentPlaylist);
                 )}
               </Button>
 
-                {/* Add to playlist button */}
+              {/* Add to playlist button */}
               {isAddedToPlaylist ? (
                 <CircleCheckBig
                   className="size-7 cursor-pointer"
                   color="green"
                 />
               ) : (
-                <PlusCircle 
+                <PlusCircle
                   onClick={handleAddAlbumToPlaylist}
                   className="size-7 cursor-pointer"
                 />
@@ -187,52 +205,97 @@ console.log(currentPlaylist);
               <div className="px-6">
                 <div className="space-y-2 py-4">
                   {!playlistLoading &&
-                    currentPlaylist?.songs.map((song: { _id: Key | null | undefined; imageUrl: string | undefined; title: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined; artists: { primary: { name: any; }[]; }; createdAt: string; duration: number; }, index: number) => {
-                      const isCurrentSong = currentSong?._id === song._id;
-                      return (
-                        <div
-                          key={song._id}
-                          onClick={() => handlePlaySong(index)}
-                          className={`grid grid-cols-[16px_4fr_2fr_1fr] gap-4 px-4 py-2 text-sm text-zinc-400 hover:bg-white/5 rounded-md group cursor-pointer`}
-                        >
-                          <div className="flex items-center justify-center">
-                            {isCurrentSong && isPlaying ? (
-                              <div className="size-4 text-green-500 animate-bounce">
-                                ♫
-                              </div>
-                            ) : (
-                              <span className="group-hover:hidden">
-                                {index + 1}
-                              </span>
-                            )}
-                            {!isCurrentSong && (
-                              <Play className="h-4 w-4 hidden group-hover:block" />
-                            )}
-                          </div>
+                    currentPlaylist?.songs.map(
+                      (
+                        song: {
+                          _id: Key | null | undefined;
+                          imageUrl: string | undefined;
+                          title:
+                            | string
+                            | number
+                            | boolean
+                            | ReactElement<
+                                any,
+                                string | JSXElementConstructor<any>
+                              >
+                            | Iterable<ReactNode>
+                            | null
+                            | undefined;
+                          artists: { primary: { name: any }[] };
+                          createdAt: string;
+                          duration: number;
+                        },
+                        index: number
+                      ) => {
+                        const isCurrentSong = currentSong?._id === song._id;
+                        return (
+                          <div
+                            key={song._id}
+                            onClick={() => handlePlaySong(index)}
+                            className={`grid grid-cols-[16px_4fr_2fr_1fr] gap-4 px-4 py-2 text-sm text-zinc-400 hover:bg-white/5 rounded-md group cursor-pointer`}
+                          >
+                            <div className="flex items-center justify-center">
+                              {isCurrentSong && isPlaying ? (
+                                <div className="size-4 text-green-500 animate-bounce">
+                                  ♫
+                                </div>
+                              ) : (
+                                <span className="group-hover:hidden">
+                                  {index + 1}
+                                </span>
+                              )}
+                              {!isCurrentSong && (
+                                <Play className="h-4 w-4 hidden group-hover:block" />
+                              )}
+                            </div>
 
-                          <div className="flex items-center gap-3">
-                            <img
-                              src={song.imageUrl}
-                              alt="song_img"
-                              className="size-10"
-                            />
+                            <div className="flex items-center gap-3">
+                              <img
+                                src={song.imageUrl}
+                                alt="song_img"
+                                className="size-10"
+                              />
 
-                            <div>
-                              <div className={`font-medium text-white`}>
-                                {song.title}
+                              <div>
+                                <div className={`font-medium text-white`}>
+                                  {song.title}
+                                </div>
+                                <div>
+                                  {song.artists?.primary
+                                    .map((artist) => artist.name)
+                                    .join(", ")}
+                                </div>
                               </div>
-                              <div>{song.artists?.primary.map((artist)=>artist.name).join(", ")}</div>
+                            </div>
+                            <div className="flex items-center">
+                              {song.createdAt.split("T")[0]}
+                            </div>
+                            <div className="flex items-center">
+                              {formatDuration(song.duration)}
                             </div>
                           </div>
-                          <div className="flex items-center">
-                            {song.createdAt.split("T")[0]}
-                          </div>
-                          <div className="flex items-center">
-                            {formatDuration(song.duration)}
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      }
+                    )}
+
+                  <h2 className="text-xl sm:text-2xl font-bold">Artists</h2>
+                  {/* Swiper for artists */}
+                  <div className="flex">
+                    <ScrollArea type="always" className="w-1 flex-1">
+                      <div className="flex gap-2 pb-4">
+                        {currentPlaylist &&
+                          currentPlaylist.artist.map((artist,idx) => (
+                            <Artists
+                              key={idx}
+                              artist={artist}
+                              playlistPage={true}
+                            />
+                          ))}
+                      </div>
+                      <ScrollBar orientation="horizontal" className="w-full" />
+                    </ScrollArea>
+                  </div>
+
                   {playlistLoading &&
                     Array.from({ length: 10 }).map((_, index) => {
                       return (

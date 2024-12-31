@@ -43,7 +43,7 @@ const LeftSidebar = () => {
 
   const { roomId, isPlayingSong, isJoined, leaveRoom } = useSocketStore();
   const {
-    playlistLoading,
+    fetchingPlaylist,
     rooms,
     playlists,
     fetchJoinedRooms,
@@ -296,7 +296,7 @@ const LeftSidebar = () => {
         {!currentUser && <LoginPrompt />}
         <ScrollArea className="h-[calc(100vh-400px)] w-fit md:w-full pb-10">
           <div className="space-y-2 w-full ">
-            {playlistLoading ? (
+            {fetchingPlaylist ? (
               <PlaylistSkeleton />
             ) : (
               playlists &&

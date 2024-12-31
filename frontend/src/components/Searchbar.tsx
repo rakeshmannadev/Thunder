@@ -59,9 +59,9 @@ const Searchbar = () => {
             {!searchLoading &&
               searchedSongs &&
               searchedSongs.topQuery.results.map((result, idx) => (
-                <CommandGroup>
+                <CommandGroup key={idx}>
                   {/*  TopQuery result section */}
-                  <CommandItem key={idx}>
+                  <CommandItem >
                     <Link
                       className="w-full flex gap-3 justify-start items-center"
                       to={`/${result.type}/${result.id}`}
@@ -93,8 +93,8 @@ const Searchbar = () => {
             {!searchLoading &&
               searchedSongs &&
               searchedSongs.songs.results.map((result, idx) => (
-                <CommandGroup>
-                  <CommandItem key={idx}>
+                <CommandGroup key={idx}>
+                  <CommandItem >
                     <Link
                       className="w-full flex gap-3 justify-start items-center"
                       to={`/song/${result.id}`}
@@ -123,8 +123,8 @@ const Searchbar = () => {
             {!searchLoading &&
               searchedSongs &&
               searchedSongs.albums.results.map((result, idx) => (
-                <CommandGroup>
-                  <CommandItem key={idx}>
+                <CommandGroup key={idx}>
+                  <CommandItem >
                     <Link
                       className="w-full flex gap-3 justify-start items-center"
                       to={`/album/${result.id}`}
@@ -153,8 +153,8 @@ const Searchbar = () => {
             {!searchLoading &&
               searchedSongs &&
               searchedSongs.playlists.results.map((result, idx) => (
-                <CommandGroup>
-                  <CommandItem key={idx}>
+                <CommandGroup key={idx}>
+                  <CommandItem >
                     <Link
                       className="w-full flex gap-3 justify-start items-center"
                       to={`/playlist/${result.id}`}

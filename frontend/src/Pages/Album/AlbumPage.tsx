@@ -81,7 +81,7 @@ const AlbumPage = () => {
       addAlbumToPlaylist(
         null,
         currentAlbum.title,
-        currentAlbum.artists.primary[0].name,
+        currentAlbum.artists.primary,
         currentAlbum.albumId,
         currentAlbum.imageUrl,
         songs
@@ -171,12 +171,12 @@ const AlbumPage = () => {
             <div className="bg-black/20 backdrop-blur-sm">
               {/* table header */}
               <div
-                className="grid grid-cols-[16px_4fr_2fr_1fr_1fr] gap-4 px-10 py-2 text-sm 
+                className="grid grid-cols-[16px_10fr_1fr] md:grid-cols-[16px_4fr_2fr_1fr_1fr] gap-4 px-10 py-2 text-sm  
             text-zinc-400 border-b border-white/5"
               >
                 <div>#</div>
                 <div>Title</div>
-                <div>Released Date</div>
+                <div className="hidden md:block">Released Date</div>
                 <div>
                   <Clock className="h-4 w-4" />
                 </div>
@@ -192,7 +192,7 @@ const AlbumPage = () => {
                         <div
                           key={song._id}
                           onClick={() => handlePlaySong(index)}
-                          className={`grid grid-cols-[16px_4fr_2fr_1fr_1fr] gap-4 px-4 py-2 text-sm text-zinc-400 hover:bg-white/5 rounded-md group cursor-pointer`}
+                          className={`grid grid-cols-[16px_10fr_1fr] md:grid-cols-[16px_4fr_2fr_1fr_1fr] gap-4 px-4 py-2 text-sm text-zinc-400 hover:bg-white/5 rounded-md group cursor-pointer`}
                         >
                           <div className="flex items-center justify-center">
                             {isCurrentSong && isPlaying ? (
@@ -215,18 +215,20 @@ const AlbumPage = () => {
                             />
 
                             <div>
-                              <div className={`font-medium text-white`}>
+                              <div className={`font-medium text-white truncate max-w-32 md:max-w-52`}>
                                 {song.title}
                               </div>
-                              <div>{song.artists.primary.map((artist)=>artist.name).join(", ")}</div>
+                              <div className="truncate max-w-24">{song.artists.primary.map((artist)=>artist.name).join(", ")}</div>
                             </div>
                           </div>
-                          <div className="flex items-center">
+                          <div className=" hidden md:flex items-center ">
                             {song.releaseDate}
                           </div>
                           <div className="flex items-center">
                             {formatDuration(song.duration)}
                           </div>
+
+                          {/*TODO: dropdown menu */}
                           <div className="flex items-center"></div>
                         </div>
                       );

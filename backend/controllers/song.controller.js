@@ -20,6 +20,7 @@ export const getFeaturedSongs = async (req, res, next) => {
       {
         $project: {
           _id: 1,
+          songId:1,
           title: 1,
           artists: 1,
           artistId: 1,
@@ -39,11 +40,12 @@ export const getMadeForYou = async (req, res, next) => {
   try {
     const songs = await Song.aggregate([
       {
-        $sample: { size: 4 },
+        $sample: { size: 5 },
       },
       {
         $project: {
           _id: 1,
+          songId:1,
           title: 1,
           artists: 1,
           artistId: 1,
@@ -68,6 +70,7 @@ export const getTrending = async (req, res, next) => {
       {
         $project: {
           _id: 1,
+          songId:1,
           title: 1,
           artists: 1,
           artistId: 1,

@@ -41,7 +41,7 @@ const {currentSong} = usePlayerStore();
     };
   }, [currentUser, disconnectSocket, connectSocket]);
 
-console.log(currentSong)
+
   useEffect(()=>{
     if(currentSong){
       document.title=`${currentSong.title} | Thunder`

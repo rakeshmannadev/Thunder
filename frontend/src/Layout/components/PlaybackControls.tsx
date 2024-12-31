@@ -195,7 +195,7 @@ export const PlaybackControls = () => {
   const favoriteSongs = playlists.find(
     (playlist) => playlist.playlistName === "Favorites"
   );
-  console.log(favoriteSongs);
+
 
   if (favoriteSongs && currentSong) {
     isAlreadyFavorite = favoriteSongs.songs.includes(currentSong._id);

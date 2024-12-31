@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import {
   Bird,
   Facebook,
-  Instagram,
+  Globe,
   Loader,
   Twitter,
   Verified,
@@ -93,7 +93,7 @@ const ArtistPage = () => {
                     </span>
                     <span>
                       <a href={currentArtist?.wiki} target="_blank">
-                        <Instagram />
+                        <Globe />
                       </a>{" "}
                     </span>
 

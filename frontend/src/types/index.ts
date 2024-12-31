@@ -20,6 +20,10 @@ export interface Song {
   createdAt: string;
   updatedAt: string;
   releaseDate:string;
+  releaseYear:string;
+  playCount:number,
+  label:string,
+  language:string
 }
 
 export interface SearchedSong {
@@ -105,7 +109,8 @@ export interface Album {
 export interface Artist {
   _id: string;
   name: string;
-  artistId: string;
+  artistId: string; 
+  role: string; 
   followers: number;
   fanCount: number;
   isVerified: boolean;
@@ -140,12 +145,14 @@ export interface Message {
 }
 export interface Playlist {
   _id: string | any;
+
   playlistId: string | null;
   playlistName: string;
   year: string | null;
   description: string | null;
   imageUrl: string;
   artist: {
+    id:string;
     artistId: string;
     name: string;
     role: string;

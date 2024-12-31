@@ -1,6 +1,5 @@
 import { Song } from "@/types";
 
-import { Button } from "@/components/ui/button";
 import PlayButton from "./PlayButton";
 import SectionGridSkeleton from "./SectionGridSkeleton";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -18,19 +17,14 @@ const SectionGrid = ({ songs, title, isLoading }: SectionGridProps) => {
     <div className="mb-8">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl sm:text-2xl font-bold">{title}</h2>
-        <Button
-          variant="link"
-          className="text-sm text-zinc-400 hover:text-white"
-        >
-          Show all
-        </Button>
+
       </div>
       <div className="flex">
         <ScrollArea type="always" className="flex-1 w-1">
           <div className="flex gap-2 pb-4">
             {songs.map((song) => (
               <Link
-                to={`/song/${song._id}`}
+                to={`/song/${song.songId}`}
                 key={song._id}
                 className="bg-zinc-800/40 p-4 w-32 lg:w-60 rounded-md hover:bg-zinc-700/40 transition-all group cursor-pointer"
               >
