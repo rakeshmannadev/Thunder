@@ -13,8 +13,6 @@ import { useState } from "react";
 const MainLayout = () => {
   const [isMobile] = useState(window.innerWidth < 768);
 
-
-
   return (
     <div className="h-screen bg-black text-white flex flex-col">
       <ResizablePanelGroup
@@ -24,7 +22,7 @@ const MainLayout = () => {
         <AudioPlayer />
         {/* Leftsidebar */}
         <ResizablePanel
-          defaultSize={15}
+          defaultSize={isMobile ? 0 : 15}
           minSize={isMobile ? 0 : 10}
           maxSize={20}
         >

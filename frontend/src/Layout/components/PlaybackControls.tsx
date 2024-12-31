@@ -303,9 +303,9 @@ export const PlaybackControls = () => {
                       aria-haspopup="true"
                       size="icon"
                       variant="ghost"
-                      className="hover:text-white text-zinc-400 sm:hidden "
+                      className="hover:text-white text-zinc-400 hidden md:block "
                     >
-                      <ListPlus className="h-4 w-4" />
+                      <ListPlus className="h-4 w-4 " />
                     </Button>
                   )}
                 </DropdownMenuTrigger>

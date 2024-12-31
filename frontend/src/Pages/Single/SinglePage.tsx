@@ -73,7 +73,7 @@ const SinglePage = () => {
     if (single) {
       const currUserName = currentUser?.name || "You";
 
-      addToFavorite(currUserName, single.imageUrl, single._id, "Favorites");
+      addToFavorite(currUserName, single.imageUrl, currentSong!._id, "Favorites");
     }
   };
 
@@ -92,7 +92,8 @@ const SinglePage = () => {
   if (favoriteSongs && currentSong) {
     isAlreadyFavorite = favoriteSongs.songs.includes(currentSong._id);
   }
-
+// console.log(currentSong)
+// console.log(favoriteSongs)
 
   return (
     <div className="h-full">
