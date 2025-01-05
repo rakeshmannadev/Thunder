@@ -71,9 +71,9 @@ const SinglePage = () => {
   };
   const handleAddToFavorite = () => {
     if (single) {
-      const currUserName = currentUser?.name || "You";
+  
 
-      addToFavorite(currUserName, single.imageUrl, currentSong!._id, "Favorites");
+      addToFavorite(currentSong!.artists.primary, single.imageUrl, currentSong!._id, "Favorites");
     }
   };
 
@@ -241,7 +241,7 @@ const SinglePage = () => {
                 <ScrollArea type="always" className="w-1 flex-1">
                   <div className="flex gap-2 pb-4">
                     {single && single.artists.all.map((artist,idx)=>(
-                      <Artists key={idx} artist={artist} playlistPage={false} />
+                      <Artists key={idx} artist={artist} />
 
                     ))}
                    

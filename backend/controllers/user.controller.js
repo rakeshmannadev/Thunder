@@ -1,7 +1,7 @@
 import Playlist from "../models/Playlist.js";
 import Room from "../models/Room.js";
 import User from "../models/User.js";
-import{ isObjectIdOrHexString } from "mongoose";
+import { isObjectIdOrHexString } from "mongoose";
 
 import Song from "../models/Song.js";
 export const getJoinedRooms = async (req, res, next) => {
@@ -137,15 +137,7 @@ export const addToFavorite = async (req, res, next) => {
     if (!favoritesPlayList) {
       const favoritesPlayList = await Playlist.create({
         playlistName: playListName,
-        artist: [
-          {
-            artistId: user._id,
-            name: artist,
-            role: user.role,
-            image: user.image,
-            type: "User",
-          },
-        ],
+        artist,
         imageUrl,
         songs: [songId],
       });
@@ -166,6 +158,20 @@ export const addToFavorite = async (req, res, next) => {
     }
 
     favoritesPlayList.songs.push(songId);
+    let flag = false;
+    for (let j = 0; j < favoritesPlayList.artist.length; j++) {
+      for (let i = 0; i < artist.length; i++) {
+        if (favoritesPlayList.artist[j].id == artist[i].id) {
+          flag = true;
+        }
+
+      }
+    }
+
+    if(!flag){
+      favoritesPlayList.artist.push(artist[0]);
+    }
+
     await favoritesPlayList.save();
 
     res.status(200).json({ status: true, message: "Song added to favorites" });
@@ -178,12 +184,11 @@ export const addToFavorite = async (req, res, next) => {
 export const getPlaylistSongs = async (req, res, next) => {
   try {
     const { id } = req.params;
-    let songs=null;
-    if(isObjectIdOrHexString(id)){
-       songs = await Playlist.findById(id).populate("songs");
-
-    }else{
-      songs = await Playlist.findOne({playlistId:id}).populate("songs");
+    let songs = null;
+    if (isObjectIdOrHexString(id)) {
+      songs = await Playlist.findById(id).populate("songs");
+    } else {
+      songs = await Playlist.findOne({ playlistId: id }).populate("songs");
     }
 
     if (songs) return res.status(200).json({ status: true, songs });
@@ -197,12 +202,12 @@ export const getPlaylistSongs = async (req, res, next) => {
         .status(404)
         .json({ status: false, message: "No playlist found" });
     }
-    // console.log(fetchedPlaylist.songs);
+
     // Store songs in Song model
     const songIds = [];
     for (let i = 0; i < fetchedPlaylist.songs.length; i++) {
       const song = await Song.findOne({ songId: fetchedPlaylist.songs[i].id });
-      console.log("Fetched song " + i, song);
+
       if (!song) {
         const newSong = new Song({
           songId: fetchedPlaylist.songs[i].id,
@@ -223,20 +228,6 @@ export const getPlaylistSongs = async (req, res, next) => {
       }
     }
 
-    // store artists in temp artist array
-
-    const artists = [];
-    for (let i = 0; i < fetchedPlaylist.artists.length; i++) {
-      const newArtist = {
-        artistId: fetchedPlaylist.artists[i].id,
-        name: fetchedPlaylist.artists[i].name,
-        role: fetchedPlaylist.artists[i].role,
-        image: fetchedPlaylist.artists[i].image[2]?.url,
-        type: fetchedPlaylist.artists[i].type,
-      };
-      artists.push(newArtist);
-    }
-
     // Store playlist in Playlist model
     const newPlaylist = new Playlist({
       playlistId: fetchedPlaylist.id,
@@ -244,7 +235,7 @@ export const getPlaylistSongs = async (req, res, next) => {
       description: fetchedPlaylist.description,
       year: fetchedPlaylist.year,
       songCount: fetchedPlaylist.songCount,
-      artist: artists,
+      artist: fetchedPlaylist.artists,
       imageUrl: fetchedPlaylist.image[2]?.url,
       songs: songIds,
     });
@@ -271,15 +262,7 @@ export const addToPlaylist = async (req, res, next) => {
           .json({ status: false, message: "Please provide all details" });
       const playlist = new Playlist({
         playlistName: playListName,
-        artist: [
-          {
-            artistId: user._id,
-            name: artist,
-            role: user.role,
-            image: user.image,
-            type: "User",
-          },
-        ],
+        artist,
         imageUrl,
         songs: [songId],
       });
@@ -314,14 +297,15 @@ export const addToPlaylist = async (req, res, next) => {
 
 export const addAlbumToPlaylist = async (req, res, next) => {
   try {
-    const { playListName, imageUrl, artist,albumId,playlistId, songs } = req.body;
+    const { playListName, imageUrl, artist, albumId, playlistId, songs } =
+      req.body;
     const user = req.user;
     const playlist = new Playlist({
       playlistName: playListName,
       imageUrl,
       playlistId,
       albumId,
-      artist: { name: artist },
+      artist: artist,
       songs,
     });
 

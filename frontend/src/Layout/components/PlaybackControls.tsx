@@ -204,10 +204,9 @@ export const PlaybackControls = () => {
   const handleAddToFavorite = () => {
     if (!currentSong) return toast.error("Play a song to add to favorite");
     if (currentSong) {
-      const currUserName = currentUser?.name || "You";
 
       addToFavorite(
-        currUserName,
+        currentSong.artists.primary,
         currentSong.imageUrl,
         currentSong._id,
         "Favorites"

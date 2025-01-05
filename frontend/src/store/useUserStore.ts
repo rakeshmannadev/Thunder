@@ -10,7 +10,7 @@ interface UserStore {
   fetchPlaylists: () => Promise<void>;
   getCurrentUser: () => Promise<void>;
   addToFavorite: (
-    artist: string,
+    artist: Array<any>,
     imageUrl: string,
     songId: string,
     playlistName: string
@@ -93,7 +93,7 @@ const useUserStore = create<UserStore>((set, get) => ({
     }
   },
   addToFavorite: async (
-    artist:string,
+    artist:Array<any>,
     imageUrl: string,
     songId: string,
     playListName: string

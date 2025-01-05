@@ -97,7 +97,7 @@ const PlaylistPage = () => {
       );
     }
   };
-
+console.log(currentPlaylist)
   const isAddedToPlaylist = playlists.find(
     (playlist) => playlist.playlistId === currentPlaylist?.playlistId
   );
@@ -138,7 +138,7 @@ const PlaylistPage = () => {
                         ? "Various artists"
                         : currentPlaylist?.artist.map(
                             (artist, idx) => idx < 3 && artist.name
-                          )}
+                          ).join(", ")}
                     </span>
                     <span>● {currentPlaylist?.songs.length} Songs</span>
                   </div>
@@ -208,6 +208,7 @@ const PlaylistPage = () => {
                     currentPlaylist?.songs.map(
                       (
                         song: {
+                          releaseDate: ReactNode;
                           _id: Key | null | undefined;
                           imageUrl: string | undefined;
                           title:
@@ -268,7 +269,7 @@ const PlaylistPage = () => {
                               </div>
                             </div>
                             <div className="flex items-center">
-                              {song.createdAt.split("T")[0]}
+                              {song.releaseDate}
                             </div>
                             <div className="flex items-center">
                               {formatDuration(song.duration)}
@@ -288,7 +289,6 @@ const PlaylistPage = () => {
                             <Artists
                               key={idx}
                               artist={artist}
-                              playlistPage={true}
                             />
                           ))}
                       </div>
