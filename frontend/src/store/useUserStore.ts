@@ -20,7 +20,7 @@ interface UserStore {
     playlistId: string | any,
     songId: string,
     playListName: string,
-    artist: string,
+    artist: Array<any>,
     imageUrl: string
   ) => Promise<void>;
   addAlbumToPlaylist: (

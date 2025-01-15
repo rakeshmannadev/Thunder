@@ -34,17 +34,13 @@ import { useEffect } from "react";
 import SectionGrid from "../Home/components/SectionGrid";
 import Artists from "./Artists";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import toast from "react-hot-toast";
 
 const SinglePage = () => {
   const { isPlaying, currentSong, togglePlay, playAlbum } = usePlayerStore();
-  const {
-    currentAlbum,
-    isLoading,
-    currentArtist,
-    single,
-    fetchSingle,
-  } = useMusicStore();
-  const { addToFavorite, currentUser,playlists } = useUserStore();
+  const { currentAlbum, isLoading, currentArtist, single, fetchSingle } =
+    useMusicStore();
+  const { addToFavorite, currentUser, playlists,addSongToPlaylist } = useUserStore();
   const { isPlayingSong, isBroadcasting, pauseSong, playSong, roomId } =
     useSocketStore();
 
@@ -54,7 +50,7 @@ const SinglePage = () => {
     if (!currentAlbum) return;
 
     const isCurrentAlbumPlaying = currentAlbum?.songs.some(
-      (song) => song._id === currentSong?._id
+      (song) => song.songId === currentSong?.songId
     );
     if (currentUser && isBroadcasting) {
       if (isPlayingSong && isCurrentAlbumPlaying && currentSong) {
@@ -66,15 +62,33 @@ const SinglePage = () => {
       togglePlay();
     } else {
       // start playing the album from the beginning
-      playAlbum(currentAlbum?.songs, 0);
+      const currentSongIdx = currentAlbum.songs.findIndex(
+        (song) => song.songId === id
+      );
+      playAlbum(currentAlbum?.songs, currentSongIdx);
     }
   };
   const handleAddToFavorite = () => {
     if (single) {
-  
-
-      addToFavorite(currentSong!.artists.primary, single.imageUrl, currentSong!._id, "Favorites");
+      addToFavorite(
+        currentSong!.artists.primary,
+        single.imageUrl,
+        currentSong!._id,
+        "Favorites"
+      );
     }
+  };
+
+  const handleAddToPlaylist = (playlistId:string,playlistName:string) => {
+    if (!currentSong) return toast.error("Play a song first");
+
+    addSongToPlaylist(
+      playlistId,
+      currentSong._id,
+      playlistName,
+     currentSong.artists.primary,
+      currentSong.imageUrl
+    );
   };
 
   useEffect(() => {
@@ -88,12 +102,12 @@ const SinglePage = () => {
     (playlist) => playlist.playlistName === "Favorites"
   );
 
-
   if (favoriteSongs && currentSong) {
     isAlreadyFavorite = favoriteSongs.songs.includes(currentSong._id);
   }
-// console.log(currentSong)
-// console.log(favoriteSongs)
+  // console.log(currentSong);
+  // console.log("single", single);
+  // console.log(favoriteSongs)
 
   return (
     <div className="h-full">
@@ -157,7 +171,10 @@ const SinglePage = () => {
                 className="w-14 h-14 rounded-full bg-green-500 hover:bg-green-400 
                 hover:scale-105 transition-all"
               >
-                {isPlaying && single && single._id === currentSong?._id ? (
+                {isPlaying &&
+                single &&
+                !isLoading &&
+                single.songId === currentSong?.songId ? (
                   <Pause className="h-7 w-7 text-black" />
                 ) : (
                   <Play className="h-7 w-7 text-black" />
@@ -192,7 +209,10 @@ const SinglePage = () => {
                 <DropdownMenuContent className="w-fit">
                   <DropdownMenuGroup>
                     <DropdownMenuItem className="hover:cursor-pointer">
-                      <Link to={`/album/${single?.albumId}`} className="flex gap-2">
+                      <Link
+                        to={`/album/${single?.albumId}`}
+                        className="flex gap-2"
+                      >
                         <Library className=" w-4" />
                         Go to album
                       </Link>
@@ -205,9 +225,18 @@ const SinglePage = () => {
                       </DropdownMenuSubTrigger>
                       <DropdownMenuPortal>
                         <DropdownMenuSubContent>
-                          <DropdownMenuItem className="hover:cursor-pointer">
-                            <span>Email</span>
-                          </DropdownMenuItem>
+                          {playlists &&
+                            playlists.map((playlist) => (
+                              <DropdownMenuItem
+                                className="cursor-pointer"
+                                key={playlist._id}
+                                onClick={() =>
+                                  handleAddToPlaylist(playlist._id,'')
+                                }
+                              >
+                                {playlist.playlistName}
+                              </DropdownMenuItem>
+                            ))}
                         </DropdownMenuSubContent>
                       </DropdownMenuPortal>
                     </DropdownMenuSub>
@@ -240,11 +269,10 @@ const SinglePage = () => {
               <div className="flex">
                 <ScrollArea type="always" className="w-1 flex-1">
                   <div className="flex gap-2 pb-4">
-                    {single && single.artists.all.map((artist,idx)=>(
-                      <Artists key={idx} artist={artist} />
-
-                    ))}
-                   
+                    {single &&
+                      single.artists.all.map((artist, idx) => (
+                        <Artists key={idx} artist={artist} />
+                      ))}
                   </div>
                   <ScrollBar orientation="horizontal" className="w-full" />
                 </ScrollArea>

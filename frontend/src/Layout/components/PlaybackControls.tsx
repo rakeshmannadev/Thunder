@@ -87,7 +87,6 @@ export const PlaybackControls = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [playlistName, setPlaylistName] = useState("");
-  const [artist, setArtist] = useState("");
   const [isOverflowing, setIsOverflowing] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -214,14 +213,14 @@ export const PlaybackControls = () => {
     }
   };
 
-  const handleAddToPlaylist = (playlistId = null) => {
+  const handleAddToPlaylist = (playlistId:string,playlistName:string) => {
     if (!currentSong) return toast.error("Play a song first");
 
     addSongToPlaylist(
       playlistId,
       currentSong._id,
       playlistName,
-      artist,
+     currentSong.artists.primary,
       currentSong.imageUrl
     );
     closeModal();
@@ -327,7 +326,7 @@ export const PlaybackControls = () => {
                             <DropdownMenuItem
                               className="cursor-pointer"
                               key={playlist._id}
-                              onClick={() => handleAddToPlaylist(playlist._id)}
+                              onClick={() => handleAddToPlaylist(playlist._id,'')}
                             >
                               {playlist.playlistName}
                             </DropdownMenuItem>
@@ -360,20 +359,9 @@ export const PlaybackControls = () => {
                       className="col-span-3"
                     />
                   </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <label htmlFor="username" className="text-right">
-                      Artist name
-                    </label>
-                    <Input
-                      onChange={(e) => setArtist(e.target.value)}
-                      id="username"
-                      placeholder="Arijit"
-                      className="col-span-3"
-                    />
-                  </div>
                 </div>
                 <DialogFooter>
-                  <Button onClick={() => handleAddToPlaylist(null)}>
+                  <Button onClick={() => handleAddToPlaylist('',playlistName)}>
                     Create playlist
                   </Button>
                 </DialogFooter>
@@ -565,7 +553,7 @@ export const PlaybackControls = () => {
                           <DropdownMenuItem
                             className="cursor-pointer"
                             key={playlist._id}
-                            onClick={() => handleAddToPlaylist(playlist._id)}
+                            onClick={() => handleAddToPlaylist(playlist._id,'')}
                           >
                             {playlist.playlistName}
                           </DropdownMenuItem>
@@ -597,21 +585,10 @@ export const PlaybackControls = () => {
                     placeholder="Party songs"
                     className="col-span-3"
                   />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <label htmlFor="username" className="text-right">
-                    Artist name
-                  </label>
-                  <Input
-                    onChange={(e) => setArtist(e.target.value)}
-                    id="username"
-                    placeholder="Arijit"
-                    className="col-span-3"
-                  />
-                </div>
+                </div> 
               </div>
               <DialogFooter>
-                <Button onClick={() => handleAddToPlaylist(null)}>
+                <Button onClick={() => handleAddToPlaylist('',playlistName)}>
                   Create playlist
                 </Button>
               </DialogFooter>

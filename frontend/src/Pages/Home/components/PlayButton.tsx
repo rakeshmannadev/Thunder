@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import useMusicStore from "@/store/useMusicStore";
 import usePlayerStore from "@/store/usePlayerStore";
 import useSocketStore from "@/store/useSocketStore";
 import useUserStore from "@/store/useUserStore";
@@ -11,7 +12,7 @@ const PlayButton = ({ song }: { song: Song }) => {
   const { isBroadcasting, isPlayingSong, playSong, pauseSong, roomId } =
     useSocketStore();
   const { currentUser } = useUserStore();
-  const isCurrentSong = currentSong?._id === song._id;
+  const isCurrentSong = currentSong?.songId === song.songId;
 
   const handlePlay = (e:any) => {
     e.preventDefault();
@@ -25,7 +26,9 @@ const PlayButton = ({ song }: { song: Song }) => {
     } else if (isCurrentSong) {
       togglePlay();
     } else {
+      console.log("Play button")
       setCurrentSong(song);
+      useMusicStore.setState({single:song});
     }
   };
 

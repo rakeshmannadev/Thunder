@@ -102,7 +102,7 @@ export const getSongById = async (req, res, next) => {
       title: fetchedSong.name,
       artists: fetchedSong.artists,
       artistId: fetchedSong.artists.primary[0]?.id,
-      imageUrl: fetchedSong.artists.primary[0].image[2].url,
+      imageUrl: fetchedSong.image[2].url,
       audioUrl: fetchedSong.downloadUrl[3].url,
       releaseYear: fetchedSong.year,
       releaseDate: fetchedSong.releaseDate,

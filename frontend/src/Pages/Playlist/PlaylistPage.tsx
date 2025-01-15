@@ -97,7 +97,7 @@ const PlaylistPage = () => {
       );
     }
   };
-console.log(currentPlaylist)
+
   const isAddedToPlaylist = playlists.find(
     (playlist) => playlist.playlistId === currentPlaylist?.playlistId
   );
