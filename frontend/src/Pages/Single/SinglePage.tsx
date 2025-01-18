@@ -97,6 +97,21 @@ const SinglePage = () => {
     }
   }, [id]);
 
+
+  const handleShare = () => {
+    if (navigator.share) {
+        navigator.share({
+            title: "Listen to this song on Thunder!",
+            text: single?.title,
+            url: window.location.href
+        }).then(() => toast.success("Song shared"))
+            .catch((error) => console.log(error))
+    } else {
+        toast.error("Your browser doesn't support his feature")
+    }
+}
+
+
   let isAlreadyFavorite;
   const favoriteSongs = playlists.find(
     (playlist) => playlist.playlistName === "Favorites"
@@ -240,7 +255,9 @@ const SinglePage = () => {
                         </DropdownMenuSubContent>
                       </DropdownMenuPortal>
                     </DropdownMenuSub>
-                    <DropdownMenuItem className="hover:cursor-pointer">
+                    <DropdownMenuItem 
+                    onClick={handleShare}
+                    className="hover:cursor-pointer">
                       <Share2 />
                       Share
                     </DropdownMenuItem>
