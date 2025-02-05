@@ -24,6 +24,22 @@ export const getPlaylists = async (req, res, next) => {
     next(error);
   }
 };
+export const getFavoriteSongs = async (req, res, next) => {
+  try {
+    const playlists = await Playlist.find({
+      _id: { $in: req.user.playlists },
+    }).populate("songs");
+
+    const favoriteSongs = playlists.filter(
+      (playlist) => playlist.playlistName === "Favorites"
+    );
+
+    res.status(200).json({ status: true, songs: favoriteSongs });
+  } catch (error) {
+    console.log("Error in getPlaylists user controller", error.message);
+    next(error);
+  }
+};
 
 export const getRooms = async (req, res, next) => {
   try {
@@ -164,11 +180,10 @@ export const addToFavorite = async (req, res, next) => {
         if (favoritesPlayList.artist[j].id == artist[i].id) {
           flag = true;
         }
-
       }
     }
 
-    if(!flag){
+    if (!flag) {
       favoritesPlayList.artist.push(artist[0]);
     }
 

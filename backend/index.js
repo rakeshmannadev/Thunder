@@ -22,11 +22,22 @@ import { app, server } from "./socket/socket.js";
 
 dotenv.config();
 const __dirname = path.resolve();
+const allowedOrigins = [
+  process.env.CLIENT_URL_WEB, // Web app URL
+  process.env.CLIENT_URL_NATIVE, // Native app URL
+];
 
 app.use(express.json());
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowd by CORS"));
+      }
+    },
     credentials: true,
   })
 );

@@ -20,7 +20,7 @@ export const getFeaturedSongs = async (req, res, next) => {
       {
         $project: {
           _id: 1,
-          songId:1,
+          songId: 1,
           title: 1,
           artists: 1,
           artistId: 1,
@@ -45,7 +45,7 @@ export const getMadeForYou = async (req, res, next) => {
       {
         $project: {
           _id: 1,
-          songId:1,
+          songId: 1,
           title: 1,
           artists: 1,
           artistId: 1,
@@ -70,7 +70,7 @@ export const getTrending = async (req, res, next) => {
       {
         $project: {
           _id: 1,
-          songId:1,
+          songId: 1,
           title: 1,
           artists: 1,
           artistId: 1,
@@ -95,7 +95,7 @@ export const getSongById = async (req, res, next) => {
       return res.status(200).json({ status: true, song });
     }
     const fetchedSong = await fetchSongById(`/songs?ids=${songId}`);
-   
+
     const newSong = new Song({
       songId: fetchedSong.id,
       albumId: fetchedSong.album.id,
@@ -112,7 +112,7 @@ export const getSongById = async (req, res, next) => {
       label: fetchedSong.label,
     });
     await newSong.save();
-    res.status(200).json({status:true,song:newSong});
+    res.status(200).json({ status: true, song: newSong });
   } catch (error) {
     console.log("first error in getSongById controller", error.message);
     next(error);
@@ -126,7 +126,7 @@ export const searchSong = async (req, res, next) => {
       `https://saavn.dev/api/search?query=${query}`
     );
     const result = await fetchedResult.json();
-
+    console.log(result);
     res.status(200).json({ status: true, song: result.data });
   } catch (error) {
     res.status(500).json({ status: false, message: "Internal server errro" });

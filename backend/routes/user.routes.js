@@ -4,6 +4,7 @@ import {
   addToFavorite,
   addToPlaylist,
   getCurrentUser,
+  getFavoriteSongs,
   getJoinedRooms,
   getJoinRequests,
   getPlaylists,
@@ -20,6 +21,7 @@ router.use(protectRoute);
 router.get("/getCurrentUser", getCurrentUser);
 router.get("/getJoinedRooms", getJoinedRooms);
 router.get("/getPlaylists", getPlaylists);
+router.get("/getFavoriteSongs", getFavoriteSongs);
 router.post("/addToFavorite", addToFavorite);
 router.post("/addToPlaylist", addToPlaylist);
 router.post("/addAlbumToPlaylist", addAlbumToPlaylist);
