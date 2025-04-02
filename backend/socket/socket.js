@@ -461,6 +461,7 @@ io.on("connection", (socket) => {
       songId,
       userName: user.name,
       requestedUser,
+      userId,
     });
 
     // push songId into currentSong map

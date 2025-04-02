@@ -14,21 +14,21 @@ const PlayButton = ({ song }: { song: Song }) => {
   const { currentUser } = useUserStore();
   const isCurrentSong = currentSong?.songId === song.songId;
 
-  const handlePlay = (e:any) => {
+  const handlePlay = (e: any) => {
     e.preventDefault();
     if (currentUser && isBroadcasting) {
       if (isPlayingSong && isCurrentSong) {
         pauseSong(currentUser._id, roomId, song._id);
       } else {
-        
-        playSong(currentUser._id, roomId, song._id, null);
+        // console.log(song._id + "in play button");
+        playSong(currentUser._id, roomId, song.songId, null);
       }
     } else if (isCurrentSong) {
       togglePlay();
     } else {
-      console.log("Play button")
+      // console.log("Play button");
       setCurrentSong(song);
-      useMusicStore.setState({single:song});
+      useMusicStore.setState({ single: song });
     }
   };
 

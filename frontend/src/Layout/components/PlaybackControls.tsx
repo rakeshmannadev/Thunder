@@ -163,19 +163,21 @@ export const PlaybackControls = () => {
 
     const songs = [...featured, ...trending];
     const randomIndex = Math.floor(Math.random() * songs.length);
-    useMusicStore.setState({ currentAlbum: {
-      songs: [...songs],
-      _id: "",
-      albumId: "",
-      title: "",
-      imageUrl: "",
-      artists: {
-        primary: [{id:"shuffle",name:"shuffle"}],
-        all: [],
-        featured: []
+    useMusicStore.setState({
+      currentAlbum: {
+        songs: [...songs],
+        _id: "",
+        albumId: "",
+        title: "",
+        imageUrl: "",
+        artists: {
+          primary: [{ id: "shuffle", name: "shuffle" }],
+          all: [],
+          featured: [],
+        },
+        releaseYear: "",
       },
-      releaseYear: ""
-    }});
+    });
     const updatedAlbum = useMusicStore.getState().currentAlbum;
 
     if (!updatedAlbum) return;
@@ -195,7 +197,6 @@ export const PlaybackControls = () => {
     (playlist) => playlist.playlistName === "Favorites"
   );
 
-
   if (favoriteSongs && currentSong) {
     isAlreadyFavorite = favoriteSongs.songs.includes(currentSong._id);
   }
@@ -203,7 +204,6 @@ export const PlaybackControls = () => {
   const handleAddToFavorite = () => {
     if (!currentSong) return toast.error("Play a song to add to favorite");
     if (currentSong) {
-
       addToFavorite(
         currentSong.artists.primary,
         currentSong.imageUrl,
@@ -213,14 +213,14 @@ export const PlaybackControls = () => {
     }
   };
 
-  const handleAddToPlaylist = (playlistId:string,playlistName:string) => {
+  const handleAddToPlaylist = (playlistId: string, playlistName: string) => {
     if (!currentSong) return toast.error("Play a song first");
 
     addSongToPlaylist(
       playlistId,
       currentSong._id,
       playlistName,
-     currentSong.artists.primary,
+      currentSong.artists.primary,
       currentSong.imageUrl
     );
     closeModal();
@@ -238,7 +238,7 @@ export const PlaybackControls = () => {
       if (isPlayingSong) {
         pauseSong(currentUser._id, roomId, currentSong!._id);
       } else {
-        playSong(currentUser._id, roomId, currentSong!._id, null);
+        playSong(currentUser._id, roomId, currentSong!.songId, null);
       }
     } else {
       togglePlay();
@@ -326,7 +326,9 @@ export const PlaybackControls = () => {
                             <DropdownMenuItem
                               className="cursor-pointer"
                               key={playlist._id}
-                              onClick={() => handleAddToPlaylist(playlist._id,'')}
+                              onClick={() =>
+                                handleAddToPlaylist(playlist._id, "")
+                              }
                             >
                               {playlist.playlistName}
                             </DropdownMenuItem>
@@ -361,7 +363,7 @@ export const PlaybackControls = () => {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button onClick={() => handleAddToPlaylist('',playlistName)}>
+                  <Button onClick={() => handleAddToPlaylist("", playlistName)}>
                     Create playlist
                   </Button>
                 </DialogFooter>
@@ -553,7 +555,9 @@ export const PlaybackControls = () => {
                           <DropdownMenuItem
                             className="cursor-pointer"
                             key={playlist._id}
-                            onClick={() => handleAddToPlaylist(playlist._id,'')}
+                            onClick={() =>
+                              handleAddToPlaylist(playlist._id, "")
+                            }
                           >
                             {playlist.playlistName}
                           </DropdownMenuItem>
@@ -585,10 +589,10 @@ export const PlaybackControls = () => {
                     placeholder="Party songs"
                     className="col-span-3"
                   />
-                </div> 
+                </div>
               </div>
               <DialogFooter>
-                <Button onClick={() => handleAddToPlaylist('',playlistName)}>
+                <Button onClick={() => handleAddToPlaylist("", playlistName)}>
                   Create playlist
                 </Button>
               </DialogFooter>
