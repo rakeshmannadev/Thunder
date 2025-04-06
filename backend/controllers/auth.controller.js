@@ -37,12 +37,14 @@ export const signup = async (req, res) => {
       gender,
       image: avatar,
     });
+    let token = null;
     if (newUser) {
-      generateTokenAndSetCookie(newUser._id, res);
+      token = generateTokenAndSetCookie(newUser._id, res);
       await newUser.save();
     }
     res.status(201).json({
       status: true,
+      accessToken: token,
       user: newUser,
     });
   } catch (error) {
@@ -68,9 +70,10 @@ export const login = async (req, res) => {
     }
 
     //res.status(200).json({message:"Login successfull"})
-    generateTokenAndSetCookie(user._id, res);
+    const token = generateTokenAndSetCookie(user._id, res);
     res.status(200).json({
       status: true,
+      accessToken: token,
       user,
       message: "Login successfull",
     });
@@ -82,7 +85,9 @@ export const login = async (req, res) => {
 export const logout = async (req, res) => {
   try {
     res.clearCookie("thunder");
-    res.status(200).json({ status: true, message: "Logout successfull" });
+    res
+      .status(200)
+      .json({ status: true, accessToken: null, message: "Logout successfull" });
   } catch (error) {
     console.log("Error in logout controller", error);
     res.status(500).json({ status: false, message: "Internal server error" });
