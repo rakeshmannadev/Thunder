@@ -153,7 +153,8 @@ export const addToFavorite = async (req, res, next) => {
     if (!favoritesPlayList) {
       const favoritesPlayList = await Playlist.create({
         playlistName: playListName,
-        artist,
+        artist:
+          artist && Array.isArray(artist) ? artist.filter(item !== "") : [], // filter out empty strings
         imageUrl,
         songs: [songId],
       });
