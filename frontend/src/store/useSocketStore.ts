@@ -178,6 +178,7 @@ const useSocketStore = create<SocketState>((set, get) => ({
     });
     socket.on("timeUpdated", (data) => {
       const audio = document.querySelector("audio");
+      console.log("audio", audio);
       if (audio) {
         audio.currentTime = parseInt(data.currentTime);
       }

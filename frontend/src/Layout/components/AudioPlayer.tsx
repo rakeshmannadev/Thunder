@@ -9,8 +9,8 @@ const AudioPlayer = () => {
 
   //  Handle play pause
   useEffect(() => {
-    if (isPlaying) audioRef.current?.play();
-    else audioRef.current?.pause();
+    if (isPlaying && audioRef && audioRef.current) audioRef.current.play();
+    else if (audioRef && audioRef.current) audioRef.current.pause();
   }, [isPlaying]);
 
   // handle song ends
@@ -33,9 +33,8 @@ const AudioPlayer = () => {
 
     const audio = audioRef.current;
     const isSongChange = prevSongRef.current !== currentSong.audioUrl;
-   
+
     if (isSongChange) {
-      
       audio.src = currentSong?.audioUrl;
       audio.currentTime = 0;
       prevSongRef.current = currentSong.audioUrl;

@@ -41,7 +41,7 @@ const RightSidebar = () => {
 
   const userCreatedRooms: string[] = [];
 
-  if ( currentUser) {
+  if (currentUser) {
     rooms.forEach((room) => {
       if (room.admin === currentUser._id) {
         userCreatedRooms.push(room._id);
@@ -50,7 +50,9 @@ const RightSidebar = () => {
   }
 
   useEffect(() => {
-    fetchJoinRequests(userCreatedRooms);
+    if (currentUser) {
+      fetchJoinRequests(userCreatedRooms);
+    }
   }, [fetchJoinRequests, userCreatedRooms.length]);
 
   useEffect(() => {
@@ -62,7 +64,7 @@ const RightSidebar = () => {
   }, [joinRequests.length]);
 
   useEffect(() => {
-    if (publicRooms.length <= 0) {
+    if (publicRooms.length <= 0 && currentUser) {
       fetchPublicRooms();
     }
   }, []);
@@ -72,8 +74,7 @@ const RightSidebar = () => {
     joinPublicRoom(roomId);
   };
   const handleSendRequest = (roomId: string) => {
-    if (!currentUser)
-      return toast.error("Please login to send request");
+    if (!currentUser) return toast.error("Please login to send request");
     sendJoinRequest(currentUser?._id, roomId);
   };
 
@@ -81,7 +82,7 @@ const RightSidebar = () => {
     <aside className="h-full flex flex-col gap-2">
       <section className="rounded-lg bg-zinc-900 p-4">
         <div className="flex  flex-col lg:flex-row  gap-2">
-          {currentUser&& (
+          {currentUser && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button

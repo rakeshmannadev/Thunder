@@ -8,7 +8,7 @@ const CurrentlyPlaying = ({ isMobile }: { isMobile: boolean }) => {
 
   const { isBroadcasting, userName, requestedUser, userId, isPlayingSong } =
     useSocketStore();
-
+  // console.log("requestedUser", requestedUser);
   return (
     <div className=" absolute top-0 w-full  p-4  bg-green-500/30 z-10  backdrop-blur-sm ">
       <div className="flex gap-3 items-center  w-full">
@@ -57,7 +57,9 @@ const CurrentlyPlaying = ({ isMobile }: { isMobile: boolean }) => {
           )}
           {isBroadcasting && isPlayingSong && (
             <p className="text-emerald-50 text-sm font-semibold">
-              {currentSong!.artists.primary.map((artist)=>artist.name).join(", ")}
+              {currentSong!.artists.primary
+                .map((artist) => artist.name)
+                .join(", ")}
             </p>
           )}
         </div>
@@ -69,7 +71,7 @@ const CurrentlyPlaying = ({ isMobile }: { isMobile: boolean }) => {
             </p>{" "}
             <Link to={`/profile/${requestedUser?._id || userId}`}>
               <Badge variant={"default"} className="cursor-pointer">
-                {userName || requestedUser?.name}
+                {requestedUser ? requestedUser.name : userName}
               </Badge>
             </Link>
           </div>

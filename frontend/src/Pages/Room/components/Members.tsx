@@ -22,7 +22,6 @@ const Members = ({
 
   const isActive =
     Array.isArray(activeUsers) && activeUsers.includes(member._id.toString());
-console.log(member)
   return (
     <div className="flex flex-col items-center gap-3 mt-2 hover:bg-zinc-600 rounded-md p-2 text-nowrap">
       {isLoading ? (

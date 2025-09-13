@@ -13,11 +13,12 @@ import {
 const app = express();
 
 const server = http.createServer(app);
-const CLIENT_URL = process.env.CLIENT_URL;
+const CLIENT_URL_WEB = process.env.CLIENT_URL_WEB;
+const CLIENT_URL_NATIVE = process.env.CLIENT_URL_NATIVE;
 
 const io = new Server(server, {
   cors: {
-    origin: [CLIENT_URL],
+    origin: [CLIENT_URL_WEB, CLIENT_URL_NATIVE],
     methods: ["GET", "POST"],
   },
 });
@@ -470,7 +471,7 @@ io.on("connection", (socket) => {
     }
 
     currentSong[roomId] = { songId, user };
-    console.log(`current songId ${currentSong[roomId]}`);
+    console.log(`current songId ${currentSong[roomId].songId}`);
     console.log(`Song played by admin: ${songId}`);
   });
   socket.on("updateTime", ({ roomId, currentTime }) => {

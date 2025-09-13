@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 
 export async function protectRoute(req, res, next) {
   try {
-    console.log("AccessToken from ascynstorage: " + req.headers.accesstoken);
+    // console.log("AccessToken from ascynstorage: " + req.headers.accesstoken);
     const token = req.cookies.thunder || req.headers.accesstoken;
     if (!token) {
       return res

@@ -84,7 +84,9 @@ const RoomPage = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      lastMessageRef.current!.scrollIntoView({ behavior: "smooth" });
+      if (lastMessageRef.current) {
+        lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
+      }
     }, 100);
   }, [currentRoom]);
 
@@ -110,11 +112,13 @@ const RoomPage = () => {
       isPlayingSong &&
       roomId &&
       currentUser &&
-      currentUser.role === "admin" &&
+      currentSong &&
+      currentRoom &&
+      currentRoom.admin === currentUser._id &&
       audio
     ) {
       intervalId = setInterval(() => {
-        updateTime(roomId, currentSong!._id, audio?.currentTime);
+        updateTime(roomId, currentSong.songId, audio.currentTime);
       }, 5000);
     }
     return () => clearInterval(intervalId);

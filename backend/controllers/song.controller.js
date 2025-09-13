@@ -1,3 +1,4 @@
+import { isValidObjectId } from "mongoose";
 import Song from "../models/Song.js";
 import { fetchSongById } from "../services/saavn.js";
 
@@ -90,11 +91,18 @@ export const getSongById = async (req, res, next) => {
   const { songId } = req.params;
 
   try {
+    const isValidMongoDbObjectId = isValidObjectId(songId);
+    if (isValidMongoDbObjectId) {
+      const song = await Song.findById(songId);
+      return res.status(200).json({ status: true, song });
+    }
     const song = await Song.findOne({ songId });
     if (song) {
       return res.status(200).json({ status: true, song });
     }
+
     const fetchedSong = await fetchSongById(`/songs?ids=${songId}`);
+    console.log("song from saavn api: ", fetchedSong);
 
     const newSong = new Song({
       songId: fetchedSong.id,
@@ -114,7 +122,7 @@ export const getSongById = async (req, res, next) => {
     await newSong.save();
     res.status(200).json({ status: true, song: newSong });
   } catch (error) {
-    console.log("first error in getSongById controller", error.message);
+    console.log("Error in getSongById controller", error.message);
     next(error);
   }
 };
